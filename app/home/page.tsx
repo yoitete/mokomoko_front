@@ -2,6 +2,12 @@ import React from "react";
 import Image from "next/image";
 import blanketBlack from "@/public/images/blanket_black_1.png";
 import blanketBeige from "@/public/images/blanket_beige_1.png";
+import blanketGray from "@/public/images/blanket_gray_1.png";
+import blanketPattern from "@/public/images/blanket_pattern_1.png";
+import blanketLightGray from "@/public/images/blanket_lightgray_1.png";
+import blanketBrown from "@/public/images/blanket_brown_1.png";
+import blanketWhite2 from "@/public/images/blanket_white2_1.png";
+import blanketWhite from "@/public/images/blanket_white_1.png";
 import { SlideBox } from "@/components/SlideBox/SlideBox";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 
@@ -12,9 +18,9 @@ export default function Home() {
       <div className="flex justify-end mt-5">
         <SlideBox>
           <div className="flex gap-4">
-            <Image src={blanketBlack} alt="black1" />
-            <Image src={blanketBeige} alt="beige1" />
-            <Image src={blanketBlack} alt="black2" />
+            <Image src={blanketBlack} alt="black1" height={118} width={160} />
+            <Image src={blanketBeige} alt="beige1" height={118} width={160} />
+            <Image src={blanketBlack} alt="black2" height={118} width={160} />
             <Image src={blanketBeige} alt="beige2" />
             <Image src={blanketBlack} alt="black3" />
             <Image src={blanketBeige} alt="beige3" />
@@ -22,16 +28,47 @@ export default function Home() {
         </SlideBox>
       </div>
 
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
-        人気ランキング
+      <div className="mt-8 text-center">人気ランキング</div>
+      <div className="mt-5 ml-2 text-left">春・夏☘️</div>
+      <div className="flex justify-end">
+        <SlideBox>
+          <div className="flex gap-4">
+            <Image src={blanketGray} alt="gray1" height={118} width={160} />
+            <Image
+              src={blanketPattern}
+              alt="pattern"
+              height={118}
+              width={160}
+            />
+            <Image src={blanketBeige} alt="beige3" height={118} width={160} />
+            <Image
+              src={blanketLightGray}
+              alt="lightgray1"
+              height={118}
+              width={160}
+            />
+          </div>
+        </SlideBox>
       </div>
-      <div style={{ textAlign: "left", marginTop: "20px" }}></div>
-      <SlideBox>{}</SlideBox>
-      <SlideBox>{}</SlideBox>
-      <div style={{ textAlign: "center", marginTop: "20px" }}>特集</div>
-      <SlideBox>{}</SlideBox>
-      <div style={{ textAlign: "center", marginTop: "20px" }}></div>
-      <SimpleBox>{}受験応援！あったか毛布あったか毛布特集</SimpleBox>
+
+      <div className="mt-5 ml-2 text-left">秋・冬🍁</div>
+      <div className="flex justify-end">
+        <SlideBox>
+          <div className="flex gap-4">
+            <Image src={blanketBlack} alt="black1" height={118} width={160} />
+            <Image src={blanketBrown} alt="brown1" height={118} width={160} />
+            <Image src={blanketWhite2} alt="White2" height={118} width={160} />
+            <Image src={blanketWhite} alt="White" height={118} width={160} />
+          </div>
+        </SlideBox>
+      </div>
+      {/* https://tailwindcss.com/docs/font-size */}
+      <div className="mt-5 text-center text-2xl">特集</div>
+      <div className="mx-4">
+        <SimpleBox className="h-72 flex justify-center items-start">
+          クリスマス特集
+        </SimpleBox>
+      </div>
     </div>
   );
 }
