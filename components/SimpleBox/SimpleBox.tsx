@@ -10,6 +10,7 @@ export const SimpleBox = ({
       bg-white
       mt-5
       p-4
+      pl-12
       w-full
       rounded-lg
       shadow

@@ -10,11 +10,12 @@ import blanketWhite2 from "@/public/images/blanket_white2_1.png";
 import blanketWhite from "@/public/images/blanket_white_1.png";
 import { SlideBox } from "@/components/SlideBox/SlideBox";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
+import { BoxImage } from "@/components/BoxImage/BoxImage";
 
 export default function Home() {
   return (
     <div>
-      <div className="mt-5 text-center">新着情報</div>
+      <div className="mt-5 text-center text-2xl">新着情報</div>
       <div className="flex justify-end mt-5">
         <SlideBox>
           <div className="flex gap-4">
@@ -28,7 +29,7 @@ export default function Home() {
         </SlideBox>
       </div>
 
-      <div className="mt-8 text-center">人気ランキング</div>
+      <div className="mt-8 text-center text-2xl">人気ランキング</div>
       <div className="mt-5 ml-2 text-left">春・夏☘️</div>
       <div className="flex justify-end">
         <SlideBox>
@@ -64,9 +65,33 @@ export default function Home() {
       </div>
       {/* https://tailwindcss.com/docs/font-size */}
       <div className="mt-5 text-center text-2xl">特集</div>
-      <div className="mx-4">
-        <SimpleBox className="h-72 flex justify-center items-start">
-          クリスマス特集
+      <div className="mx-4 mb-2">
+        <SimpleBox className="h-110 flex flex-col justify-start items-center p-4">
+          <p className="text-center text-lg font-semibold mb-4">
+            クリスマス特集
+          </p>
+
+          <div className="grid grid-cols-2 gap-2 w-full">
+            <BoxImage src={blanketBeige} alt="beige1" />
+            <BoxImage src={blanketBrown} alt="brown1" />
+            <BoxImage src={blanketGray} alt="gray1" />
+            <BoxImage src={blanketWhite} alt="navy1" />
+          </div>
+        </SimpleBox>
+      </div>
+
+      <div className="mx-4 mb-2">
+        <SimpleBox className="h-110 flex flex-col justify-start items-center p-4">
+          <div className="text-center font-semibold mb-4">
+            <p>受験応援！</p>
+            <p>あったか毛布特集</p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 w-full">
+            <BoxImage src={blanketBeige} alt="beige1" />
+            <BoxImage src={blanketBrown} alt="brown1" />
+            <BoxImage src={blanketGray} alt="gray1" />
+            <BoxImage src={blanketWhite} alt="navy1" />
+          </div>
         </SimpleBox>
       </div>
     </div>
