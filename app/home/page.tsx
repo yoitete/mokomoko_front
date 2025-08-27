@@ -1,3 +1,4 @@
+import Header from "@/components/Header/Header";
 import React from "react";
 import Image from "next/image";
 import blanketBlack from "@/public/images/blanket_black_1.png";
@@ -15,18 +16,21 @@ import { BoxImage } from "@/components/BoxImage/BoxImage";
 export default function Home() {
   return (
     <div>
-      <div className="mt-5 text-center text-2xl">新着情報</div>
-      <div className="flex justify-end mt-5">
-        <SlideBox>
-          <div className="flex gap-4">
-            <Image src={blanketBlack} alt="black1" height={118} width={160} />
-            <Image src={blanketBeige} alt="beige1" height={118} width={160} />
-            <Image src={blanketBlack} alt="black2" height={118} width={160} />
-            <Image src={blanketBeige} alt="beige2" />
-            <Image src={blanketBlack} alt="black3" />
-            <Image src={blanketBeige} alt="beige3" />
-          </div>
-        </SlideBox>
+      <Header />
+      <div className="mt-20">
+        <div className="mt-5 text-center text-2xl">新着情報</div>
+        <div className="flex justify-end mt-5">
+          <SlideBox>
+            <div className="flex gap-4">
+              <Image src={blanketBlack} alt="black1" height={118} width={160} />
+              <Image src={blanketBeige} alt="beige1" height={118} width={160} />
+              <Image src={blanketBlack} alt="black2" height={118} width={160} />
+              <Image src={blanketBeige} alt="beige2" />
+              <Image src={blanketBlack} alt="black3" />
+              <Image src={blanketBeige} alt="beige3" />
+            </div>
+          </SlideBox>
+        </div>
       </div>
 
       <div className="mt-8 text-center text-2xl">人気ランキング</div>
