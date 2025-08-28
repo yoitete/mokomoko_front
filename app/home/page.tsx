@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <div>
       <Header />
-      <div className="mt-20">
+      <div className="mt-10">
         <div className="mt-5 text-center text-2xl">新着情報</div>
         <div className="flex justify-end mt-5">
           <SlideBox>
@@ -68,8 +68,9 @@ export default function Home() {
         </SlideBox>
       </div>
       {/* https://tailwindcss.com/docs/font-size */}
-      <div className="mt-5 text-center text-2xl">特集</div>
-      <div className="mx-4 mb-2">
+      <div className="mt-10"></div>
+      <div className="mt-5 mb-10 text-center text-2xl">特集</div>
+      <div className="mx-4 mb-5">
         <SimpleBox className="h-110 flex flex-col justify-start items-center p-4">
           <p className="text-center text-lg font-semibold mb-4">
             クリスマス特集
