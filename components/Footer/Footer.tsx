@@ -2,7 +2,7 @@
 
 import { faHouse, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -20,7 +20,7 @@ export default function Footer() {
         className="cursor-pointer text-[#F1F6F7]"
       />
       <FontAwesomeIcon
-        icon={faPlus}
+        icon={faHeart}
         size="2x"
         className="cursor-pointer text-[#F1F6F7]"
       />

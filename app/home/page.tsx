@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <div>
       <div className="mt-10">
-        <div className="mt-5 text-center text-2xl">新着情報</div>
+        <div className="mt-5 text-center text-2xl font-semibold">新着情報</div>
         <div className="flex justify-end mt-5">
           <SlideBox>
             <div className="flex gap-4">
@@ -34,7 +34,7 @@ export default function Home() {
       <div className="mt-8 text-center text-2xl font-semibold">
         人気ランキング
       </div>
-      <div className="mt-5 ml-3 text-left font-semibold">春・夏☘️</div>
+      <div className="mt-5 ml-6 text-left font-semibold">春・夏☘️</div>
       <div className="flex justify-end">
         <SlideBox>
           <div className="flex gap-4">
@@ -56,7 +56,7 @@ export default function Home() {
         </SlideBox>
       </div>
 
-      <div className="mt-5 ml-3 text-left font-semibold">秋・冬🍁</div>
+      <div className="mt-5 ml-6 text-left font-semibold">秋・冬🍁</div>
       <div className="flex justify-end">
         <SlideBox>
           <div className="flex gap-4">
