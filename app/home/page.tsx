@@ -1,4 +1,3 @@
-import Header from "@/components/Header/Header";
 import React from "react";
 import Image from "next/image";
 import blanketBlack from "@/public/images/blanket_black_1.png";
@@ -16,7 +15,6 @@ import { BoxImage } from "@/components/BoxImage/BoxImage";
 export default function Home() {
   return (
     <div>
-      <Header />
       <div className="mt-10">
         <div className="mt-5 text-center text-2xl">新着情報</div>
         <div className="flex justify-end mt-5">
@@ -33,8 +31,10 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mt-8 text-center text-2xl">人気ランキング</div>
-      <div className="mt-5 ml-2 text-left">春・夏☘️</div>
+      <div className="mt-8 text-center text-2xl font-semibold">
+        人気ランキング
+      </div>
+      <div className="mt-5 ml-3 text-left font-semibold">春・夏☘️</div>
       <div className="flex justify-end">
         <SlideBox>
           <div className="flex gap-4">
@@ -56,7 +56,7 @@ export default function Home() {
         </SlideBox>
       </div>
 
-      <div className="mt-5 ml-2 text-left">秋・冬🍁</div>
+      <div className="mt-5 ml-3 text-left font-semibold">秋・冬🍁</div>
       <div className="flex justify-end">
         <SlideBox>
           <div className="flex gap-4">
@@ -69,7 +69,7 @@ export default function Home() {
       </div>
       {/* https://tailwindcss.com/docs/font-size */}
       <div className="mt-10"></div>
-      <div className="mt-5 mb-10 text-center text-2xl">特集</div>
+      <div className="mt-5 mb-10 text-center text-2xl font-semibold">特集</div>
       <div className="mx-4 mb-5">
         <SimpleBox className="h-110 flex flex-col justify-start items-center p-4">
           <p className="text-center text-lg font-semibold mb-4">
@@ -85,7 +85,7 @@ export default function Home() {
         </SimpleBox>
       </div>
 
-      <div className="mx-4 mb-2">
+      <div className="mx-4 mb-4">
         <SimpleBox className="h-110 flex flex-col justify-start items-center p-4">
           <div className="text-center font-semibold mb-4">
             <p>受験応援！</p>
