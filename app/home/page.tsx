@@ -19,13 +19,35 @@ export default function Home() {
         <div className="mt-5 text-center text-2xl font-semibold">新着情報</div>
         <div className="flex justify-end mt-5">
           <SlideBox>
-            <div className="flex gap-4">
-              <Image src={blanketBlack} alt="black1" height={118} width={160} />
-              <Image src={blanketBeige} alt="beige1" height={118} width={160} />
-              <Image src={blanketBlack} alt="black2" height={118} width={160} />
-              <Image src={blanketBeige} alt="beige2" />
-              <Image src={blanketBlack} alt="black3" />
-              <Image src={blanketBeige} alt="beige3" />
+            <div className="flex flex-col gap-2">
+              {/* ボックス上に New を表示 */}
+              <p className="text-left text-lg font-semibold text-orange-600">
+                New
+              </p>
+
+              <div className="flex gap-4">
+                <Image
+                  src={blanketBlack}
+                  alt="black1"
+                  height={118}
+                  width={160}
+                />
+                <Image
+                  src={blanketBeige}
+                  alt="beige1"
+                  height={118}
+                  width={160}
+                />
+                <Image
+                  src={blanketBlack}
+                  alt="black2"
+                  height={118}
+                  width={160}
+                />
+                <Image src={blanketBeige} alt="beige2" />
+                <Image src={blanketBlack} alt="black3" />
+                <Image src={blanketBeige} alt="beige3" />
+              </div>
             </div>
           </SlideBox>
         </div>
@@ -34,7 +56,7 @@ export default function Home() {
       <div className="mt-8 text-center text-2xl font-semibold">
         人気ランキング
       </div>
-      <div className="mt-5 ml-6 text-left font-semibold">春・夏☘️</div>
+      <div className="mt-5 ml-4 text-left font-semibold">春・夏☘️</div>
       <div className="flex justify-end">
         <SlideBox>
           <div className="flex gap-4">
@@ -56,7 +78,7 @@ export default function Home() {
         </SlideBox>
       </div>
 
-      <div className="mt-5 ml-6 text-left font-semibold">秋・冬🍁</div>
+      <div className="mt-5 ml-4 text-left font-semibold">秋・冬🍁</div>
       <div className="flex justify-end">
         <SlideBox>
           <div className="flex gap-4">

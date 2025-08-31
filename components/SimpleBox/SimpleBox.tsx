@@ -11,7 +11,6 @@ export const SimpleBox = ({
       mt-5
       p-4
       pl-12
-      w-full
       rounded-lg
       shadow
       ${className ?? ""}
