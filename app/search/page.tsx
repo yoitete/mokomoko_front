@@ -23,30 +23,37 @@ export default function Search() {
   ];
 
   return (
-    <div className="mt-5 mb-4">
+    <div className="mt-5 mb-5">
       <div className="mt-5 ml-6 text-left font-semibold">検 索</div>
-      <div className="ml-6">
-        <SimpleBox className="w-60 h-10 flex items-center justify-start gap-2 !p-0 !pl-2">
-          <p className="mb-0.5 text-sm text-gray-700">検 索</p>
-        </SimpleBox>
 
-        <div className="mr-6 mt-2 flex justify-end">
-          <div className="flex items-center gap-2 text-sm text-black">
-            <FontAwesomeIcon
-              icon={faList}
-              size="lg"
-              className="mt-3 cursor-pointer text-black"
-            />
-            <p className="mt-3">並べ替え：</p>
-            <p className="mt-3">新着順 / 人気順</p>
-          </div>
+      <SimpleBox className="w-60 h-10 ml-6 flex items-center justify-start gap-2 !p-0 !pl-2 min-w-[430px]">
+        <p className="mb-0.5 text-sm text-gray-700">検 索</p>
+      </SimpleBox>
+
+      {/* テキスト */}
+      <input
+        type="text"
+        className="bg-white p-4 border min-w-[430px] mt-4 flex items-center justify-start rounded-sm"
+        placeholder="テキストを入力"
+      />
+
+      <div className="mr-6 mt-2 flex justify-end">
+        <div className="flex items-center gap-2 text-sm text-black">
+          <FontAwesomeIcon
+            icon={faList}
+            size="lg"
+            className="mt-3 cursor-pointer text-black"
+          />
+          <p className="mt-3">並べ替え：</p>
+          <p className="mt-3">新着順 / 人気順</p>
         </div>
-
+      </div>
+      <div className="mt-2 flex justify-center">
         <div className="mt-2 space-y-4">
           {boxes.map((images, index) => (
             <SimpleBox
               key={index}
-              className="h-40 mr-5 flex flex-col justify-center items-center p-4"
+              className="h-40 flex flex-col justify-center items-center p-4 min-w-[430px]"
             >
               <div className="grid grid-cols-2 gap-2 w-full">
                 {images.map((src, i) => (
