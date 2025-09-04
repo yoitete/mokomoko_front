@@ -24,16 +24,12 @@ export default function Search() {
 
   return (
     <div className="mt-5 mb-5">
-      <div className="mt-5 ml-6 text-left font-semibold">検 索</div>
-
-      <SimpleBox className="w-60 h-10 ml-6 flex items-center justify-start gap-2 !p-0 !pl-2 min-w-[430px]">
-        <p className="mb-0.5 text-sm text-gray-700">検 索</p>
-      </SimpleBox>
+      <div className="mt-5 ml-7 text-left font-semibold">検 索</div>
 
       {/* テキスト */}
       <input
         type="text"
-        className="bg-white p-4 border min-w-[430px] mt-4 flex items-center justify-start rounded-sm"
+        className="bg-white p-3 border min-w-[430px] ml-6 mt-3 flex items-center justify-start rounded-xl"
         placeholder="テキストを入力"
       />
 
