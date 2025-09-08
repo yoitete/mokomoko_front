@@ -4,6 +4,8 @@
 import React, { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
+import Button from "@/components/Button/Button";
+import { usePosts, CreatePostWithImageData } from "@/hooks/usePosts";
 
 interface Combination {
   title: string;
@@ -22,11 +24,57 @@ export default function Post() {
     category: "",
   });
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { createPostWithImage, loading, error } = usePosts();
 
   const handleChange = <K extends keyof Combination>(
     field: K,
     value: Combination[K]
   ) => setCombination({ ...combination, [field]: value });
+
+  const handleSubmit = async () => {
+    // バリデーション
+    if (!combination.title.trim()) {
+      alert("タイトルを入力してください");
+      return;
+    }
+
+    if (!combination.category) {
+      alert("季節を選択してください");
+      return;
+    }
+
+    try {
+      // 投稿データを準備
+      const postData: CreatePostWithImageData = {
+        user_id: 1, // TODO: 実際のユーザーIDに置き換え
+        title: combination.title,
+        description: combination.description || "",
+        price: combination.price,
+        season: combination.category,
+        image: combination.image, // 画像ファイルを追加
+      };
+
+      // 投稿を作成
+      await createPostWithImage(postData);
+
+      alert("投稿が完了しました！");
+
+      // フォームをリセット
+      setCombination({
+        title: "",
+        description: "",
+        price: undefined,
+        category: "",
+      });
+      setPreviewUrl(null);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    } catch (err) {
+      console.error("投稿エラー:", err);
+      alert("投稿中にエラーが発生しました。");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -57,27 +105,26 @@ export default function Post() {
           投稿画像
         </label>
         <div className="flex justify-center">
-          <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden hover:border-gray-400 transition-colors">
+          <div
+            className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden hover:border-gray-400 transition-colors cursor-pointer"
+            onClick={() => {
+              inputRef.current?.click();
+            }}
+          >
             {previewUrl ? (
               <img
                 src={previewUrl}
                 alt="選択された画像"
-                className="w-full h-full object-cover cursor-pointer"
-                onClick={() => {
-                  inputRef.current?.click();
-                }}
+                className="w-full h-full object-cover"
               />
             ) : (
-              <label
-                htmlFor="imageUpload"
-                className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
-              >
+              <div className="w-full h-full flex flex-col items-center justify-center hover:bg-gray-50 transition-colors">
                 <FontAwesomeIcon
                   icon={faUpload}
                   className="text-gray-400 text-3xl mb-2"
                 />
                 <span className="text-sm text-gray-500">画像を選択</span>
-              </label>
+              </div>
             )}
           </div>
         </div>
@@ -85,6 +132,7 @@ export default function Post() {
           type="file"
           accept="image/*"
           ref={inputRef}
+          id="imageUpload"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
@@ -96,43 +144,37 @@ export default function Post() {
         />
       </div>
 
-      {/* 詳細情報 */}
       <div className="space-y-4">
-        {/* カテゴリー */}
+        {/* 季節カテゴリー */}
         <select
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={combination.category ?? ""}
           onChange={(e) => handleChange("category", e.target.value)}
         >
-          <option value="">カテゴリーを選択</option>
-          <optgroup label="素材">
-            <option value="fleece">フリース</option>
-            <option value="microfiber">マイクロファイバー</option>
-            <option value="cotton">コットン</option>
-            <option value="wool">ウール</option>
-            <option value="gauze">ガーゼ</option>
-          </optgroup>
-          <optgroup label="厚さ・暖かさ">
-            <option value="thin">薄手（夏用）</option>
-            <option value="medium">普通（春秋用）</option>
-            <option value="thick">厚手（冬用）</option>
-            <option value="light">軽量</option>
-            <option value="warm">暖かい</option>
-          </optgroup>
-          <optgroup label="サイズ・用途">
-            <option value="single">シングル</option>
-            <option value="double">ダブル</option>
-            <option value="lap">ひざ掛け</option>
-          </optgroup>
+          <option value="">季節を選択</option>
+          <option value="spring">春 </option>
+          <option value="summer">夏 </option>
+          <option value="autumn">秋 </option>
+          <option value="winter">冬 </option>
+          <option value="all-season">通年 </option>
         </select>
 
         {/* 値段 */}
         <input
           type="number"
+          min="0"
+          inputMode="numeric"
           placeholder="価格（例：3000）"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={combination.price ?? ""}
-          onChange={(e) => handleChange("price", Number(e.target.value))}
+          onChange={(e) => {
+            const value = e.target.value;
+            const numericValue = value.replace(/[^0-9]/g, "");
+            handleChange(
+              "price",
+              numericValue === "" ? undefined : Number(numericValue)
+            );
+          }}
         />
 
         {/* 説明 */}
@@ -143,6 +185,25 @@ export default function Post() {
           value={combination.description}
           onChange={(e) => handleChange("description", e.target.value)}
         />
+
+        {/* エラー表示 */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
+
+        {/* 投稿ボタン */}
+        <div className="flex justify-center mt-8">
+          <Button
+            onClick={handleSubmit}
+            size="lg"
+            className="min-w-[200px] cursor-pointer"
+            disabled={loading}
+          >
+            {loading ? "投稿中..." : "投稿する"}
+          </Button>
+        </div>
       </div>
     </div>
   );
