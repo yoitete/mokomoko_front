@@ -20,7 +20,6 @@ export default function Home() {
         <div className="flex justify-end mt-5">
           <SlideBox>
             <div className="flex flex-col gap-2">
-              {/* ボックス上に New を表示 */}
               <p className="text-left text-lg font-semibold text-orange-600">
                 New
               </p>
