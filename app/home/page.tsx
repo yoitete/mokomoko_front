@@ -1,18 +1,92 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import blanketBlack from "@/public/images/blanket_black_1.png";
-import blanketBeige from "@/public/images/blanket_beige_1.png";
-import blanketGray from "@/public/images/blanket_gray_1.png";
-import blanketPattern from "@/public/images/blanket_pattern_1.png";
-import blanketLightGray from "@/public/images/blanket_lightgray_1.png";
-import blanketBrown from "@/public/images/blanket_brown_1.png";
-import blanketWhite2 from "@/public/images/blanket_white2_1.png";
-import blanketWhite from "@/public/images/blanket_white_1.png";
 import { SlideBox } from "@/components/SlideBox/SlideBox";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import { BoxImage } from "@/components/BoxImage/BoxImage";
+import { Post } from "@/hooks/usePosts";
+import { useAPI } from "@/hooks/useAPI";
 
 export default function Home() {
+  console.log("Home component rendered");
+  const { get } = useAPI();
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log("useEffect triggered - fetching posts");
+    const fetchPosts = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        console.log("API call started");
+        const data = await get<Post[]>("/posts");
+        console.log("API call completed, data:", data);
+        setPosts(data);
+      } catch (err) {
+        console.error("Failed to fetch posts:", err);
+        setError(
+          err instanceof Error ? err.message : "投稿の取得に失敗しました"
+        );
+      } finally {
+        setIsLoading(false);
+        console.log("fetchPosts completed");
+      }
+    };
+
+    fetchPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 空の依存配列でマウント時にのみ実行
+
+  // 新着投稿を取得（作成日時でソート）
+  const newPosts = posts
+    .sort(
+      (a, b) =>
+        new Date(b.created_at || 0).getTime() -
+        new Date(a.created_at || 0).getTime()
+    )
+    .slice(0, 6);
+
+  // 春・夏の投稿を取得
+  const springSummerPosts = posts
+    .filter((post) => post.season === "spring" || post.season === "summer")
+    .slice(0, 4);
+
+  // 秋・冬の投稿を取得
+  const autumnWinterPosts = posts
+    .filter((post) => post.season === "autumn" || post.season === "winter")
+    .slice(0, 4);
+
+  // 画像がある投稿のみをフィルタリング
+  const postsWithImages = posts.filter(
+    (post) => post.images && post.images.length > 0
+  );
+
+  if (isLoading) {
+    return (
+      <div className="text-center mt-10">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+        <p className="mt-2">読み込み中...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center mt-10 text-red-500">
+        <p>エラーが発生しました: {error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          再読み込み
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="mt-10">
@@ -25,27 +99,31 @@ export default function Home() {
               </p>
 
               <div className="flex gap-4">
-                <Image
-                  src={blanketBlack}
-                  alt="black1"
-                  height={118}
-                  width={160}
-                />
-                <Image
-                  src={blanketBeige}
-                  alt="beige1"
-                  height={118}
-                  width={160}
-                />
-                <Image
-                  src={blanketBlack}
-                  alt="black2"
-                  height={118}
-                  width={160}
-                />
-                <Image src={blanketBeige} alt="beige2" />
-                <Image src={blanketBlack} alt="black3" />
-                <Image src={blanketBeige} alt="beige3" />
+                {newPosts.map((post, index) => {
+                  const imageUrl = post.images?.[0];
+
+                  console.log(
+                    `Post ${post.id} (${post.title}): 
+                    - Image URL: ${imageUrl}
+                    - Has image: ${Boolean(imageUrl)}`
+                  );
+
+                  // 画像が存在する場合のみ表示
+                  if (!imageUrl) {
+                    return null;
+                  }
+
+                  return (
+                    <Image
+                      key={post.id || index}
+                      src={imageUrl}
+                      alt={post.title}
+                      height={118}
+                      width={160}
+                      unoptimized={true}
+                    />
+                  );
+                })}
               </div>
             </div>
           </SlideBox>
@@ -59,20 +137,31 @@ export default function Home() {
       <div className="flex justify-end">
         <SlideBox>
           <div className="flex gap-4">
-            <Image src={blanketGray} alt="gray1" height={118} width={160} />
-            <Image
-              src={blanketPattern}
-              alt="pattern"
-              height={118}
-              width={160}
-            />
-            <Image src={blanketBeige} alt="beige3" height={118} width={160} />
-            <Image
-              src={blanketLightGray}
-              alt="lightgray1"
-              height={118}
-              width={160}
-            />
+            {springSummerPosts.map((post, index) => {
+              const imageUrl = post.images?.[0];
+
+              console.log(
+                `Spring/Summer Post ${post.id} (${post.title}): 
+                - Image URL: ${imageUrl}
+                - Has image: ${Boolean(imageUrl)}`
+              );
+
+              // 画像が存在する場合のみ表示
+              if (!imageUrl) {
+                return null;
+              }
+
+              return (
+                <Image
+                  key={post.id || index}
+                  src={imageUrl}
+                  alt={post.title}
+                  height={118}
+                  width={160}
+                  unoptimized={true}
+                />
+              );
+            })}
           </div>
         </SlideBox>
       </div>
@@ -81,10 +170,31 @@ export default function Home() {
       <div className="flex justify-end">
         <SlideBox>
           <div className="flex gap-4">
-            <Image src={blanketBlack} alt="black1" height={118} width={160} />
-            <Image src={blanketBrown} alt="brown1" height={118} width={160} />
-            <Image src={blanketWhite2} alt="White2" height={118} width={160} />
-            <Image src={blanketWhite} alt="White" height={118} width={160} />
+            {autumnWinterPosts.map((post, index) => {
+              const imageUrl = post.images?.[0];
+
+              console.log(
+                `Autumn/Winter Post ${post.id} (${post.title}): 
+                - Image URL: ${imageUrl}
+                - Has image: ${Boolean(imageUrl)}`
+              );
+
+              // 画像が存在する場合のみ表示
+              if (!imageUrl) {
+                return null;
+              }
+
+              return (
+                <Image
+                  key={post.id || index}
+                  src={imageUrl}
+                  alt={post.title}
+                  height={118}
+                  width={160}
+                  unoptimized={true}
+                />
+              );
+            })}
           </div>
         </SlideBox>
       </div>
@@ -98,10 +208,28 @@ export default function Home() {
           </p>
 
           <div className="grid grid-cols-2 gap-2 w-full">
-            <BoxImage src={blanketBeige} alt="beige1" />
-            <BoxImage src={blanketBrown} alt="brown1" />
-            <BoxImage src={blanketGray} alt="gray1" />
-            <BoxImage src={blanketWhite} alt="navy1" />
+            {postsWithImages.slice(0, 4).map((post, index) => {
+              const imageUrl = post.images?.[0];
+
+              console.log(
+                `Christmas Post ${post.id} (${post.title}): 
+                - Image URL: ${imageUrl}
+                - Has image: ${Boolean(imageUrl)}`
+              );
+
+              // 画像が存在する場合のみ表示
+              if (!imageUrl) {
+                return null;
+              }
+
+              return (
+                <BoxImage
+                  key={post.id || index}
+                  src={imageUrl}
+                  alt={post.title}
+                />
+              );
+            })}
           </div>
         </SimpleBox>
       </div>
@@ -113,10 +241,28 @@ export default function Home() {
             <p>あったか毛布特集</p>
           </div>
           <div className="grid grid-cols-2 gap-2 w-full">
-            <BoxImage src={blanketBeige} alt="beige1" />
-            <BoxImage src={blanketBrown} alt="brown1" />
-            <BoxImage src={blanketGray} alt="gray1" />
-            <BoxImage src={blanketWhite} alt="navy1" />
+            {postsWithImages.slice(0, 4).map((post, index) => {
+              const imageUrl = post.images?.[0];
+
+              console.log(
+                `Exam Support Post ${post.id} (${post.title}): 
+                - Image URL: ${imageUrl}
+                - Has image: ${Boolean(imageUrl)}`
+              );
+
+              // 画像が存在する場合のみ表示
+              if (!imageUrl) {
+                return null;
+              }
+
+              return (
+                <BoxImage
+                  key={post.id || index}
+                  src={imageUrl}
+                  alt={post.title}
+                />
+              );
+            })}
           </div>
         </SimpleBox>
       </div>

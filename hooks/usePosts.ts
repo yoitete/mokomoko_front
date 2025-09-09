@@ -11,6 +11,7 @@ export type Post = {
   season: string;
   created_at?: string;
   updated_at?: string;
+  images?: string[];
 };
 
 // 投稿作成用の型定義
@@ -52,7 +53,25 @@ export type CreatePostResponse = {
 export const usePosts = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { post, postFormData } = useAPI();
+  const { get, post, postFormData } = useAPI();
+
+  // 投稿一覧を取得
+  const getPosts = useCallback(async (): Promise<Post[]> => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await get<Post[]>("/posts");
+      return response;
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "投稿の取得に失敗しました";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [get]);
 
   // 投稿を作成（画像なし）
   const createPost = useCallback(
@@ -91,16 +110,19 @@ export const usePosts = () => {
         formData.append("post[title]", postData.title);
         formData.append("post[description]", postData.description || "");
         formData.append("post[season]", postData.season);
-        
+
         if (postData.price) {
           formData.append("post[price]", postData.price.toString());
         }
-        
+
         if (postData.image) {
           formData.append("post[images][]", postData.image);
         }
 
-        const response = await postFormData<CreatePostResponse>("/posts", formData);
+        const response = await postFormData<CreatePostResponse>(
+          "/posts",
+          formData
+        );
         return response;
       } catch (err) {
         const errorMessage =
@@ -122,6 +144,7 @@ export const usePosts = () => {
   return {
     loading,
     error,
+    getPosts,
     createPost,
     createPostWithImage,
     clearError,

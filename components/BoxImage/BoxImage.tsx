@@ -16,5 +16,7 @@ export const BoxImage = ({
     width={160}
     height={118}
     className={`object-cover rounded-lg ${className}`}
+    style={{ width: "auto", height: "auto" }}
+    unoptimized={true}
   />
 );
