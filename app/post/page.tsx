@@ -3,7 +3,7 @@
 
 import React, { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faUpload, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/components/Button/Button";
 import { usePosts, CreatePostWithImageData } from "@/hooks/usePosts";
 
@@ -13,15 +13,19 @@ interface Combination {
   image?: File;
   price?: number;
   category?: string;
+  tags?: string[];
 }
 
 export default function Post() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
   const [combination, setCombination] = useState<Combination>({
     title: "",
     description: "",
     price: undefined,
     category: "",
+    tags: [],
   });
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { createPostWithImage, loading, error } = usePosts();
@@ -30,6 +34,31 @@ export default function Post() {
     field: K,
     value: Combination[K]
   ) => setCombination({ ...combination, [field]: value });
+
+  // タグ追加関数
+  const addTag = () => {
+    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+      const newTags = [...tags, tagInput.trim()];
+      setTags(newTags);
+      handleChange("tags", newTags);
+      setTagInput("");
+    }
+  };
+
+  // タグ削除関数
+  const removeTag = (index: number) => {
+    const newTags = tags.filter((_, i) => i !== index);
+    setTags(newTags);
+    handleChange("tags", newTags);
+  };
+
+  // Enterキーでタグ追加
+  const handleTagKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addTag();
+    }
+  };
 
   const handleSubmit = async () => {
     // バリデーション
@@ -51,6 +80,7 @@ export default function Post() {
         description: combination.description || "",
         price: combination.price,
         season: combination.category,
+        tags: combination.tags,
         image: combination.image, // 画像ファイルを追加
       };
 
@@ -65,7 +95,9 @@ export default function Post() {
         description: "",
         price: undefined,
         category: "",
+        tags: [],
       });
+      setTags([]);
       setPreviewUrl(null);
       if (inputRef.current) {
         inputRef.current.value = "";
@@ -158,6 +190,51 @@ export default function Post() {
           <option value="winter">冬 </option>
           <option value="all-season">通年 </option>
         </select>
+
+        {/* タグ入力 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            タグ（オプション）
+          </label>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              placeholder="タグを入力してEnterキーで追加"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyPress={handleTagKeyPress}
+            />
+            <Button
+              onClick={addTag}
+              size="sm"
+              className="px-4"
+              disabled={!tagInput.trim() || tags.includes(tagInput.trim())}
+            >
+              追加
+            </Button>
+          </div>
+
+          {/* タグ表示 */}
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                >
+                  {tag}
+                  <button
+                    onClick={() => removeTag(index)}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <FontAwesomeIcon icon={faTimes} size="xs" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* 値段 */}
         <input

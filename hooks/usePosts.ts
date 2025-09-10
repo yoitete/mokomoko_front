@@ -9,6 +9,7 @@ export type Post = {
   price?: number;
   description?: string;
   season: string;
+  tags?: string[];
   created_at?: string;
   updated_at?: string;
   images?: string[];
@@ -21,6 +22,7 @@ export type CreatePostData = {
   price?: number;
   description?: string;
   season: string;
+  tags?: string[];
 };
 
 // 画像付き投稿作成用の型定義
@@ -30,39 +32,24 @@ export type CreatePostWithImageData = {
   price?: number;
   description?: string;
   season: string;
+  tags?: string[];
   image?: File;
 };
 
-// 投稿作成のリクエスト型
-export type CreatePostRequest = {
-  post: CreatePostData;
-};
-
-// 投稿作成のレスポンス型
-export type CreatePostResponse = {
-  id: number;
-  user_id: number;
-  title: string;
-  price?: number;
-  description?: string;
-  season: string;
-  created_at: string;
-  updated_at: string;
-};
-
 export const usePosts = () => {
+  const { get, post, postFormData, delete: del } = useAPI();
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { get, post, postFormData } = useAPI();
 
   // 投稿一覧を取得
-  const getPosts = useCallback(async (): Promise<Post[]> => {
+  const getPosts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
-      const response = await get<Post[]>("/posts");
-      return response;
+      const data = await get<Post[]>("/posts");
+      setPosts(data);
+      return data;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "投稿の取得に失敗しました";
@@ -75,17 +62,13 @@ export const usePosts = () => {
 
   // 投稿を作成（画像なし）
   const createPost = useCallback(
-    async (postData: CreatePostData): Promise<CreatePostResponse> => {
+    async (postData: CreatePostData) => {
       try {
         setLoading(true);
         setError(null);
-
-        const requestData: CreatePostRequest = {
-          post: postData,
-        };
-
-        const response = await post<CreatePostResponse>("/posts", requestData);
-        return response;
+        const data = await post<Post>("/posts", { post: postData });
+        setPosts((prev) => [data, ...prev]);
+        return data;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "投稿の作成に失敗しました";
@@ -98,9 +81,9 @@ export const usePosts = () => {
     [post]
   );
 
-  // 画像付き投稿を作成
+  // 投稿を作成（画像付き）
   const createPostWithImage = useCallback(
-    async (postData: CreatePostWithImageData): Promise<CreatePostResponse> => {
+    async (postData: CreatePostWithImageData) => {
       try {
         setLoading(true);
         setError(null);
@@ -111,19 +94,23 @@ export const usePosts = () => {
         formData.append("post[description]", postData.description || "");
         formData.append("post[season]", postData.season);
 
-        if (postData.price) {
+        if (postData.price !== undefined) {
           formData.append("post[price]", postData.price.toString());
+        }
+
+        if (postData.tags && postData.tags.length > 0) {
+          postData.tags.forEach((tag) => {
+            formData.append("post[tags][]", tag);
+          });
         }
 
         if (postData.image) {
           formData.append("post[images][]", postData.image);
         }
 
-        const response = await postFormData<CreatePostResponse>(
-          "/posts",
-          formData
-        );
-        return response;
+        const data = await postFormData<Post>("/posts", formData);
+        setPosts((prev) => [data, ...prev]);
+        return data;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "投稿の作成に失敗しました";
@@ -136,17 +123,55 @@ export const usePosts = () => {
     [postFormData]
   );
 
-  // エラーをクリア
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  // 投稿を更新
+  const updatePost = useCallback(
+    async (id: number, postData: Partial<CreatePostData>) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await post<Post>(`/posts/${id}`, { post: postData });
+        setPosts((prev) => prev.map((post) => (post.id === id ? data : post)));
+        return data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "投稿の更新に失敗しました";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [post]
+  );
+
+  // 投稿を削除
+  const deletePost = useCallback(
+    async (id: number) => {
+      try {
+        setLoading(true);
+        setError(null);
+        await del(`/posts/${id}`);
+        setPosts((prev) => prev.filter((post) => post.id !== id));
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "投稿の削除に失敗しました";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [del]
+  );
 
   return {
+    posts,
     loading,
     error,
     getPosts,
     createPost,
     createPostWithImage,
-    clearError,
+    updatePost,
+    deletePost,
   };
 };
