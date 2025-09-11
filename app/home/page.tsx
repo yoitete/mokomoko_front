@@ -7,6 +7,8 @@ import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import { BoxImage } from "@/components/BoxImage/BoxImage";
 import { Post } from "@/hooks/usePosts";
 import { useAPI } from "@/hooks/useAPI";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 
 export default function Home() {
   console.log("Home component rendered");
@@ -14,6 +16,25 @@ export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<number[]>([]);
+
+  // お気に入り状態を切り替える関数
+  const toggleFavorite = (postId: number) => {
+    setFavorites((prev) => {
+      if (prev.includes(postId)) {
+        // お気に入りから削除
+        return prev.filter((id) => id !== postId);
+      } else {
+        // お気に入りに追加
+        return [...prev, postId];
+      }
+    });
+  };
+
+  // お気に入り状態をチェックする関数
+  const isFavorite = (postId: number) => {
+    return favorites.includes(postId);
+  };
 
   useEffect(() => {
     console.log("useEffect triggered - fetching posts");
@@ -91,40 +112,55 @@ export default function Home() {
     <div>
       <div className="mt-10">
         <div className="mt-5 text-center text-2xl font-semibold">新着情報</div>
-        <div className="flex justify-end mt-5">
+        <p className="text-lg font-semibold ml-4 text-orange-600">New</p>
+        <div className="flex justify-end">
           <SlideBox>
-            <div className="flex flex-col gap-2">
-              <p className="text-left text-lg font-semibold text-orange-600">
-                New
-              </p>
+            <div className="gap-4">
+              {newPosts.map((post, index) => {
+                const imageUrl = post.images?.[0];
 
-              <div className="flex gap-4">
-                {newPosts.map((post, index) => {
-                  const imageUrl = post.images?.[0];
-
-                  console.log(
-                    `Post ${post.id} (${post.title}): 
+                console.log(
+                  `Post ${post.id} (${post.title}): 
                     - Image URL: ${imageUrl}
                     - Has image: ${Boolean(imageUrl)}`
-                  );
+                );
 
-                  // 画像が存在する場合のみ表示
-                  if (!imageUrl) {
-                    return null;
-                  }
+                // 画像が存在する場合のみ表示
+                if (!imageUrl) {
+                  return null;
+                }
 
-                  return (
+                return (
+                  <div
+                    key={post.id || index}
+                    className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg cursor-pointer"
+                  >
                     <Image
-                      key={post.id || index}
                       src={imageUrl}
                       alt={post.title}
-                      height={118}
-                      width={160}
+                      fill
                       unoptimized={true}
                     />
-                  );
-                })}
-              </div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleFavorite(post.id!);
+                      }}
+                      className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
+                    >
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        className={`text-lg ${
+                          isFavorite(post.id!)
+                            ? "text-red-500"
+                            : "text-gray-400 hover:text-red-500"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </SlideBox>
         </div>
@@ -136,7 +172,7 @@ export default function Home() {
       <div className="mt-5 ml-4 text-left font-semibold">春・夏☘️</div>
       <div className="flex justify-end">
         <SlideBox>
-          <div className="flex gap-4">
+          <div className="gap-4">
             {springSummerPosts.map((post, index) => {
               const imageUrl = post.images?.[0];
 
@@ -152,14 +188,34 @@ export default function Home() {
               }
 
               return (
-                <Image
+                <div
                   key={post.id || index}
-                  src={imageUrl}
-                  alt={post.title}
-                  height={118}
-                  width={160}
-                  unoptimized={true}
-                />
+                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg cursor-pointer"
+                >
+                  <Image
+                    src={imageUrl}
+                    alt={post.title}
+                    fill
+                    unoptimized={true}
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleFavorite(post.id!);
+                    }}
+                    className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
+                  >
+                    <FontAwesomeIcon
+                      icon={faHeart}
+                      className={`text-lg ${
+                        isFavorite(post.id!)
+                          ? "text-red-500"
+                          : "text-gray-400 hover:text-red-500"
+                      }`}
+                    />
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -169,7 +225,7 @@ export default function Home() {
       <div className="mt-5 ml-4 text-left font-semibold">秋・冬🍁</div>
       <div className="flex justify-end">
         <SlideBox>
-          <div className="flex gap-4">
+          <div className="gap-4">
             {autumnWinterPosts.map((post, index) => {
               const imageUrl = post.images?.[0];
 
@@ -185,14 +241,34 @@ export default function Home() {
               }
 
               return (
-                <Image
+                <div
                   key={post.id || index}
-                  src={imageUrl}
-                  alt={post.title}
-                  height={118}
-                  width={160}
-                  unoptimized={true}
-                />
+                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg cursor-pointer"
+                >
+                  <Image
+                    src={imageUrl}
+                    alt={post.title}
+                    fill
+                    unoptimized={true}
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleFavorite(post.id!);
+                    }}
+                    className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
+                  >
+                    <FontAwesomeIcon
+                      icon={faHeart}
+                      className={`text-lg ${
+                        isFavorite(post.id!)
+                          ? "text-red-500"
+                          : "text-gray-400 hover:text-red-500"
+                      }`}
+                    />
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -227,6 +303,7 @@ export default function Home() {
                   key={post.id || index}
                   src={imageUrl}
                   alt={post.title}
+                  className="cursor-pointer text-[#F1F6F7]"
                 />
               );
             })}
@@ -260,6 +337,7 @@ export default function Home() {
                   key={post.id || index}
                   src={imageUrl}
                   alt={post.title}
+                  className="cursor-pointer text-[#F1F6F7]"
                 />
               );
             })}
