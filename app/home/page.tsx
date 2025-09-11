@@ -278,12 +278,12 @@ export default function Home() {
       <div className="mt-10"></div>
       <div className="mt-5 mb-10 text-center text-2xl font-semibold">特集</div>
       <div className="mx-4 mb-5">
-        <SimpleBox className="h-110 flex flex-col justify-start items-center p-4">
+        <SimpleBox className="h-120 flex flex-col justify-start items-center p-4">
           <p className="text-center text-lg font-semibold mb-4">
             クリスマス特集
           </p>
 
-          <div className="grid grid-cols-2 gap-2 w-full">
+          <div className="grid grid-cols-2 gap-2 w-full cursor-pointer">
             {postsWithImages.slice(0, 4).map((post, index) => {
               const imageUrl = post.images?.[0];
 
@@ -299,12 +299,30 @@ export default function Home() {
               }
 
               return (
-                <BoxImage
-                  key={post.id || index}
-                  src={imageUrl}
-                  alt={post.title}
-                  className="cursor-pointer text-[#F1F6F7]"
-                />
+                <div key={post.id || index} className="relative">
+                  <BoxImage
+                    src={imageUrl}
+                    alt={post.title}
+                    className="cursor-pointer"
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleFavorite(post.id!);
+                    }}
+                    className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
+                  >
+                    <FontAwesomeIcon
+                      icon={faHeart}
+                      className={`text-lg ${
+                        isFavorite(post.id!)
+                          ? "text-red-500"
+                          : "text-gray-400 hover:text-red-500"
+                      }`}
+                    />
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -312,12 +330,12 @@ export default function Home() {
       </div>
 
       <div className="mx-4 mb-4">
-        <SimpleBox className="h-110 flex flex-col justify-start items-center p-4">
+        <SimpleBox className="h-120 flex flex-col justify-start items-center p-4">
           <div className="text-center font-semibold mb-4">
             <p>受験応援！</p>
             <p>あったか毛布特集</p>
           </div>
-          <div className="grid grid-cols-2 gap-2 w-full">
+          <div className="grid grid-cols-2 gap-2 w-full cursor-pointer">
             {postsWithImages.slice(0, 4).map((post, index) => {
               const imageUrl = post.images?.[0];
 
@@ -333,12 +351,30 @@ export default function Home() {
               }
 
               return (
-                <BoxImage
-                  key={post.id || index}
-                  src={imageUrl}
-                  alt={post.title}
-                  className="cursor-pointer text-[#F1F6F7]"
-                />
+                <div key={post.id || index} className="relative">
+                  <BoxImage
+                    src={imageUrl}
+                    alt={post.title}
+                    className="cursor-pointer"
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleFavorite(post.id!);
+                    }}
+                    className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
+                  >
+                    <FontAwesomeIcon
+                      icon={faHeart}
+                      className={`text-lg ${
+                        isFavorite(post.id!)
+                          ? "text-red-500"
+                          : "text-gray-400 hover:text-red-500"
+                      }`}
+                    />
+                  </button>
+                </div>
               );
             })}
           </div>
