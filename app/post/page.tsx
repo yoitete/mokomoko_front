@@ -109,179 +109,248 @@ export default function Post() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <header className="bg-white border-b border-gray-200 py-6 text-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">新規投稿</h1>
-      </header>
-
-      <main className="max-w-4xl mx-auto space-y-6">
-        {/* タイトル */}
-        <div>
-          <label className="block font-semibold mb-2">タイトル</label>
-          <input
-            type="text"
-            maxLength={20}
-            placeholder="タイトルを入力してください（20文字以内）"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={combination.title}
-            onChange={(e) => handleChange("title", e.target.value)}
-          />
-          <p className="text-xs text-right text-gray-500 mt-1">
-            {combination.title.length}/20文字
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* ヘッダー */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <h1 className="text-3xl font-bold text-gray-800 text-center">
+            新規投稿
+          </h1>
+          <p className="text-gray-600 text-center mt-2">
+            あなたの素敵なコーディネートを共有しましょう
           </p>
         </div>
-      </main>
+      </header>
 
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          投稿画像
-        </label>
-        <div className="flex justify-center">
-          <div
-            className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden hover:border-gray-400 transition-colors cursor-pointer"
-            onClick={() => {
-              inputRef.current?.click();
-            }}
-          >
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="選択された画像"
-                className="w-full h-full object-cover"
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="p-8 space-y-8">
+            {/* タイトルセクション */}
+            <div className="space-y-2">
+              <label className="block text-lg font-semibold text-gray-800">
+                タイトル <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                maxLength={20}
+                placeholder="魅力的なタイトルを入力してください"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                value={combination.title}
+                onChange={(e) => handleChange("title", e.target.value)}
               />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center hover:bg-gray-50 transition-colors">
-                <FontAwesomeIcon
-                  icon={faUpload}
-                  className="text-gray-400 text-3xl mb-2"
+              <div className="flex justify-between items-center">
+                <p className="text-sm text-gray-500">
+                  タイトルは投稿の第一印象を決めます
+                </p>
+                <p className="text-sm font-medium text-gray-600">
+                  {combination.title.length}/20文字
+                </p>
+              </div>
+            </div>
+
+            {/* 画像アップロードセクション */}
+            <div className="space-y-4">
+              <label className="block text-lg font-semibold text-gray-800">
+                投稿画像 <span className="text-red-500">*</span>
+              </label>
+              <div className="flex justify-center">
+                <div
+                  className="w-64 h-64 border-2 border-dashed border-gray-300 rounded-xl overflow-hidden hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 cursor-pointer group"
+                  onClick={() => {
+                    inputRef.current?.click();
+                  }}
+                >
+                  {previewUrl ? (
+                    <div className="relative w-full h-full">
+                      <img
+                        src={previewUrl}
+                        alt="選択された画像"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <FontAwesomeIcon
+                            icon={faUpload}
+                            className="text-white text-2xl"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center group-hover:bg-blue-50 transition-colors duration-200">
+                      <FontAwesomeIcon
+                        icon={faUpload}
+                        className="text-gray-400 text-4xl mb-3 group-hover:text-blue-500 transition-colors duration-200"
+                      />
+                      <span className="text-sm text-gray-500 group-hover:text-blue-600 transition-colors duration-200">
+                        画像をクリックして選択
+                      </span>
+                      <span className="text-xs text-gray-400 mt-1">
+                        JPG, PNG, GIF対応
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                ref={inputRef}
+                id="imageUpload"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleChange("image", file);
+                    setPreviewUrl(URL.createObjectURL(file));
+                  }
+                }}
+              />
+            </div>
+
+            {/* フォームセクション */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* 季節カテゴリー */}
+              <div className="space-y-2">
+                <label className="block text-lg font-semibold text-gray-800">
+                  季節 <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                  value={combination.category ?? ""}
+                  onChange={(e) => handleChange("category", e.target.value)}
+                >
+                  <option value="">季節を選択してください</option>
+                  <option value="spring-summer">春・夏</option>
+                  <option value="autumn-winter">秋・冬</option>
+                  <option value="christmas">クリスマス特集</option>
+                  <option value="exam-support">受験応援特集</option>
+                  <option value="new-arrivals">新着情報</option>
+                </select>
+              </div>
+
+              {/* 価格 */}
+              <div className="space-y-2">
+                <label className="block text-lg font-semibold text-gray-800">
+                  価格（円）
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">
+                    ¥
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    inputMode="numeric"
+                    placeholder="3000"
+                    className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                    value={combination.price ?? ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const numericValue = value.replace(/[^0-9]/g, "");
+                      handleChange(
+                        "price",
+                        numericValue === "" ? undefined : Number(numericValue)
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* タグ入力セクション */}
+            <div className="space-y-4">
+              <label className="block text-lg font-semibold text-gray-800">
+                タグ
+              </label>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  placeholder="タグを入力してEnterキーで追加"
+                  className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyPress={handleTagKeyPress}
                 />
-                <span className="text-sm text-gray-500">画像を選択</span>
+                <Button
+                  onClick={addTag}
+                  size="md"
+                  className="px-6"
+                  disabled={!tagInput.trim() || tags.includes(tagInput.trim())}
+                >
+                  追加
+                </Button>
+              </div>
+
+              {/* タグ表示 */}
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-800 text-sm rounded-full hover:bg-blue-200 transition-colors duration-200"
+                    >
+                      #{tag}
+                      <button
+                        onClick={() => removeTag(index)}
+                        className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                      >
+                        <FontAwesomeIcon icon={faTimes} size="xs" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 説明セクション */}
+            <div className="space-y-2">
+              <label className="block text-lg font-semibold text-gray-800">
+                説明
+              </label>
+              <textarea
+                placeholder="コーディネートのポイントや着こなしのコツを教えてください..."
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-lg"
+                rows={5}
+                value={combination.description}
+                onChange={(e) => handleChange("description", e.target.value)}
+              />
+              <p className="text-sm text-gray-500">
+                他のユーザーが参考になるような詳細な説明を書いてみてください
+              </p>
+            </div>
+
+            {/* エラー表示 */}
+            {error && (
+              <div className="bg-red-50 border-2 border-red-200 text-red-700 px-6 py-4 rounded-lg">
+                <div className="flex items-center">
+                  <FontAwesomeIcon icon={faTimes} className="mr-2" />
+                  {error}
+                </div>
               </div>
             )}
-          </div>
-        </div>
-        <input
-          type="file"
-          accept="image/*"
-          ref={inputRef}
-          id="imageUpload"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              handleChange("image", file);
-              setPreviewUrl(URL.createObjectURL(file));
-            }
-          }}
-        />
-      </div>
 
-      <div className="space-y-4">
-        {/* 季節カテゴリー */}
-        <select
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={combination.category ?? ""}
-          onChange={(e) => handleChange("category", e.target.value)}
-        >
-          <option value="">季節を選択</option>
-          <option value="spring">春 </option>
-          <option value="summer">夏 </option>
-          <option value="autumn">秋 </option>
-          <option value="winter">冬 </option>
-          <option value="all-season">通年 </option>
-        </select>
-
-        {/* タグ入力 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            タグ（オプション）
-          </label>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              placeholder="タグを入力してEnterキーで追加"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyPress={handleTagKeyPress}
-            />
-            <Button
-              onClick={addTag}
-              size="sm"
-              className="px-4"
-              disabled={!tagInput.trim() || tags.includes(tagInput.trim())}
-            >
-              追加
-            </Button>
-          </div>
-
-          {/* タグ表示 */}
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                >
-                  {tag}
-                  <button
-                    onClick={() => removeTag(index)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <FontAwesomeIcon icon={faTimes} size="xs" />
-                  </button>
-                </span>
-              ))}
+            {/* 投稿ボタン */}
+            <div className="flex justify-center pt-6">
+              <Button
+                onClick={handleSubmit}
+                size="lg"
+                className="min-w-[240px] py-4 text-lg font-semibold cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    投稿中...
+                  </div>
+                ) : (
+                  "投稿する"
+                )}
+              </Button>
             </div>
-          )}
-        </div>
-
-        {/* 値段 */}
-        <input
-          type="number"
-          min="0"
-          inputMode="numeric"
-          placeholder="価格（例：3000）"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={combination.price ?? ""}
-          onChange={(e) => {
-            const value = e.target.value;
-            const numericValue = value.replace(/[^0-9]/g, "");
-            handleChange(
-              "price",
-              numericValue === "" ? undefined : Number(numericValue)
-            );
-          }}
-        />
-
-        {/* 説明 */}
-        <textarea
-          placeholder="説明"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-          rows={4}
-          value={combination.description}
-          onChange={(e) => handleChange("description", e.target.value)}
-        />
-
-        {/* エラー表示 */}
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
           </div>
-        )}
-
-        {/* 投稿ボタン */}
-        <div className="flex justify-center mt-8">
-          <Button
-            onClick={handleSubmit}
-            size="lg"
-            className="min-w-[200px] cursor-pointer"
-            disabled={loading}
-          >
-            {loading ? "投稿中..." : "投稿する"}
-          </Button>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

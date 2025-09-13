@@ -110,7 +110,7 @@ export default function FavoritePage() {
 
       {/* ページネーション */}
       {totalPages >= 1 && (
-        <div className="flex justify-center items-center space-x-4 mt-8">
+        <div className="flex justify-center items-center space-x-4 mt-8 mb-3">
           <Button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}

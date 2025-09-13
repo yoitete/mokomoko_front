@@ -10,6 +10,8 @@ import { useAPI } from "@/hooks/useAPI";
 import { useFavorites } from "@/hooks/useFavorites";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
+import Button from "@/components/Button/Button";
 
 export default function Home() {
   console.log("Home component rendered");
@@ -96,7 +98,7 @@ export default function Home() {
   return (
     <div>
       <div className="mt-10">
-        <div className="mt-5 text-center text-2xl font-medium text-gray-800">
+        <div className="mt-5 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent">
           投稿新着一覧
         </div>
         <p className="text-lg font-semibold ml-4 text-orange-600">New</p>
@@ -120,14 +122,17 @@ export default function Home() {
                 return (
                   <div
                     key={post.id || index}
-                    className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg cursor-pointer"
+                    className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
                   >
-                    <Image
-                      src={imageUrl}
-                      alt={post.title}
-                      fill
-                      unoptimized={true}
-                    />
+                    <Link href={`/post/${post.id}`}>
+                      <Image
+                        src={imageUrl}
+                        alt={post.title}
+                        fill
+                        unoptimized={true}
+                        className="cursor-pointer"
+                      />
+                    </Link>
                     <button
                       onClick={(e) => {
                         e.preventDefault();
@@ -153,8 +158,8 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mt-8 text-center text-2xl font-medium text-gray-800">
-        新着人気ランキング
+      <div className="mt-8 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-blue-900 to-slate-800 bg-clip-text text-transparent">
+        投稿人気ランキング
       </div>
       <div className="mt-5 ml-4 text-left font-semibold text-gray-700 border-l-4 border-green-500 pl-3">
         春・夏
@@ -179,14 +184,17 @@ export default function Home() {
               return (
                 <div
                   key={post.id || index}
-                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg cursor-pointer"
+                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
                 >
-                  <Image
-                    src={imageUrl}
-                    alt={post.title}
-                    fill
-                    unoptimized={true}
-                  />
+                  <Link href={`/post/${post.id}`}>
+                    <Image
+                      src={imageUrl}
+                      alt={post.title}
+                      fill
+                      unoptimized={true}
+                      className="cursor-pointer"
+                    />
+                  </Link>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -234,14 +242,17 @@ export default function Home() {
               return (
                 <div
                   key={post.id || index}
-                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg cursor-pointer"
+                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
                 >
-                  <Image
-                    src={imageUrl}
-                    alt={post.title}
-                    fill
-                    unoptimized={true}
-                  />
+                  <Link href={`/post/${post.id}`}>
+                    <Image
+                      src={imageUrl}
+                      alt={post.title}
+                      fill
+                      unoptimized={true}
+                      className="cursor-pointer"
+                    />
+                  </Link>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -267,7 +278,7 @@ export default function Home() {
       </div>
       {/* https://tailwindcss.com/docs/font-size */}
       <div className="mt-10"></div>
-      <div className="mt-5 mb-10 text-center text-2xl font-medium text-gray-800">
+      <div className="mt-5 mb-10 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-amber-700 to-orange-800 bg-clip-text text-transparent">
         特集
       </div>
       <div className="mx-4 mb-5">
@@ -276,7 +287,7 @@ export default function Home() {
             クリスマス特集
           </p>
 
-          <div className="grid grid-cols-2 gap-2 w-full cursor-pointer">
+          <div className="grid grid-cols-2 gap-2 w-full">
             {postsWithImages.slice(0, 4).map((post, index) => {
               const imageUrl = post.images?.[0];
 
@@ -293,11 +304,7 @@ export default function Home() {
 
               return (
                 <div key={post.id || index}>
-                  <BoxImage
-                    src={imageUrl}
-                    alt={post.title}
-                    className="cursor-pointer"
-                  />
+                  <BoxImage src={imageUrl} alt={post.title} />
                 </div>
               );
             })}
@@ -317,6 +324,17 @@ export default function Home() {
                 大切な人へのギフトにも、自分へのご褒美にもぴったり！
               </span>
             </p>
+            <div className="mt-4 text-right">
+              <Link href="/christmas">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="min-w-[150px] cursor-pointer"
+                >
+                  詳しくはこちら →
+                </Button>
+              </Link>
+            </div>
           </div>
         </SimpleBox>
       </div>
@@ -327,7 +345,7 @@ export default function Home() {
             <p>受験応援！</p>
             <p>あったか毛布特集</p>
           </div>
-          <div className="grid grid-cols-2 gap-2 w-full cursor-pointer">
+          <div className="grid grid-cols-2 gap-2 w-full">
             {postsWithImages.slice(0, 4).map((post, index) => {
               const imageUrl = post.images?.[0];
 
@@ -344,11 +362,7 @@ export default function Home() {
 
               return (
                 <div key={post.id || index}>
-                  <BoxImage
-                    src={imageUrl}
-                    alt={post.title}
-                    className="cursor-pointer"
-                  />
+                  <BoxImage src={imageUrl} alt={post.title} />
                 </div>
               );
             })}
@@ -372,6 +386,17 @@ export default function Home() {
                 集中力を高める、あなただけの学習パートナー
               </span>
             </p>
+            <div className="mt-4 text-right">
+              <Link href="/exam-support">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="min-w-[150px] cursor-pointer"
+                >
+                  詳しくはこちら →
+                </Button>
+              </Link>
+            </div>
           </div>
         </SimpleBox>
       </div>
