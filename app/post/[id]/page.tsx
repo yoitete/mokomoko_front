@@ -40,7 +40,7 @@ export default function PostDetail() {
     if (params.id) {
       fetchPost();
     }
-  }, [params.id, get]);
+  }, [params.id]);
 
   if (isLoading) {
     return (
