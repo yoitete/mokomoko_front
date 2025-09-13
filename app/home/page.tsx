@@ -7,8 +7,11 @@ import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import { BoxImage } from "@/components/BoxImage/BoxImage";
 import { Post } from "@/hooks/usePosts";
 import { useAPI } from "@/hooks/useAPI";
+import { useFavorites } from "@/hooks/useFavorites";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
+import Button from "@/components/Button/Button";
 
 export default function Home() {
   console.log("Home component rendered");
@@ -16,25 +19,9 @@ export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [favorites, setFavorites] = useState<number[]>([]);
 
-  // お気に入り状態を切り替える関数
-  const toggleFavorite = (postId: number) => {
-    setFavorites((prev) => {
-      if (prev.includes(postId)) {
-        // お気に入りから削除
-        return prev.filter((id) => id !== postId);
-      } else {
-        // お気に入りに追加
-        return [...prev, postId];
-      }
-    });
-  };
-
-  // お気に入り状態をチェックする関数
-  const isFavorite = (postId: number) => {
-    return favorites.includes(postId);
-  };
+  // お気に入り機能
+  const { toggleFavorite, isFavorite } = useFavorites(1);
 
   useEffect(() => {
     console.log("useEffect triggered - fetching posts");
@@ -111,7 +98,9 @@ export default function Home() {
   return (
     <div>
       <div className="mt-10">
-        <div className="mt-5 text-center text-2xl font-semibold">新着情報</div>
+        <div className="mt-5 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent">
+          投稿新着一覧
+        </div>
         <p className="text-lg font-semibold ml-4 text-orange-600">New</p>
         <div className="flex justify-end">
           <SlideBox>
@@ -133,14 +122,17 @@ export default function Home() {
                 return (
                   <div
                     key={post.id || index}
-                    className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg cursor-pointer"
+                    className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
                   >
-                    <Image
-                      src={imageUrl}
-                      alt={post.title}
-                      fill
-                      unoptimized={true}
-                    />
+                    <Link href={`/post/${post.id}`}>
+                      <Image
+                        src={imageUrl}
+                        alt={post.title}
+                        fill
+                        unoptimized={true}
+                        className="cursor-pointer"
+                      />
+                    </Link>
                     <button
                       onClick={(e) => {
                         e.preventDefault();
@@ -166,10 +158,12 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mt-8 text-center text-2xl font-semibold">
-        人気ランキング
+      <div className="mt-8 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-blue-900 to-slate-800 bg-clip-text text-transparent">
+        投稿人気ランキング
       </div>
-      <div className="mt-5 ml-4 text-left font-semibold">春・夏☘️</div>
+      <div className="mt-5 ml-4 text-left font-semibold text-gray-700 border-l-4 border-green-500 pl-3">
+        春・夏
+      </div>
       <div className="flex justify-end">
         <SlideBox>
           <div className="gap-4">
@@ -190,14 +184,17 @@ export default function Home() {
               return (
                 <div
                   key={post.id || index}
-                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg cursor-pointer"
+                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
                 >
-                  <Image
-                    src={imageUrl}
-                    alt={post.title}
-                    fill
-                    unoptimized={true}
-                  />
+                  <Link href={`/post/${post.id}`}>
+                    <Image
+                      src={imageUrl}
+                      alt={post.title}
+                      fill
+                      unoptimized={true}
+                      className="cursor-pointer"
+                    />
+                  </Link>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -222,7 +219,9 @@ export default function Home() {
         </SlideBox>
       </div>
 
-      <div className="mt-5 ml-4 text-left font-semibold">秋・冬🍁</div>
+      <div className="mt-5 ml-4 text-left font-semibold text-gray-700 border-l-4 border-orange-500 pl-3">
+        秋・冬
+      </div>
       <div className="flex justify-end">
         <SlideBox>
           <div className="gap-4">
@@ -243,14 +242,17 @@ export default function Home() {
               return (
                 <div
                   key={post.id || index}
-                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg cursor-pointer"
+                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
                 >
-                  <Image
-                    src={imageUrl}
-                    alt={post.title}
-                    fill
-                    unoptimized={true}
-                  />
+                  <Link href={`/post/${post.id}`}>
+                    <Image
+                      src={imageUrl}
+                      alt={post.title}
+                      fill
+                      unoptimized={true}
+                      className="cursor-pointer"
+                    />
+                  </Link>
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -276,14 +278,16 @@ export default function Home() {
       </div>
       {/* https://tailwindcss.com/docs/font-size */}
       <div className="mt-10"></div>
-      <div className="mt-5 mb-10 text-center text-2xl font-semibold">特集</div>
+      <div className="mt-5 mb-10 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-amber-700 to-orange-800 bg-clip-text text-transparent">
+        特集
+      </div>
       <div className="mx-4 mb-5">
-        <SimpleBox className="h-120 flex flex-col justify-start items-center p-4">
-          <p className="text-center text-lg font-semibold mb-4">
+        <SimpleBox className="h-137 flex flex-col justify-start items-center p-4">
+          <p className="text-center text-xl font-semibold text-red-600 mb-4">
             クリスマス特集
           </p>
 
-          <div className="grid grid-cols-2 gap-2 w-full cursor-pointer">
+          <div className="grid grid-cols-2 gap-2 w-full">
             {postsWithImages.slice(0, 4).map((post, index) => {
               const imageUrl = post.images?.[0];
 
@@ -299,43 +303,49 @@ export default function Home() {
               }
 
               return (
-                <div key={post.id || index} className="relative">
-                  <BoxImage
-                    src={imageUrl}
-                    alt={post.title}
-                    className="cursor-pointer"
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleFavorite(post.id!);
-                    }}
-                    className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
-                  >
-                    <FontAwesomeIcon
-                      icon={faHeart}
-                      className={`text-lg ${
-                        isFavorite(post.id!)
-                          ? "text-red-500"
-                          : "text-gray-400 hover:text-red-500"
-                      }`}
-                    />
-                  </button>
+                <div key={post.id || index}>
+                  <BoxImage src={imageUrl} alt={post.title} />
                 </div>
               );
             })}
+          </div>
+          <div className="mt-6 px-4">
+            <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
+              <span className="text-red-500 font-semibold">心まで温まる</span>
+              、クリスマス限定のふわもこ毛布
+            </p>
+            <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
+              冬の夜をやさしく包み込む、
+              <br />
+              とっておきのブランケットをご用意しました
+            </p>
+            <p className="text-center text-gray-500 text-sm mt-3">
+              <span className="bg-red-50 text-red-600 px-2 py-1 rounded-full text-xs font-medium">
+                大切な人へのギフトにも、自分へのご褒美にもぴったり！
+              </span>
+            </p>
+            <div className="mt-4 text-right">
+              <Link href="/christmas">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="min-w-[150px] cursor-pointer"
+                >
+                  詳しくはこちら →
+                </Button>
+              </Link>
+            </div>
           </div>
         </SimpleBox>
       </div>
 
       <div className="mx-4 mb-4">
-        <SimpleBox className="h-120 flex flex-col justify-start items-center p-4">
-          <div className="text-center font-semibold mb-4">
+        <SimpleBox className="h-150 flex flex-col justify-start items-center p-4">
+          <div className="text-center text-xl font-semibold text-indigo-800 mb-4">
             <p>受験応援！</p>
             <p>あったか毛布特集</p>
           </div>
-          <div className="grid grid-cols-2 gap-2 w-full cursor-pointer">
+          <div className="grid grid-cols-2 gap-2 w-full">
             {postsWithImages.slice(0, 4).map((post, index) => {
               const imageUrl = post.images?.[0];
 
@@ -351,32 +361,42 @@ export default function Home() {
               }
 
               return (
-                <div key={post.id || index} className="relative">
-                  <BoxImage
-                    src={imageUrl}
-                    alt={post.title}
-                    className="cursor-pointer"
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleFavorite(post.id!);
-                    }}
-                    className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
-                  >
-                    <FontAwesomeIcon
-                      icon={faHeart}
-                      className={`text-lg ${
-                        isFavorite(post.id!)
-                          ? "text-red-500"
-                          : "text-gray-400 hover:text-red-500"
-                      }`}
-                    />
-                  </button>
+                <div key={post.id || index}>
+                  <BoxImage src={imageUrl} alt={post.title} />
                 </div>
               );
             })}
+          </div>
+          <div className="mt-6 px-4">
+            <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
+              <span className="text-indigo-600 font-semibold">
+                合格への道を
+              </span>
+              、あたたかさで支える
+            </p>
+            <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
+              冬の受験勉強は、寒さとの戦いでもあります。
+              <br />
+              深夜まで机に向かうあなたの背中をやさしく包み込み、
+              <br />
+              心までほっと落ち着ける&ldquo;あったか毛布&rdquo;をご用意しました
+            </p>
+            <p className="text-center text-gray-500 text-sm mt-3">
+              <span className="bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full text-xs font-medium">
+                集中力を高める、あなただけの学習パートナー
+              </span>
+            </p>
+            <div className="mt-4 text-right">
+              <Link href="/exam-support">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="min-w-[150px] cursor-pointer"
+                >
+                  詳しくはこちら →
+                </Button>
+              </Link>
+            </div>
           </div>
         </SimpleBox>
       </div>
