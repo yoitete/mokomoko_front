@@ -6,11 +6,7 @@ import Image from "next/image";
 import { Post } from "@/hooks/usePosts";
 import { useAPI } from "@/hooks/useAPI";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowLeft,
-  faHeart,
-  faShare,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 export default function PostDetail() {
   const params = useParams();
@@ -153,18 +149,6 @@ export default function PostDetail() {
                 </div>
               </div>
             )}
-
-            {/* アクションボタン */}
-            <div className="flex gap-4 pt-4 border-t border-gray-200">
-              <button className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors">
-                <FontAwesomeIcon icon={faHeart} />
-                いいね
-              </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
-                <FontAwesomeIcon icon={faShare} />
-                シェア
-              </button>
-            </div>
 
             {/* 投稿日時 */}
             <div className="mt-4 text-sm text-gray-500">

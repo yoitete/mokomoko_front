@@ -32,8 +32,8 @@ export default function RootLayout({
         <div className="flex-grow bg-[#E2D8D8] relative z-10">
           <Header />
           {children}
-          <Footer />
         </div>
+        <Footer />
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { BoxImage } from "@/components/BoxImage/BoxImage";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import { useAPI } from "@/hooks/useAPI";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -84,9 +84,17 @@ export default function FavoritePage() {
           {/* 左：画像 */}
           <div className="md:w-1/3 w-full">
             {post.images?.[0] ? (
-              <BoxImage src={post.images[0]} alt={post.title} />
+              <div className="w-full h-[118px] overflow-hidden rounded-lg relative">
+                <Image
+                  src={post.images[0]}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  unoptimized={true}
+                />
+              </div>
             ) : (
-              <div className="h-40 bg-gray-200 flex items-center justify-center rounded-lg">
+              <div className="h-[118px] bg-gray-200 flex items-center justify-center rounded-lg">
                 No Image
               </div>
             )}
@@ -122,7 +130,7 @@ export default function FavoritePage() {
           </Button>
 
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-800 font-medium">
+            <span className="text-sm text-gray-900 font-semibold">
               {currentPage} / {totalPages}
             </span>
           </div>

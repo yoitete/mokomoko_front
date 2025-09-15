@@ -1,69 +1,384 @@
-import { BoxImage } from "@/components/BoxImage/BoxImage";
-import blanketBeige from "@/public/images/blanket_beige_1.png";
-import blanketBrown from "@/public/images/blanket_brown_1.png";
-import blanketGray from "@/public/images/blanket_gray_1.png";
-import blanketWhite from "@/public/images/blanket_white_1.png";
-import blanketBlack from "@/public/images/blanket_black_1.png";
-import blanketPattern from "@/public/images/blanket_pattern_1.png";
-import blanketLightGray from "@/public/images/blanket_lightgray_1.png";
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { useAPI } from "@/hooks/useAPI";
+import { Post } from "@/hooks/usePosts";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
-import { faList } from "@fortawesome/free-solid-svg-icons";
+import Button from "@/components/Button/Button";
+import { faList, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 
 export default function Search() {
-  const boxes = [
-    [blanketBeige],
-    [blanketBrown],
-    [blanketGray],
-    [blanketWhite],
-    [blanketBlack],
-    [blanketPattern],
-    [blanketLightGray],
-  ];
+  const { get } = useAPI();
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
+  const [selectedSort, setSelectedSort] = useState<"newest" | "popular">(
+    "newest"
+  );
+
+  // 投稿データ取得
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const data = await get<Post[]>("/posts");
+        setPosts(data);
+        setFilteredPosts(data);
+      } catch (err) {
+        console.error("投稿の取得に失敗しました", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, [get]);
+
+  // 検索機能
+  useEffect(() => {
+    let filtered = posts;
+
+    // テキスト検索
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((post) => {
+        return (
+          post.title?.toLowerCase().includes(query) ||
+          post.description?.toLowerCase().includes(query) ||
+          (post.tags &&
+            post.tags.some((tag) => tag.toLowerCase().includes(query))) ||
+          post.season?.toLowerCase().includes(query)
+        );
+      });
+    }
+
+    // 季節フィルター
+    if (selectedSeason) {
+      filtered = filtered.filter((post) => {
+        if (selectedSeason === "spring") {
+          return post.season === "spring-summer";
+        } else if (selectedSeason === "summer") {
+          return post.season === "spring-summer";
+        } else if (selectedSeason === "autumn") {
+          return post.season === "autumn-winter";
+        } else if (selectedSeason === "winter") {
+          return post.season === "autumn-winter";
+        }
+        return post.season === selectedSeason;
+      });
+    }
+
+    setFilteredPosts(filtered);
+    setCurrentPage(1); // 検索時にページを1にリセット
+  }, [searchQuery, posts, selectedSeason]);
+
+  // 並び替え機能
+  const sortedPosts = React.useMemo(() => {
+    return [...filteredPosts].sort((a, b) => {
+      if (selectedSort === "newest") {
+        return (
+          new Date(b.created_at || 0).getTime() -
+          new Date(a.created_at || 0).getTime()
+        );
+      } else {
+        // 人気順（仮実装：価格の高い順）
+        return (b.price || 0) - (a.price || 0);
+      }
+    });
+  }, [filteredPosts, selectedSort]);
+
+  // 並び替え変更時にページを1にリセット
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedSort]);
+
+  // ドロップダウンメニューの外側クリックで閉じる
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isDropdownOpen) {
+        const target = event.target as Element;
+        if (!target.closest(".dropdown-container")) {
+          setIsDropdownOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
+  // 画像がある投稿のみをフィルタリング
+  const postsWithImages = sortedPosts.filter(
+    (post) => post.images && post.images.length > 0
+  );
+
+  // ページネーション計算
+  const totalPages = Math.ceil(postsWithImages.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPosts = postsWithImages.slice(startIndex, endIndex);
+
+  // ページ変更時にトップにスクロール
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  if (loading) {
+    return (
+      <div className="mt-5 mb-5">
+        <div className="text-center mt-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-5 mb-5">
-      <div className="mt-5 ml-7 text-left font-semibold">検 索</div>
+      <div className="mt-5 ml-7 text-left font-semibold text-2xl">検索</div>
 
-      {/* テキスト */}
-      <input
-        type="text"
-        className="bg-white p-3 border min-w-[430px] ml-6 mt-3 flex items-center justify-start rounded-xl"
-        placeholder="テキストを入力"
-      />
-
-      <div className="mr-6 mt-2 flex justify-end">
-        <div className="flex items-center gap-2 text-sm text-black">
-          <FontAwesomeIcon
-            icon={faList}
-            size="lg"
-            className="mt-3 cursor-pointer text-black"
+      {/* 検索バー */}
+      <div className="ml-6 mt-3 flex items-center gap-2">
+        <div className="relative flex-1 max-w-md">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-white p-3 border w-full rounded-xl pr-10"
+            placeholder="タグ、タイトル、説明で検索..."
           />
-          <p className="mt-3">並べ替え：</p>
-          <p className="mt-3">新着順 / 人気順</p>
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          />
         </div>
       </div>
-      <div className="mt-2 flex justify-center">
-        <div className="mt-2 space-y-4">
-          {boxes.map((images, index) => (
+
+      {/* フィルターと並び替え */}
+      <div className="mr-6 mt-2 flex justify-end">
+        <div className="relative dropdown-container">
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-black"
+          >
+            <FontAwesomeIcon icon={faList} size="lg" className="text-black" />
+            <span>
+              並べ替え：{selectedSort === "newest" ? "新着順" : "人気順"}
+            </span>
+          </button>
+
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+              <div className="py-1">
+                <button
+                  onClick={() => {
+                    setSelectedSeason(null);
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                    !selectedSeason ? "bg-blue-50 text-blue-600" : ""
+                  }`}
+                >
+                  すべて
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedSort("newest");
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                    selectedSort === "newest" ? "bg-blue-50 text-blue-600" : ""
+                  }`}
+                >
+                  新着順
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedSort("popular");
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                    selectedSort === "popular" ? "bg-blue-50 text-blue-600" : ""
+                  }`}
+                >
+                  人気順
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedSeason("spring");
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                    selectedSeason === "spring"
+                      ? "bg-blue-50 text-blue-600"
+                      : ""
+                  }`}
+                >
+                  春
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedSeason("summer");
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                    selectedSeason === "summer"
+                      ? "bg-blue-50 text-blue-600"
+                      : ""
+                  }`}
+                >
+                  夏
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedSeason("autumn");
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                    selectedSeason === "autumn"
+                      ? "bg-blue-50 text-blue-600"
+                      : ""
+                  }`}
+                >
+                  秋
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedSeason("winter");
+                    setIsDropdownOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                    selectedSeason === "winter"
+                      ? "bg-blue-50 text-blue-600"
+                      : ""
+                  }`}
+                >
+                  冬
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 検索結果 */}
+      <div className="mt-4 ml-6">
+        <p className="text-sm text-gray-600">
+          {searchQuery
+            ? `"${searchQuery}" の検索結果: ${postsWithImages.length}件`
+            : `全投稿: ${postsWithImages.length}件`}
+        </p>
+        {totalPages > 1 && (
+          <p className="text-sm text-gray-500 mt-1">
+            {currentPage} / {totalPages} ページ
+          </p>
+        )}
+      </div>
+
+      {/* 投稿一覧 */}
+      <div className="mt-10 mx-4 space-y-4">
+        {postsWithImages.length === 0 ? (
+          <p className="text-center mt-10 text-gray-600">
+            {searchQuery
+              ? "検索結果が見つかりませんでした"
+              : "投稿がありません"}
+          </p>
+        ) : (
+          currentPosts.map((post) => (
             <SimpleBox
-              key={index}
-              className="h-40 flex flex-col justify-center items-center p-4 min-w-[430px]"
+              key={post.id}
+              className="flex flex-col md:flex-row items-start p-4"
             >
-              <div className="grid grid-cols-2 gap-2 w-full">
-                {images.map((src, i) => (
-                  <BoxImage
-                    key={i}
-                    src={src}
-                    alt={`box${index + 1}-img${i + 1}`}
-                  />
-                ))}
+              {/* 左：画像 */}
+              <div className="md:w-1/3 w-full">
+                {post.images?.[0] ? (
+                  <div className="w-full h-[118px] overflow-hidden rounded-lg relative">
+                    <Image
+                      src={post.images[0]}
+                      alt={post.title}
+                      fill
+                      className="object-cover"
+                      unoptimized={true}
+                    />
+                  </div>
+                ) : (
+                  <div className="h-[118px] bg-gray-200 flex items-center justify-center rounded-lg">
+                    No Image
+                  </div>
+                )}
+              </div>
+
+              {/* 右：タイトル＋本文サマリー */}
+              <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
+                <p className="text-lg font-semibold">{post.title}</p>
+                <p className="text-sm text-gray-600 line-clamp-3 mt-1">
+                  {post.description}
+                </p>
+                {post.tags && post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {post.tags.slice(0, 5).map((tag, index) => (
+                      <span
+                        key={index}
+                        className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <Link
+                  href={`/post/${post.id}`}
+                  className="text-blue-500 text-sm mt-2 inline-block"
+                >
+                  続きを読む
+                </Link>
               </div>
             </SimpleBox>
-          ))}
-        </div>
+          ))
+        )}
       </div>
+
+      {/* ページネーション */}
+      {totalPages >= 1 && (
+        <div className="flex justify-center items-center space-x-4 mt-8 mb-3">
+          <Button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            variant="outline"
+            size="md"
+            className="min-w-[100px]"
+          >
+            前へ
+          </Button>
+
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-900 font-semibold">
+              {currentPage} / {totalPages}
+            </span>
+          </div>
+
+          <Button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            variant="outline"
+            size="md"
+            className="min-w-[100px]"
+          >
+            次へ
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
