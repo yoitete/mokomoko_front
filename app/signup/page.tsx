@@ -1,20 +1,32 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useCallback, useState, useEffect } from "react";
+import { useAPI } from "@/hooks/useAPI";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useAtomValue } from "jotai";
+import { authTokenAtom } from "@/lib/authAtoms";
 import Link from "next/link";
 import Input from "@/components/Input/Input";
 import Button from "@/components/Button/Button";
 
 export default function Signup() {
   const { signUp, loading, error, isAuthenticated } = useAuth();
+  const { post } = useAPI();
+  const currentToken = useAtomValue(authTokenAtom); // 現在のトークン値を直接取得
+  const tokenRef = useRef<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState("");
   const router = useRouter();
+
+  // トークンが更新されたらrefに保存
+  useEffect(() => {
+    tokenRef.current = currentToken;
+  }, [currentToken]);
 
   // ログイン済みの場合はホームページにリダイレクト
   useEffect(() => {
@@ -22,6 +34,47 @@ export default function Signup() {
       router.push("/home");
     }
   }, [isAuthenticated, router]);
+
+  // トークンが利用可能になるまで待機（refから現在のトークン値を取得）
+  const waitForToken = useCallback(
+    async (maxWaitTime = 10000): Promise<string> => {
+      // 既にトークンがある場合は即座に返す
+      if (tokenRef.current) {
+        return tokenRef.current;
+      }
+
+      return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+
+        const checkToken = () => {
+          if (tokenRef.current) {
+            resolve(tokenRef.current);
+          } else if (Date.now() - startTime >= maxWaitTime) {
+            reject(new Error("認証トークンの取得がタイムアウトしました"));
+          } else {
+            setTimeout(checkToken, 100);
+          }
+        };
+
+        checkToken();
+      });
+    },
+    []
+  );
+
+  // ユーザー作成API呼び出し
+  const createUserInDatabase = useCallback(
+    async (userData: { email: string; name?: string; token: string }) => {
+      try {
+        const response = await post("/users", userData);
+        return response;
+      } catch (err) {
+        console.error("ユーザー情報の保存に失敗しました:", err);
+        throw new Error("ユーザー情報の保存に失敗しました");
+      }
+    },
+    [post]
+  );
 
   const validateForm = useCallback(() => {
     if (!email.trim()) {
@@ -55,17 +108,39 @@ export default function Signup() {
       setFormError("");
 
       try {
+        // 1. Firebaseでアカウント作成
         await signUp(email, password);
+
+        // 2. トークンが利用可能になるまで待機
+        const obtainedToken = await waitForToken();
+
+        // 3. バックエンドにユーザー情報を保存
+        await createUserInDatabase({
+          email,
+          name: name.trim() || undefined,
+          token: obtainedToken,
+        });
+
         // 成功時はuseEffectでリダイレクトされる
-      } catch {
+      } catch (err) {
         setFormError(
-          "アカウント作成に失敗しました。入力内容をご確認ください。"
+          err instanceof Error
+            ? err.message
+            : "アカウント作成に失敗しました。入力内容をご確認ください。"
         );
       } finally {
         setIsLoading(false);
       }
     },
-    [email, password, signUp, validateForm]
+    [
+      email,
+      password,
+      name,
+      signUp,
+      validateForm,
+      createUserInDatabase,
+      waitForToken,
+    ]
   );
 
   // 認証状態の初期読み込み中
@@ -96,6 +171,24 @@ export default function Signup() {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-[#5A4A4A] mb-2"
+              >
+                お名前（任意）
+              </label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="お名前を入力"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
+                disabled={isLoading}
+              />
+            </div>
+
             <div>
               <label
                 htmlFor="email"

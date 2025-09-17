@@ -77,16 +77,8 @@ export default function ChristmasPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500 mb-4">
-            エラーが発生しました:{" "}
-            {error.message || "データの取得に失敗しました"}
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            再読み込み
-          </button>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 font-medium">読み込み中...</p>
         </div>
       </div>
     );
@@ -115,15 +107,6 @@ export default function ChristmasPage() {
           <div className="grid grid-cols-2 gap-2">
             {christmasPostsWithImages.map((post, index) => {
               const imageUrl = post.images?.[0];
-
-              console.log(
-                `Christmas Post ${post.id} (${post.title}): 
-                - Image URL: ${imageUrl}
-                - Has image: ${Boolean(imageUrl)}
-                - Post images array: ${JSON.stringify(post.images)}
-                - Post season: ${post.season}
-                - Post tags: ${JSON.stringify(post.tags)}`
-              );
 
               // 画像が存在する場合のみ表示
               if (!imageUrl) {

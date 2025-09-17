@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { usePost, usePut, useDelete } from "./useSWRAPI";
+import { useAPI } from "./useAPI";
 import { mutate } from "swr";
 
 // 投稿の型定義
@@ -42,6 +43,7 @@ export const usePosts = () => {
   const postData = usePost<Post>();
   const putData = usePut<Post>();
   const deleteData = useDelete();
+  const { postFormData } = useAPI();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,24 +70,51 @@ export const usePosts = () => {
     [postData]
   );
 
-  // 投稿を作成（画像付き）- TODO: FormData対応が必要
-  const createPostWithImage = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // 投稿を作成（画像付き）
+  const createPostWithImage = useCallback(
+    async (postDataInput: CreatePostWithImageData) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      // TODO: FormDataを使用した画像アップロード機能の実装が必要
-      // 現在はSWRのpostFormData相当の機能が未実装
-      throw new Error("画像付き投稿機能は現在開発中です");
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "投稿の作成に失敗しました";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+        // FormDataを作成
+        const formData = new FormData();
+        formData.append("post[user_id]", postDataInput.user_id.toString());
+        formData.append("post[title]", postDataInput.title);
+        formData.append("post[description]", postDataInput.description || "");
+        formData.append("post[season]", postDataInput.season);
+
+        if (postDataInput.price !== undefined) {
+          formData.append("post[price]", postDataInput.price.toString());
+        }
+
+        if (postDataInput.tags && postDataInput.tags.length > 0) {
+          postDataInput.tags.forEach((tag) => {
+            formData.append("post[tags][]", tag);
+          });
+        }
+
+        if (postDataInput.image) {
+          formData.append("post[images][]", postDataInput.image);
+        }
+
+        // FormDataを使用してPOST
+        const data = await postFormData<Post>("/posts", formData);
+
+        // キャッシュを更新
+        mutate("/posts");
+        return data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "投稿の作成に失敗しました";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [postFormData]
+  );
 
   // 投稿を更新
   const updatePost = useCallback(

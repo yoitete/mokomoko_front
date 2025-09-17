@@ -14,7 +14,19 @@ import {
   authTokenAtom,
 } from "@/lib/authAtoms";
 
-export const useAuth = () => {
+export const useAuth = (): {
+  user: import("firebase/auth").User | null;
+  loading: boolean;
+  error: string | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isUnauthenticated: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  refreshToken: () => Promise<string>;
+} => {
   // Jotaiのatomから認証状態を取得
   const { user, loading, error, token } = useAtomValue(authStateAtom);
   const setLoading = useSetAtom(authLoadingAtom);

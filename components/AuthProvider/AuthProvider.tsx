@@ -28,13 +28,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (user) => {
+        console.log("AuthProvider: onAuthStateChanged called, user:", user);
         setUser(user);
         setError(null);
 
         // ユーザーがいる場合のみトークンを取得
         if (user) {
           try {
+            console.log("AuthProvider: トークン取得開始");
             const token = await user.getIdToken();
+            console.log("AuthProvider: トークン取得成功:", token);
             setToken(token);
           } catch (error) {
             console.error("トークンの取得に失敗しました:", error);
@@ -43,9 +46,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         } else {
           // ユーザーがいない場合はトークンをクリア
+          console.log("AuthProvider: ユーザーなし、トークンクリア");
           setToken(null);
         }
 
+        console.log("AuthProvider: 認証状態更新完了");
         setLoading(false);
       },
       (error) => {

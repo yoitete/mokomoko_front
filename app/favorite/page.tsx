@@ -53,16 +53,9 @@ export default function FavoritePage() {
   // エラー状態
   if (error) {
     return (
-      <div className="text-center mt-10 text-red-500">
-        <p>
-          エラーが発生しました: {error.message || "データの取得に失敗しました"}
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          再読み込み
-        </button>
+      <div className="text-center mt-10">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+        <p className="mt-2">お気に入りを読み込み中...</p>
       </div>
     );
   }

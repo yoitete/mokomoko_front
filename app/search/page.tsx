@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useAPI } from "@/hooks/useAPI";
+import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import Button from "@/components/Button/Button";
@@ -11,11 +11,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 
 export default function Search() {
-  const { get } = useAPI();
-  const [posts, setPosts] = useState<Post[]>([]);
+  // SWRを使用してデータを取得（デフォルト設定を使用）
+  const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
+
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -24,26 +24,16 @@ export default function Search() {
     "newest"
   );
 
-  // 投稿データ取得
+  // postsが更新されたときにfilteredPostsを更新
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const data = await get<Post[]>("/posts");
-        setPosts(data);
-        setFilteredPosts(data);
-      } catch (err) {
-        console.error("投稿の取得に失敗しました", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
-  }, [get]);
+    if (posts) {
+      setFilteredPosts(posts);
+    }
+  }, [posts]);
 
   // 検索機能
   useEffect(() => {
-    let filtered = posts;
+    let filtered = posts || [];
 
     // テキスト検索
     if (searchQuery.trim()) {
@@ -133,7 +123,18 @@ export default function Search() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) {
+  if (isLoading) {
+    return (
+      <div className="mt-5 mb-5">
+        <div className="text-center mt-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
     return (
       <div className="mt-5 mb-5">
         <div className="text-center mt-10">

@@ -47,16 +47,9 @@ export default function ExamSupportPage() {
 
   if (error) {
     return (
-      <div className="text-center mt-10 text-red-500">
-        <p>
-          エラーが発生しました: {error.message || "データの取得に失敗しました"}
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          再読み込み
-        </button>
+      <div className="text-center mt-10">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+        <p className="mt-2">読み込み中...</p>
       </div>
     );
   }
@@ -91,15 +84,6 @@ export default function ExamSupportPage() {
         <div className="grid grid-cols-2 gap-2">
           {examSupportPosts.map((post, index) => {
             const imageUrl = post.images?.[0];
-
-            console.log(
-              `Exam Support Post ${post.id} (${post.title}): 
-              - Image URL: ${imageUrl}
-              - Has image: ${Boolean(imageUrl)}
-              - Post images array: ${JSON.stringify(post.images)}
-              - Post season: ${post.season}
-              - Post tags: ${JSON.stringify(post.tags)}`
-            );
 
             // 画像が存在する場合のみ表示
             if (!imageUrl) {
