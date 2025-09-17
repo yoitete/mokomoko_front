@@ -10,7 +10,7 @@ export const useFavorites = (userId: number = 1) => {
     isLoading,
   } = useGet<{ post_id: number }[]>(`/favorites?user_id=${userId}`, {
     revalidateOnFocus: false, // お気に入りは頻繁に変更されないため
-    dedupingInterval: 5 * 60 * 1000, // お気に入りは5分キャッシュ
+    dedupingInterval: 0,
   });
 
   // お気に入りIDの配列を生成（useMemoで最適化）

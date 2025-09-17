@@ -18,8 +18,8 @@ export default function PostDetail() {
     error,
     isLoading,
   } = useGet<Post>(params.id ? `/posts/${params.id}` : null, {
-    revalidateOnFocus: false, // 詳細ページでは頻繁な再検証は不要
-    dedupingInterval: 10 * 60 * 1000, // 詳細ページは長めのキャッシュ
+    revalidateOnFocus: true, // 詳細ページでは頻繁な再検証は不要
+    dedupingInterval: 0, // 詳細ページは長めのキャッシュ
   });
 
   if (isLoading) {

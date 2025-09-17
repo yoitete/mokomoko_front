@@ -51,7 +51,7 @@ export const useGet = <T = unknown>(
       // 最適化されたデフォルト設定
       revalidateOnFocus: true, // フォーカス時に再検証（デフォルトtrue）
       revalidateOnReconnect: true, // 再接続時に再検証
-      dedupingInterval: 2 * 60 * 1000, // 2分間のキャッシュ（5分は長すぎるため短縮）
+      dedupingInterval: 0,
       errorRetryCount: 3, // エラー時のリトライ回数
       errorRetryInterval: 1000, // リトライ間隔（1秒）
       refreshInterval: 0, // 自動リフレッシュは無効（必要に応じて個別設定）

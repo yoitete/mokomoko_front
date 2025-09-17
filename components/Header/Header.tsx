@@ -17,6 +17,7 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await logout();
+      window.location.href = "/login";
       setShowMenu(false);
     } catch (error) {
       console.error("ログアウトに失敗しました:", error);
