@@ -20,7 +20,7 @@ export default function Footer() {
           icon={faHouse}
           size="2x"
           className={`cursor-pointer text-[#F1F6F7] ${
-            homePath.includes(pathname) ? "text-sky-300" : ""
+            homePath.includes(pathname) ? "text-green-300" : ""
           }`}
         />
       </Link>
@@ -30,7 +30,7 @@ export default function Footer() {
           icon={faMagnifyingGlass}
           size="2x"
           className={`cursor-pointer text-[#F1F6F7] ${
-            pathname === "/search" ? "text-sky-300" : ""
+            pathname === "/search" ? "text-green-300" : ""
           }`}
         />
       </Link>
@@ -40,7 +40,7 @@ export default function Footer() {
           icon={faHeart}
           size="2x"
           className={`cursor-pointer text-[#F1F6F7] ${
-            pathname === "/favorite" ? "text-sky-300" : ""
+            pathname === "/favorite" ? "text-green-300" : ""
           }`}
         />
       </Link>
@@ -50,7 +50,7 @@ export default function Footer() {
           icon={faPenToSquare}
           size="2x"
           className={`cursor-pointer text-[#F1F6F7] ${
-            pathname === "/post" ? "text-sky-300" : ""
+            pathname === "/post" ? "text-green-300" : ""
           }`}
         />
       </Link>
@@ -60,7 +60,7 @@ export default function Footer() {
           icon={faUser}
           size="2x"
           className={`cursor-pointer text-[#F1F6F7] ${
-            pathname === "/mypage" ? "text-sky-300" : ""
+            pathname === "/mypage" ? "text-pink-300" : ""
           }`}
         />
       </Link>
