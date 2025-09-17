@@ -1,138 +1,187 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { BoxImage } from "@/components/BoxImage/BoxImage";
-import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
-import { useAPI } from "@/hooks/useAPI";
+import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 
 export default function ChristmasPage() {
-  const { get } = useAPI();
-  const [posts, setPosts] = useState<Post[]>([]);
+  // SWRを使用してデータを取得（デフォルト設定を使用）
+  const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
 
-  // 投稿データ取得
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const data = await get<Post[]>("/posts");
-        setPosts(data);
-      } catch (err) {
-        console.error("投稿の取得に失敗しました", err);
-      }
-    };
-    fetchPosts();
-  }, [get]);
-
-  // クリスマス関連の投稿をフィルタリング（seasonが"Christmas Special"の投稿）
-  const christmasPosts = posts.filter(
-    (post) =>
-      post.season === "Christmas Special" &&
-      post.images &&
-      post.images.length > 0
+  // 画像がある投稿のみをフィルタリング
+  const postsWithImages = (posts || []).filter(
+    (post) => post.images && post.images.length > 0
   );
 
-  return (
-    <div className="mt-10 mx-4">
-      {/* ヘッダー */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-red-600 mb-4">
-          🎄 クリスマス特集 🎄
-        </h1>
-        <p className="text-gray-600 text-lg">
-          心まで温まる、クリスマス限定のふわもこ毛布
-        </p>
-        <p className="text-gray-500 text-sm mt-2">
-          冬の夜をやさしく包み込む、とっておきのブランケットをご用意しました
-        </p>
-      </div>
+  // クリスマス関連の投稿をフィルタリング（#クリスマスタグまたはChristmas Special）
+  const christmasPostsWithImages = postsWithImages.filter(
+    (post) =>
+      (post.tags &&
+        post.tags.some(
+          (tag) =>
+            tag.toLowerCase().includes("クリスマス") ||
+            tag.toLowerCase().includes("christmas")
+        )) ||
+      post.season === "Christmas Special" ||
+      post.season === "christmas" ||
+      post.title?.toLowerCase().includes("クリスマス") ||
+      post.title?.toLowerCase().includes("christmas")
+  );
 
-      {/* 商品一覧 */}
-      {christmasPosts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">
-            クリスマス特集の商品を準備中です...
+  // デバッグ用ログ
+  console.log("All posts:", posts);
+  console.log("Posts with images:", postsWithImages);
+  console.log("Christmas posts with images:", christmasPostsWithImages);
+  console.log(
+    "Posts with Christmas season:",
+    posts?.filter(
+      (post) =>
+        post.season === "Christmas Special" || post.season === "christmas"
+    )
+  );
+  console.log(
+    "Posts with Christmas tags:",
+    posts?.filter(
+      (post) =>
+        post.tags &&
+        post.tags.some(
+          (tag) =>
+            tag.toLowerCase().includes("クリスマス") ||
+            tag.toLowerCase().includes("christmas")
+        )
+    )
+  );
+  console.log(
+    "Posts with Christmas in title:",
+    posts?.filter(
+      (post) =>
+        post.title?.toLowerCase().includes("クリスマス") ||
+        post.title?.toLowerCase().includes("christmas")
+    )
+  );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 font-medium">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 font-medium">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">
+            #クリスマス特集
+          </h1>
+          <p className="text-gray-600">
+            冬の夜をやさしく包み込む、とっておきのブランケットをご用意しました
           </p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {christmasPosts.map((post) => (
-            <SimpleBox
-              key={post.id}
-              className="p-4 hover:shadow-lg transition-shadow"
-            >
-              {/* 商品画像 */}
-              <div className="mb-4">
-                {post.images?.[0] ? (
-                  <BoxImage
-                    src={post.images[0]}
-                    alt={post.title}
-                    className="w-full h-48 object-cover rounded-lg"
+
+        {christmasPostsWithImages.length === 0 ? (
+          <div className="text-center py-16">
+            <h3 className="text-xl font-bold text-gray-700 mb-4">
+              クリスマス特集の投稿を準備中です...
+            </h3>
+            <p className="text-gray-500">まもなく素敵な商品をお届けします</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            {christmasPostsWithImages.map((post, index) => {
+              const imageUrl = post.images?.[0];
+
+              // 画像が存在する場合のみ表示
+              if (!imageUrl) {
+                return null;
+              }
+
+              return (
+                <div
+                  key={post.id}
+                  className="group bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl hover:scale-105 transition-all duration-300 transform hover:-translate-y-1"
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                  }}
+                >
+                  {/* 投稿画像 - ホームページと同じ構造 */}
+                  <div className="relative">
+                    <BoxImage src={imageUrl} alt={post.title} />
+                  </div>
+
+                  {/* 投稿情報 - コンパクト表示 */}
+                  <div className="p-4 space-y-3">
+                    {/* タイトル */}
+                    <h3 className="text-base font-semibold text-gray-800 line-clamp-2 group-hover:text-gray-900 transition-colors duration-200">
+                      {post.title}
+                    </h3>
+
+                    {/* 価格 */}
+                    {post.price && (
+                      <div className="flex items-baseline space-x-1">
+                        <span className="text-lg font-bold text-red-600">
+                          ¥{post.price.toLocaleString()}
+                        </span>
+                        <span className="text-xs text-gray-400">税込</span>
+                      </div>
+                    )}
+
+                    {/* タグ - コンパクト */}
+                    {post.tags && post.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {post.tags.slice(0, 3).map((tag, index) => (
+                          <span
+                            key={index}
+                            className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-medium hover:bg-gray-200 transition-colors duration-200"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                        {post.tags.length > 3 && (
+                          <span className="text-xs text-gray-400 px-2 py-1">
+                            +{post.tags.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 詳細ページへのリンク - カード全体をクリック可能に */}
+                  <Link
+                    href={`/post/${post.id}`}
+                    className="absolute inset-0 z-10"
                   />
-                ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-lg">
-                    <span className="text-gray-400">No Image</span>
-                  </div>
-                )}
-              </div>
-
-              {/* 商品情報 */}
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {post.title}
-                </h3>
-
-                {post.description && (
-                  <p className="text-gray-600 text-sm line-clamp-3">
-                    {post.description}
-                  </p>
-                )}
-
-                {post.price && (
-                  <p className="text-red-600 font-bold text-lg">
-                    ¥{post.price.toLocaleString()}
-                  </p>
-                )}
-
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {post.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* 詳細ページへのリンク */}
-                <div className="mt-4">
-                  <Link href={`/post/${post.id}`} className="block w-full">
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      className="w-full cursor-pointer px-2 py-1 text-xs"
-                    >
-                      詳細を見る
-                    </Button>
-                  </Link>
                 </div>
-              </div>
-            </SimpleBox>
-          ))}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
 
-      {/* 戻るボタン */}
-      <div className="mt-8 mb-3 text-center">
-        <Link href="/home">
-          <Button variant="primary" size="md" className="cursor-pointer">
-            ホームに戻る
-          </Button>
-        </Link>
+        {/* 戻るボタン */}
+        <div className="text-center mt-8 relative z-20">
+          <Link href="/home">
+            <Button variant="primary" size="md" className="cursor-pointer">
+              ホームに戻る
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

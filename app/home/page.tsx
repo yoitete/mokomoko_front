@@ -1,55 +1,42 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { SlideBox } from "@/components/SlideBox/SlideBox";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import { BoxImage } from "@/components/BoxImage/BoxImage";
 import { Post } from "@/hooks/usePosts";
-import { useAPI } from "@/hooks/useAPI";
+import { useGet } from "@/hooks/useSWRAPI";
 import { useFavorites } from "@/hooks/useFavorites";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
-  console.log("Home component rendered");
-  const { get } = useAPI();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  // SWRを使用してデータを取得（デフォルト設定を使用）
+  const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
 
   // お気に入り機能
   const { toggleFavorite, isFavorite } = useFavorites(1);
 
+  // 一時的にログを出す（ログインしているかどうかを確認）
   useEffect(() => {
-    console.log("useEffect triggered - fetching posts");
-    const fetchPosts = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        console.log("API call started");
-        const data = await get<Post[]>("/posts");
-        console.log("API call completed, data:", data);
-        setPosts(data);
-      } catch (err) {
-        console.error("Failed to fetch posts:", err);
-        setError(
-          err instanceof Error ? err.message : "投稿の取得に失敗しました"
-        );
-      } finally {
-        setIsLoading(false);
-        console.log("fetchPosts completed");
-      }
-    };
+    console.log("user:", user);
+  }, [user]);
 
-    fetchPosts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 空の依存配列でマウント時にのみ実行
+  // デバッグ用のログ
+  useEffect(() => {
+    console.log("SWR posts data:", posts);
+    console.log("SWR loading:", isLoading);
+    console.log("SWR error:", error);
+  }, [posts, isLoading, error]);
 
   // 新着投稿を取得（作成日時でソート）
-  const newPosts = posts
+  const newPosts = (posts || [])
     .sort(
       (a, b) =>
         new Date(b.created_at || 0).getTime() -
@@ -58,17 +45,17 @@ export default function Home() {
     .slice(0, 6);
 
   // 春・夏の投稿を取得
-  const springSummerPosts = posts
+  const springSummerPosts = (posts || [])
     .filter((post) => post.season === "spring" || post.season === "summer")
     .slice(0, 4);
 
   // 秋・冬の投稿を取得
-  const autumnWinterPosts = posts
+  const autumnWinterPosts = (posts || [])
     .filter((post) => post.season === "autumn" || post.season === "winter")
     .slice(0, 4);
 
   // 画像がある投稿のみをフィルタリング
-  const postsWithImages = posts.filter(
+  const postsWithImages = (posts || []).filter(
     (post) => post.images && post.images.length > 0
   );
 
@@ -83,14 +70,9 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="text-center mt-10 text-red-500">
-        <p>エラーが発生しました: {error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
-          再読み込み
-        </button>
+      <div className="text-center mt-10">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+        <p className="mt-2">読み込み中...</p>
       </div>
     );
   }
@@ -107,12 +89,6 @@ export default function Home() {
             <div className="gap-4">
               {newPosts.map((post, index) => {
                 const imageUrl = post.images?.[0];
-
-                console.log(
-                  `Post ${post.id} (${post.title}): 
-                    - Image URL: ${imageUrl}
-                    - Has image: ${Boolean(imageUrl)}`
-                );
 
                 // 画像が存在する場合のみ表示
                 if (!imageUrl) {
@@ -170,12 +146,6 @@ export default function Home() {
             {springSummerPosts.map((post, index) => {
               const imageUrl = post.images?.[0];
 
-              console.log(
-                `Spring/Summer Post ${post.id} (${post.title}): 
-                - Image URL: ${imageUrl}
-                - Has image: ${Boolean(imageUrl)}`
-              );
-
               // 画像が存在する場合のみ表示
               if (!imageUrl) {
                 return null;
@@ -227,12 +197,6 @@ export default function Home() {
           <div className="gap-4">
             {autumnWinterPosts.map((post, index) => {
               const imageUrl = post.images?.[0];
-
-              console.log(
-                `Autumn/Winter Post ${post.id} (${post.title}): 
-                - Image URL: ${imageUrl}
-                - Has image: ${Boolean(imageUrl)}`
-              );
 
               // 画像が存在する場合のみ表示
               if (!imageUrl) {
@@ -291,12 +255,6 @@ export default function Home() {
             {postsWithImages.slice(0, 4).map((post, index) => {
               const imageUrl = post.images?.[0];
 
-              console.log(
-                `Christmas Post ${post.id} (${post.title}): 
-                - Image URL: ${imageUrl}
-                - Has image: ${Boolean(imageUrl)}`
-              );
-
               // 画像が存在する場合のみ表示
               if (!imageUrl) {
                 return null;
@@ -348,12 +306,6 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-2 w-full">
             {postsWithImages.slice(0, 4).map((post, index) => {
               const imageUrl = post.images?.[0];
-
-              console.log(
-                `Exam Support Post ${post.id} (${post.title}): 
-                - Image URL: ${imageUrl}
-                - Has image: ${Boolean(imageUrl)}`
-              );
 
               // 画像が存在する場合のみ表示
               if (!imageUrl) {

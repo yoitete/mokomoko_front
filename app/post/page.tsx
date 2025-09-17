@@ -161,19 +161,21 @@ export default function Post() {
                   }}
                 >
                   {previewUrl ? (
-                    <div className="relative w-full h-full">
+                    <div className="relative w-full h-full bg-white flex items-center justify-center">
                       <img
                         src={previewUrl}
                         alt="選択された画像"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-lg"
+                        onLoad={() =>
+                          console.log("画像読み込み成功:", previewUrl)
+                        }
+                        onError={(e) => {
+                          console.log("画像読み込みエラー:", e);
+                          console.log("エラーの詳細:", e.target);
+                        }}
                       />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          <FontAwesomeIcon
-                            icon={faUpload}
-                            className="text-white text-2xl"
-                          />
-                        </div>
+                      <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                        画像選択済み
                       </div>
                     </div>
                   ) : (
@@ -194,16 +196,36 @@ export default function Post() {
               </div>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                 ref={inputRef}
                 id="imageUpload"
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
+                  console.log("=== ファイル選択開始 ===");
+                  console.log("ファイル選択:", file);
+                  console.log("previewUrl現在の値:", previewUrl);
+
                   if (file) {
+                    console.log("ファイル名:", file.name);
+                    console.log("ファイルサイズ:", file.size, "bytes");
+                    console.log("ファイルタイプ:", file.type);
+                    console.log("ファイルの最後の変更日:", file.lastModified);
+
                     handleChange("image", file);
-                    setPreviewUrl(URL.createObjectURL(file));
+                    const url = URL.createObjectURL(file);
+                    console.log("生成されたプレビューURL:", url);
+                    console.log(
+                      "URLが有効かチェック:",
+                      url.startsWith("blob:")
+                    );
+
+                    setPreviewUrl(url);
+                    console.log("setPreviewUrl実行完了");
+                  } else {
+                    console.log("ファイルが選択されていません");
                   }
+                  console.log("=== ファイル選択終了 ===");
                 }}
               />
             </div>

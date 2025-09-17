@@ -1,38 +1,32 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { BoxImage } from "@/components/BoxImage/BoxImage";
+import { useState } from "react";
+import Image from "next/image";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
-import { useAPI } from "@/hooks/useAPI";
+import { useGet } from "@/hooks/useSWRAPI";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 
 export default function FavoritePage() {
-  const { get } = useAPI();
-  const [posts, setPosts] = useState<Post[]>([]);
+  // SWRを使用してデータを取得（デフォルト設定を使用）
+  const {
+    data: posts,
+    error,
+    isLoading: postsLoading,
+  } = useGet<Post[]>("/posts");
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
   // お気に入り機能
   const { favorites, isLoading: favoritesLoading } = useFavorites(1);
 
-  // 投稿データ取得
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const data = await get<Post[]>("/posts");
-        setPosts(data);
-      } catch (err) {
-        console.error("投稿の取得に失敗しました", err);
-      }
-    };
-    fetchPosts();
-  }, [get]);
-
   // お気に入り投稿のみ抽出
-  const favoritePosts = posts.filter((post) => favorites.includes(post.id!));
+  const favoritePosts = (posts || []).filter((post) =>
+    favorites.includes(post.id!)
+  );
 
   // ページネーション計算
   const totalPages = Math.ceil(favoritePosts.length / itemsPerPage);
@@ -47,7 +41,17 @@ export default function FavoritePage() {
   };
 
   // ローディング状態
-  if (favoritesLoading) {
+  if (postsLoading || favoritesLoading) {
+    return (
+      <div className="text-center mt-10">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+        <p className="mt-2">お気に入りを読み込み中...</p>
+      </div>
+    );
+  }
+
+  // エラー状態
+  if (error) {
     return (
       <div className="text-center mt-10">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
@@ -84,9 +88,17 @@ export default function FavoritePage() {
           {/* 左：画像 */}
           <div className="md:w-1/3 w-full">
             {post.images?.[0] ? (
-              <BoxImage src={post.images[0]} alt={post.title} />
+              <div className="w-full h-[118px] overflow-hidden rounded-lg relative">
+                <Image
+                  src={post.images[0]}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  unoptimized={true}
+                />
+              </div>
             ) : (
-              <div className="h-40 bg-gray-200 flex items-center justify-center rounded-lg">
+              <div className="h-[118px] bg-gray-200 flex items-center justify-center rounded-lg">
                 No Image
               </div>
             )}
@@ -122,7 +134,7 @@ export default function FavoritePage() {
           </Button>
 
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-800 font-medium">
+            <span className="text-sm text-gray-900 font-semibold">
               {currentPage} / {totalPages}
             </span>
           </div>

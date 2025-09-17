@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
+import { usePost, usePut, useDelete } from "./useSWRAPI";
 import { useAPI } from "./useAPI";
+import { mutate } from "swr";
 
 // 投稿の型定義
 export type Post = {
@@ -37,37 +39,24 @@ export type CreatePostWithImageData = {
 };
 
 export const usePosts = () => {
-  const { get, post, postFormData, delete: del } = useAPI();
-  const [posts, setPosts] = useState<Post[]>([]);
+  // ミューテーション用のフック
+  const postData = usePost<Post>();
+  const putData = usePut<Post>();
+  const deleteData = useDelete();
+  const { postFormData } = useAPI();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 投稿一覧を取得
-  const getPosts = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await get<Post[]>("/posts");
-      setPosts(data);
-      return data;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "投稿の取得に失敗しました";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [get]);
-
   // 投稿を作成（画像なし）
   const createPost = useCallback(
-    async (postData: CreatePostData) => {
+    async (postDataInput: CreatePostData) => {
       try {
         setLoading(true);
         setError(null);
-        const data = await post<Post>("/posts", { post: postData });
-        setPosts((prev) => [data, ...prev]);
+        const data = await postData("/posts", { post: postDataInput });
+        // キャッシュを更新
+        mutate("/posts");
         return data;
       } catch (err) {
         const errorMessage =
@@ -78,38 +67,42 @@ export const usePosts = () => {
         setLoading(false);
       }
     },
-    [post]
+    [postData]
   );
 
   // 投稿を作成（画像付き）
   const createPostWithImage = useCallback(
-    async (postData: CreatePostWithImageData) => {
+    async (postDataInput: CreatePostWithImageData) => {
       try {
         setLoading(true);
         setError(null);
 
+        // FormDataを作成
         const formData = new FormData();
-        formData.append("post[user_id]", postData.user_id.toString());
-        formData.append("post[title]", postData.title);
-        formData.append("post[description]", postData.description || "");
-        formData.append("post[season]", postData.season);
+        formData.append("post[user_id]", postDataInput.user_id.toString());
+        formData.append("post[title]", postDataInput.title);
+        formData.append("post[description]", postDataInput.description || "");
+        formData.append("post[season]", postDataInput.season);
 
-        if (postData.price !== undefined) {
-          formData.append("post[price]", postData.price.toString());
+        if (postDataInput.price !== undefined) {
+          formData.append("post[price]", postDataInput.price.toString());
         }
 
-        if (postData.tags && postData.tags.length > 0) {
-          postData.tags.forEach((tag) => {
+        if (postDataInput.tags && postDataInput.tags.length > 0) {
+          postDataInput.tags.forEach((tag) => {
             formData.append("post[tags][]", tag);
           });
         }
 
-        if (postData.image) {
-          formData.append("post[images][]", postData.image);
+        if (postDataInput.image) {
+          formData.append("post[images][]", postDataInput.image);
         }
 
+        // FormDataを使用してPOST
         const data = await postFormData<Post>("/posts", formData);
-        setPosts((prev) => [data, ...prev]);
+
+        // キャッシュを更新
+        mutate("/posts");
         return data;
       } catch (err) {
         const errorMessage =
@@ -125,12 +118,14 @@ export const usePosts = () => {
 
   // 投稿を更新
   const updatePost = useCallback(
-    async (id: number, postData: Partial<CreatePostData>) => {
+    async (id: number, postDataInput: Partial<CreatePostData>) => {
       try {
         setLoading(true);
         setError(null);
-        const data = await post<Post>(`/posts/${id}`, { post: postData });
-        setPosts((prev) => prev.map((post) => (post.id === id ? data : post)));
+        const data = await putData(`/posts/${id}`, { post: postDataInput });
+        // キャッシュを更新
+        mutate("/posts");
+        mutate(`/posts/${id}`);
         return data;
       } catch (err) {
         const errorMessage =
@@ -141,7 +136,7 @@ export const usePosts = () => {
         setLoading(false);
       }
     },
-    [post]
+    [putData]
   );
 
   // 投稿を削除
@@ -150,8 +145,10 @@ export const usePosts = () => {
       try {
         setLoading(true);
         setError(null);
-        await del(`/posts/${id}`);
-        setPosts((prev) => prev.filter((post) => post.id !== id));
+        await deleteData(`/posts/${id}`);
+        // キャッシュを更新
+        mutate("/posts");
+        return;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "投稿の削除に失敗しました";
@@ -161,14 +158,12 @@ export const usePosts = () => {
         setLoading(false);
       }
     },
-    [del]
+    [deleteData]
   );
 
   return {
-    posts,
     loading,
     error,
-    getPosts,
     createPost,
     createPostWithImage,
     updatePost,
