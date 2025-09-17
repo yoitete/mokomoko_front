@@ -1,31 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { BoxImage } from "@/components/BoxImage/BoxImage";
-import { useAPI } from "@/hooks/useAPI";
+import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 
 export default function ExamSupportPage() {
-  const { get } = useAPI();
-  const [posts, setPosts] = useState<Post[]>([]);
-
-  // 投稿データ取得
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const data = await get<Post[]>("/posts");
-        setPosts(data);
-      } catch (err) {
-        console.error("投稿の取得に失敗しました", err);
-      }
-    };
-    fetchPosts();
-  }, [get]);
+  // SWRを使用してデータを取得（デフォルト設定を使用）
+  const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
 
   // 画像がある投稿のみをフィルタリング
-  const postsWithImages = posts.filter(
+  const postsWithImages = (posts || []).filter(
     (post) => post.images && post.images.length > 0
   );
 
@@ -49,6 +35,31 @@ export default function ExamSupportPage() {
   console.log("All posts:", posts);
   console.log("Posts with images:", postsWithImages);
   console.log("Exam support posts:", examSupportPosts);
+
+  if (isLoading) {
+    return (
+      <div className="text-center mt-10">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+        <p className="mt-2">読み込み中...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center mt-10 text-red-500">
+        <p>
+          エラーが発生しました: {error.message || "データの取得に失敗しました"}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          再読み込み
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-10 mx-4">

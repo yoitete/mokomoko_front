@@ -1,64 +1,55 @@
-import { useState, useCallback, useEffect } from "react";
-import { useAPI } from "./useAPI";
+import { useCallback, useMemo } from "react";
+import { useGet, usePost, useDelete } from "./useSWRAPI";
+import { mutate } from "swr";
 
 export const useFavorites = (userId: number = 1) => {
-  const { get, post, delete: del } = useAPI();
-  const [favorites, setFavorites] = useState<number[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // SWRを使用してお気に入り一覧を取得
+  const {
+    data: favoritesData,
+    error,
+    isLoading,
+  } = useGet<{ post_id: number }[]>(`/favorites?user_id=${userId}`, {
+    revalidateOnFocus: false, // お気に入りは頻繁に変更されないため
+    dedupingInterval: 5 * 60 * 1000, // お気に入りは5分キャッシュ
+  });
 
-  // お気に入り一覧を取得
-  const fetchFavorites = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await get<{ post_id: number }[]>(
-        `/favorites?user_id=${userId}`
-      );
-      const favoriteIds = data.map((fav) => fav.post_id);
-      setFavorites(favoriteIds);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "お気に入りの取得に失敗しました";
-      setError(errorMessage);
-      console.error("Failed to fetch favorites:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId]);
+  // お気に入りIDの配列を生成（useMemoで最適化）
+  const favorites = useMemo(() => {
+    return favoritesData?.map((fav) => fav.post_id) || [];
+  }, [favoritesData]);
+
+  // ミューテーション用のフック
+  const postData = usePost();
+  const deleteData = useDelete();
 
   // お気に入りを追加
   const addFavorite = useCallback(
     async (postId: number) => {
       try {
-        setError(null);
-        await post(`/favorites`, { user_id: userId, post_id: postId });
-        setFavorites((prev) => [...prev, postId]);
+        await postData(`/favorites`, { user_id: userId, post_id: postId });
+        // キャッシュを更新
+        mutate(`/favorites?user_id=${userId}`);
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "お気に入りの追加に失敗しました";
-        setError(errorMessage);
+        console.error("Failed to add favorite:", err);
         throw err;
       }
     },
-    [post, userId]
+    [postData, userId]
   );
 
   // お気に入りを削除
   const removeFavorite = useCallback(
     async (postId: number) => {
       try {
-        setError(null);
-        await del(`/favorites?user_id=${userId}&post_id=${postId}`);
-        setFavorites((prev) => prev.filter((id) => id !== postId));
+        await deleteData(`/favorites?user_id=${userId}&post_id=${postId}`);
+        // キャッシュを更新
+        mutate(`/favorites?user_id=${userId}`);
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "お気に入りの削除に失敗しました";
-        setError(errorMessage);
+        console.error("Failed to remove favorite:", err);
         throw err;
       }
     },
-    [del, userId]
+    [deleteData, userId]
   );
 
   // お気に入りを切り替え
@@ -81,16 +72,10 @@ export const useFavorites = (userId: number = 1) => {
     [favorites]
   );
 
-  // コンポーネントマウント時にお気に入り一覧を取得
-  useEffect(() => {
-    fetchFavorites();
-  }, [userId]);
-
   return {
     favorites,
     isLoading,
-    error,
-    fetchFavorites,
+    error: error?.message || null,
     addFavorite,
     removeFavorite,
     toggleFavorite,

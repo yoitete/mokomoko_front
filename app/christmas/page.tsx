@@ -1,35 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { BoxImage } from "@/components/BoxImage/BoxImage";
-import { useAPI } from "@/hooks/useAPI";
+import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 
 export default function ChristmasPage() {
-  const { get } = useAPI();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // 投稿データ取得
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const data = await get<Post[]>("/posts");
-        setPosts(data);
-      } catch (err) {
-        console.error("投稿の取得に失敗しました", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
-  }, [get]);
+  // SWRを使用してデータを取得（デフォルト設定を使用）
+  const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
 
   // 画像がある投稿のみをフィルタリング
-  const postsWithImages = posts.filter(
+  const postsWithImages = (posts || []).filter(
     (post) => post.images && post.images.length > 0
   );
 
@@ -54,14 +36,14 @@ export default function ChristmasPage() {
   console.log("Christmas posts with images:", christmasPostsWithImages);
   console.log(
     "Posts with Christmas season:",
-    posts.filter(
+    posts?.filter(
       (post) =>
         post.season === "Christmas Special" || post.season === "christmas"
     )
   );
   console.log(
     "Posts with Christmas tags:",
-    posts.filter(
+    posts?.filter(
       (post) =>
         post.tags &&
         post.tags.some(
@@ -73,19 +55,38 @@ export default function ChristmasPage() {
   );
   console.log(
     "Posts with Christmas in title:",
-    posts.filter(
+    posts?.filter(
       (post) =>
         post.title?.toLowerCase().includes("クリスマス") ||
         post.title?.toLowerCase().includes("christmas")
     )
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto"></div>
           <p className="mt-4 text-gray-600 font-medium">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">
+            エラーが発生しました:{" "}
+            {error.message || "データの取得に失敗しました"}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            再読み込み
+          </button>
         </div>
       </div>
     );

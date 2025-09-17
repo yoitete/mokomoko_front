@@ -1,42 +1,26 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Post } from "@/hooks/usePosts";
-import { useAPI } from "@/hooks/useAPI";
+import { useGet } from "@/hooks/useSWRAPI";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 export default function PostDetail() {
   const params = useParams();
   const router = useRouter();
-  const { get } = useAPI();
-  const [post, setPost] = useState<Post | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await get<Post>(`/posts/${params.id}`);
-        setPost(data);
-      } catch (err) {
-        console.error("Failed to fetch post:", err);
-        setError(
-          err instanceof Error ? err.message : "投稿の取得に失敗しました"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (params.id) {
-      fetchPost();
-    }
-  }, [params.id, get]);
+  // SWRを使用してデータを取得
+  const {
+    data: post,
+    error,
+    isLoading,
+  } = useGet<Post>(params.id ? `/posts/${params.id}` : null, {
+    revalidateOnFocus: false, // 詳細ページでは頻繁な再検証は不要
+    dedupingInterval: 10 * 60 * 1000, // 詳細ページは長めのキャッシュ
+  });
 
   if (isLoading) {
     return (
@@ -49,11 +33,13 @@ export default function PostDetail() {
     );
   }
 
-  if (error || !post) {
+  if (error || (!isLoading && !post)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500 mb-4">{error || "投稿が見つかりません"}</p>
+          <p className="text-red-500 mb-4">
+            {error?.message || "投稿が見つかりません"}
+          </p>
           <button
             onClick={() => router.back()}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -64,6 +50,10 @@ export default function PostDetail() {
       </div>
     );
   }
+
+  // postが存在しない場合の早期リターンは上で処理済み
+  // ここに到達した時点でpostは必ず存在する
+  if (!post) return null;
 
   return (
     <div className="min-h-screen bg-gray-50">
