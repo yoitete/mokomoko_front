@@ -1,17 +1,23 @@
 import { useCallback, useMemo } from "react";
 import { useGet, usePost, useDelete } from "./useSWRAPI";
 import { mutate } from "swr";
+import { authTokenAtom } from "@/lib/authAtoms";
+import { useAtomValue } from "jotai";
 
 export const useFavorites = (userId: number = 1) => {
+  const token = useAtomValue(authTokenAtom);
   // SWRを使用してお気に入り一覧を取得
   const {
     data: favoritesData,
     error,
     isLoading,
-  } = useGet<{ post_id: number }[]>(`/favorites?user_id=${userId}`, {
-    revalidateOnFocus: false, // お気に入りは頻繁に変更されないため
-    dedupingInterval: 0,
-  });
+  } = useGet<{ post_id: number }[]>(
+    token ? `/favorites?user_id=${userId}` : null,
+    {
+      revalidateOnFocus: false, // お気に入りは頻繁に変更されないため
+      dedupingInterval: 0,
+    }
+  );
 
   // お気に入りIDの配列を生成（useMemoで最適化）
   const favorites = useMemo(() => {
