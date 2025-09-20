@@ -21,3 +21,13 @@ export const updateProfileAtom = atom(
     set(profileAtom, { ...currentProfile, ...updates });
   }
 );
+
+// プロフィールをリセットするatom
+export const resetProfileAtom = atom(null, (get, set) => {
+  set(profileAtom, {
+    nickname: "ユーザー名",
+    bio: "自己紹介が設定されていません",
+    profileImage: null,
+    selectedIcon: "user",
+  });
+});
