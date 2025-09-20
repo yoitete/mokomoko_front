@@ -9,8 +9,11 @@ import Button from "@/components/Button/Button";
 import { faList, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Search() {
+  const { isUnauthenticated, loading } = useAuth();
+
   // SWRを使用してデータを取得（デフォルト設定を使用）
   const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
 
@@ -122,6 +125,46 @@ export default function Search() {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  // ローディング中の表示
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2">認証状態を確認中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ログイン前の表示
+  if (isUnauthenticated) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center whitespace-nowrap">
+            このページはログイン後に表示されます
+          </h2>
+          <p className="text-gray-600 mb-6 text-center">
+            この機能をご利用いただくには
+            <br />
+            ログインまたは新規登録が必要です。
+          </p>
+          <div className="space-y-3">
+            <Link href="/signup">
+              <Button className="w-full">新規アカウント作成</Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" className="w-full">
+                ログイン
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

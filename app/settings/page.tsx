@@ -1,6 +1,9 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useProfile } from "@/hooks/useProfile";
+import { useAPI } from "@/hooks/useAPI";
 import { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button/Button";
@@ -9,7 +12,6 @@ import {
   faUser,
   faEnvelope,
   faSave,
-  
   faArrowLeft,
   faLock,
   faTrash,
@@ -19,7 +21,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 
 export default function Settings() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+  const {
+    firebaseUser: user,
+    userData,
+    userId,
+    isUnauthenticated,
+    loading,
+  } = useCurrentUser();
+  const { updateProfile: updateUserProfile } = useProfile();
+  const { put } = useAPI();
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -36,26 +47,48 @@ export default function Settings() {
   useEffect(() => {
     if (user) {
       setEmail(user.email || "");
-      // 実際の実装では、バックエンドからユーザー名を取得
-      setName("");
     }
   }, [user]);
 
+  // API側のユーザーデータから名前を設定
+  useEffect(() => {
+    if (userData?.name) {
+      setName(userData.name);
+    }
+  }, [userData]);
+
   const handleSave = useCallback(async () => {
+    if (!userId) {
+      setFormError("ユーザー情報が取得できませんでした");
+      return;
+    }
+
     setIsLoading(true);
     setFormError("");
     setSuccessMessage("");
 
     try {
-      // 実際の実装では、ここでユーザー情報を更新
+      // API側のユーザー情報を更新（nameフィールドを含む）
+      await put(`/users/${userId}`, {
+        user: {
+          name: name,
+          nickname: userData?.nickname || "",
+          bio: userData?.bio || "",
+          profile_image: userData?.profile_image || null,
+          selected_icon: userData?.selected_icon || "user",
+        },
+      });
+
+      // 実際の実装では、ここでFirebaseのemailも更新する必要があります
       console.log("ユーザー情報を更新:", { name, email });
       setSuccessMessage("情報が正常に更新されました");
-    } catch {
+    } catch (err) {
+      console.error("ユーザー情報更新エラー:", err);
       setFormError("情報の更新に失敗しました");
     } finally {
       setIsLoading(false);
     }
-  }, [name, email]);
+  }, [name, email, userId, userData, put]);
 
   const handlePasswordChange = useCallback(async () => {
     if (newPassword !== confirmPassword) {
@@ -110,6 +143,46 @@ export default function Settings() {
       console.error("ログアウトに失敗しました:", error);
     }
   }, [logout, router]);
+
+  // ローディング中の表示
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2">設定を読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ログイン前の表示
+  if (isUnauthenticated) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center whitespace-nowrap">
+            このページはログイン後に表示されます
+          </h2>
+          <p className="text-gray-600 mb-6 text-center">
+            この機能をご利用いただくには
+            <br />
+            ログインまたは新規登録が必要です。
+          </p>
+          <div className="space-y-3">
+            <Link href="/signup">
+              <Button className="w-full">新規アカウント作成</Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" className="w-full">
+                ログイン
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">

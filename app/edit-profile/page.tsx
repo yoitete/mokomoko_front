@@ -4,6 +4,8 @@ import { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAtomValue, useSetAtom } from "jotai";
 import { profileAtom, updateProfileAtom } from "@/lib/profileAtoms";
+import { useProfile } from "@/hooks/useProfile";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import Button from "@/components/Button/Button";
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
 import IconSelector from "@/components/IconSelector/IconSelector";
@@ -24,6 +26,8 @@ import Link from "next/link";
 export default function EditProfile() {
   const profile = useAtomValue(profileAtom);
   const updateProfile = useSetAtom(updateProfileAtom);
+  const { updateProfile: updateProfileAPI } = useProfile();
+  const { userData, userId, firebaseUID } = useCurrentUser();
   const [nickname, setNickname] = useState(profile.nickname);
   const [bio, setBio] = useState(profile.bio);
   const [profileImage, setProfileImage] = useState<string | null>(
@@ -43,6 +47,17 @@ export default function EditProfile() {
     setProfileImage(profile.profileImage);
     setSelectedIcon(profile.selectedIcon);
   }, [profile]);
+
+  // API側のデータが取得できたら、それを優先して表示
+  useEffect(() => {
+    if (userData && userData.nickname !== undefined) {
+      console.log("編集ページでAPI側のデータを反映:", userData);
+      setNickname(userData.nickname || "ユーザー名");
+      setBio(userData.bio || "自己紹介が設定されていません");
+      setProfileImage(userData.profile_image || null);
+      setSelectedIcon(userData.selected_icon || "user");
+    }
+  }, [userData]);
 
   const handleImageUpload = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +91,7 @@ export default function EditProfile() {
     setFormError("");
 
     try {
-      // 一時的にローカルストレージのみに保存（404エラー回避のため）
+      // ローカル状態を更新
       updateProfile({
         nickname,
         bio,
@@ -84,7 +99,28 @@ export default function EditProfile() {
         selectedIcon,
       });
 
-      console.log("プロフィールを更新:", { nickname, bio, selectedIcon });
+      // API側にも更新を送信
+      if (firebaseUID && userId) {
+        console.log("Firebase UID:", firebaseUID, "User ID:", userId);
+
+        await updateProfileAPI(userId, {
+          nickname,
+          bio,
+          profile_image: profileImage,
+          selected_icon: selectedIcon,
+        });
+        console.log("プロフィールをAPI側にも更新完了:", {
+          nickname,
+          bio,
+          selectedIcon,
+        });
+      } else {
+        console.warn(
+          "ユーザーIDが取得できませんでした。ローカルのみ更新されました。",
+          { firebaseUID, userId, userData }
+        );
+      }
+
       router.push("/mypage");
     } catch (err) {
       console.error("プロフィール更新エラー:", err);
@@ -92,7 +128,18 @@ export default function EditProfile() {
     } finally {
       setIsLoading(false);
     }
-  }, [nickname, bio, profileImage, selectedIcon, updateProfile, router]);
+  }, [
+    nickname,
+    bio,
+    profileImage,
+    selectedIcon,
+    updateProfile,
+    updateProfileAPI,
+    firebaseUID,
+    userId,
+    userData,
+    router,
+  ]);
 
   const handleCancel = useCallback(() => {
     router.push("/mypage");

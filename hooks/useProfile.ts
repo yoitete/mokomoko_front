@@ -5,12 +5,13 @@ import { mutate } from "swr";
 
 // プロフィールの型定義
 export type Profile = {
-  id?: number;
-  user_id: number;
-  nickname: string;
-  bio: string;
+  id: number;
+  firebase_uid?: string;
+  name?: string;
+  nickname?: string | null;
+  bio?: string | null;
   profile_image?: string | null;
-  selected_icon: string;
+  selected_icon?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -38,23 +39,27 @@ export const useProfile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // プロフィールを取得
-  const getProfile = useCallback((userId: number) => {
-    return useGet<Profile>(`/profiles/${userId}`, {
-      revalidateOnFocus: false,
-      dedupingInterval: 30000, // 30秒間キャッシュ
-    });
+  // プロフィール取得用のヘルパー関数（エンドポイントを生成）
+  const getProfileEndpoint = useCallback((userId: number) => {
+    return `/users/${userId}`;
   }, []);
 
   // プロフィールを作成
   const createProfile = useCallback(
-    async (profileData: Omit<Profile, "id" | "created_at" | "updated_at">) => {
+    async (
+      profileData: Omit<
+        Profile,
+        "id" | "created_at" | "updated_at" | "firebase_uid" | "name"
+      >
+    ) => {
       try {
         setLoading(true);
         setError(null);
-        const data = await postData("/profiles", { profile: profileData });
-        // キャッシュを更新
-        mutate(`/profiles/${profileData.user_id}`);
+        const data = await postData("/users", { profile: profileData });
+        // キャッシュを更新（作成されたユーザーのIDを使用）
+        if (data?.id) {
+          mutate(`/users/${data.id}`);
+        }
         return data;
       } catch (err) {
         const errorMessage =
@@ -76,11 +81,11 @@ export const useProfile = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await putData(`/profiles/${userId}`, {
+        const data = await putData(`/users/${userId}`, {
           profile: profileData,
         });
         // キャッシュを更新
-        mutate(`/profiles/${userId}`);
+        mutate(`/users/${userId}`);
         return data;
       } catch (err) {
         const errorMessage =
@@ -110,12 +115,12 @@ export const useProfile = () => {
 
         // FormDataを使用してPOST
         const data = await postFormData<Profile>(
-          "/profiles/upload_image",
+          "/users/upload_image",
           formData
         );
 
         // キャッシュを更新
-        mutate(`/profiles/${uploadData.user_id}`);
+        mutate(`/users/${uploadData.user_id}`);
         return data;
       } catch (err) {
         const errorMessage =
@@ -134,9 +139,31 @@ export const useProfile = () => {
   return {
     loading,
     error,
-    getProfile,
+    getProfileEndpoint,
     createProfile,
     updateProfile,
     uploadProfileImage,
   };
+};
+
+// プロフィール取得専用フック
+export const useProfileData = (userId: number | null) => {
+  const shouldFetch = userId !== null;
+  const endpoint = shouldFetch ? `/users/${userId}` : null;
+
+  return useGet<Profile>(endpoint, {
+    revalidateOnFocus: false,
+    dedupingInterval: 30000, // 30秒間キャッシュ
+  });
+};
+
+// Firebase UIDからユーザー情報を取得するフック
+export const useUserByFirebaseUID = (firebaseUID: string | null) => {
+  const shouldFetch = firebaseUID !== null;
+  const endpoint = shouldFetch ? `/users/by_firebase_uid/${firebaseUID}` : null;
+
+  return useGet<Profile>(endpoint, {
+    revalidateOnFocus: false,
+    dedupingInterval: 30000, // 30秒間キャッシュ
+  });
 };

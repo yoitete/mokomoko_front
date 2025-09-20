@@ -8,20 +8,30 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function FavoritePage() {
+  const { isUnauthenticated, loading, userId, userData, firebaseUID, error } =
+    useCurrentUser();
+
+  // デバッグログ（必要に応じてコメントアウト）
+  // console.log("FavoritePage - User ID:", userId);
+  // console.log("FavoritePage - Firebase UID:", firebaseUID);
+  // console.log("FavoritePage - User Data:", userData);
+  // console.log("FavoritePage - Error:", error);
+
   // SWRを使用してデータを取得（デフォルト設定を使用）
   const {
     data: posts,
-    error,
+    error: postsError,
     isLoading: postsLoading,
   } = useGet<Post[]>("/posts");
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // お気に入り機能
-  const { favorites, isLoading: favoritesLoading } = useFavorites(1);
+  // お気に入り機能（ログインユーザーのIDを使用）
+  const { favorites, isLoading: favoritesLoading } = useFavorites(userId || 0);
 
   // お気に入り投稿のみ抽出
   const favoritePosts = (posts || []).filter((post) =>
@@ -40,6 +50,75 @@ export default function FavoritePage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // ローディング中の表示
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2">認証状態を確認中...</p>
+          {firebaseUID && (
+            <p className="mt-1 text-sm text-gray-600">
+              Firebase UID: {firebaseUID}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ユーザーデータ取得エラーの表示
+  if (error && firebaseUID) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+            ユーザーデータの取得に失敗しました
+          </h2>
+          <p className="text-gray-600 mb-4 text-center">
+            Firebase UID: {firebaseUID}
+          </p>
+          <p className="text-red-600 mb-6 text-center text-sm">
+            エラー: {error?.message || "不明なエラー"}
+          </p>
+          <div className="space-y-3">
+            <Button onClick={() => window.location.reload()} className="w-full">
+              ページを再読み込み
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ログイン前の表示
+  if (isUnauthenticated) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center whitespace-nowrap">
+            このページはログイン後に表示されます
+          </h2>
+          <p className="text-gray-600 mb-6 text-center">
+            この機能をご利用いただくには
+            <br />
+            ログインまたは新規登録が必要です。
+          </p>
+          <div className="space-y-3">
+            <Link href="/signup">
+              <Button className="w-full">新規アカウント作成</Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" className="w-full">
+                ログイン
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ローディング状態
   if (postsLoading || favoritesLoading) {
     return (
@@ -51,7 +130,7 @@ export default function FavoritePage() {
   }
 
   // エラー状態
-  if (error) {
+  if (postsError) {
     return (
       <div className="text-center mt-10">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>

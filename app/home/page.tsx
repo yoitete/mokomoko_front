@@ -106,7 +106,7 @@ export default function Home() {
                         alt={post.title}
                         fill
                         unoptimized={true}
-                        className="cursor-pointer"
+                        className="cursor-pointer object-cover"
                       />
                     </Link>
                     <button
@@ -162,7 +162,7 @@ export default function Home() {
                       alt={post.title}
                       fill
                       unoptimized={true}
-                      className="cursor-pointer"
+                      className="cursor-pointer object-cover"
                     />
                   </Link>
                   <button
@@ -214,7 +214,7 @@ export default function Home() {
                       alt={post.title}
                       fill
                       unoptimized={true}
-                      className="cursor-pointer"
+                      className="cursor-pointer object-cover"
                     />
                   </Link>
                   <button

@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/components/Button/Button";
 import { usePosts, CreatePostWithImageData } from "@/hooks/usePosts";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import Link from "next/link";
 
 interface Combination {
   title: string;
@@ -17,6 +19,13 @@ interface Combination {
 }
 
 export default function Post() {
+  const {
+    isUnauthenticated,
+    loading: authLoading,
+    userId,
+    isUserDataReady,
+  } = useCurrentUser();
+
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
@@ -72,10 +81,17 @@ export default function Post() {
       return;
     }
 
+    if (!isUserDataReady || !userId) {
+      alert(
+        "ユーザー情報の取得に失敗しました。ページを再読み込みしてください。"
+      );
+      return;
+    }
+
     try {
       // 投稿データを準備
       const postData: CreatePostWithImageData = {
-        user_id: 1, // TODO: 実際のユーザーIDに置き換え
+        user_id: userId, // ログインユーザーのIDを使用
         title: combination.title,
         description: combination.description || "",
         price: combination.price,
@@ -107,6 +123,46 @@ export default function Post() {
       alert("投稿中にエラーが発生しました。");
     }
   };
+
+  // ローディング中の表示
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2">認証状態を確認中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ログイン前の表示
+  if (isUnauthenticated) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center whitespace-nowrap">
+            このページはログイン後に表示されます
+          </h2>
+          <p className="text-gray-600 mb-6 text-center">
+            この機能をご利用いただくには
+            <br />
+            ログインまたは新規登録が必要です。
+          </p>
+          <div className="space-y-3">
+            <Link href="/signup">
+              <Button className="w-full">新規アカウント作成</Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" className="w-full">
+                ログイン
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">

@@ -1,10 +1,11 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAtomValue } from "jotai";
-import { profileAtom } from "@/lib/profileAtoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import { profileAtom, updateProfileAtom } from "@/lib/profileAtoms";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useAuth } from "@/hooks/useAuth";
 import Button from "@/components/Button/Button";
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
 import {
@@ -21,31 +22,38 @@ import Link from "next/link";
 
 export default function Mypage() {
   const { logout } = useAuth();
+  const {
+    isUnauthenticated,
+    loading,
+    userData,
+    nickname,
+    bio,
+    profileImage,
+    selectedIcon,
+    error: userError,
+  } = useCurrentUser();
   const profile = useAtomValue(profileAtom);
+  const updateProfile = useSetAtom(updateProfileAtom);
   const router = useRouter();
 
-  // 一時的にAPI連携を無効化（404エラー回避のため）
-  // const {
-  //   data: apiProfile,
-  //   error: profileError,
-  //   isLoading: profileLoading,
-  // } = getProfile(user?.uid ? parseInt(user.uid) : 0);
-
   // APIから取得したプロフィールデータをローカル状態に同期
-  // useEffect(() => {
-  //   if (apiProfile) {
-  //     updateProfile({
-  //       nickname: apiProfile.nickname,
-  //       bio: apiProfile.bio,
-  //       profileImage: apiProfile.profile_image,
-  //       selectedIcon: apiProfile.selected_icon,
-  //     });
-  //   }
-  // }, [apiProfile, updateProfile]);
+  useEffect(() => {
+    if (userData && userData.nickname !== undefined) {
+      console.log("API側のデータでローカル状態を更新:", userData);
+      updateProfile({
+        nickname: userData.nickname || "ユーザー名",
+        bio: userData.bio || "自己紹介が設定されていません",
+        profileImage: userData.profile_image,
+        selectedIcon: userData.selected_icon || "user",
+      });
+    }
+  }, [userData, updateProfile]);
 
-  // デバッグ用ログ
-  console.log("Mypage - profile:", profile);
-  console.log("Mypage - selectedIcon:", profile.selectedIcon);
+  // デバッグ用ログ（必要に応じてコメントアウト）
+  // console.log("Mypage - profile:", profile);
+  // console.log("Mypage - selectedIcon:", profile.selectedIcon);
+  // console.log("Mypage - userData:", userData);
+  // console.log("Mypage - userError:", userError);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -55,6 +63,46 @@ export default function Mypage() {
       console.error("ログアウトに失敗しました:", error);
     }
   }, [logout, router]);
+
+  // ローディング中の表示
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2">認証状態を確認中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ログイン前の表示
+  if (isUnauthenticated) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center whitespace-nowrap">
+            このページはログイン後に表示されます
+          </h2>
+          <p className="text-gray-600 mb-6 text-center">
+            この機能をご利用いただくには
+            <br />
+            ログインまたは新規登録が必要です。
+          </p>
+          <div className="space-y-3">
+            <Link href="/signup">
+              <Button className="w-full">新規アカウント作成</Button>
+            </Link>
+            <Link href="/login">
+              <Button variant="outline" className="w-full">
+                ログイン
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const iconOptions = [
     // FontAwesomeアイコン
