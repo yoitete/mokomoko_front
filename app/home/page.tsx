@@ -12,21 +12,46 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
-import { useAuth } from "@/hooks/useAuth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import {
+  useCurrentSeasonalCampaignAPI,
+  useCurrentSecondSeasonalCampaignAPI,
+} from "@/hooks/useSeasonalCampaign";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { userId, isAuthenticated } = useCurrentUser();
 
   // SWRを使用してデータを取得（デフォルト設定を使用）
   const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
 
-  // お気に入り機能
-  const { toggleFavorite, isFavorite } = useFavorites(1);
+  // お気に入り機能（ログインユーザーのIDを使用）
+  const { toggleFavorite, isFavorite } = useFavorites(userId || 0);
 
-  // 一時的にログを出す（ログインしているかどうかを確認）
+  // 現在の季節特集を取得（API版）
+  const {
+    data: currentCampaign,
+    colorClasses,
+    isLoading: campaignLoading,
+    error: campaignError,
+  } = useCurrentSeasonalCampaignAPI();
+
+  // 現在の第2季節特集を取得（API版）
+  const { data: secondCampaign, colorClasses: secondColorClasses } =
+    useCurrentSecondSeasonalCampaignAPI();
+
+  // 一時的にログを出す（ユーザーIDを確認）
   useEffect(() => {
-    console.log("user:", user);
-  }, [user]);
+    console.log("userId:", userId);
+  }, [userId]);
+
+  // 季節特集のデバッグログ
+  useEffect(() => {
+    console.log("Seasonal Campaign API Response:", {
+      data: currentCampaign,
+      loading: campaignLoading,
+      error: campaignError,
+    });
+  }, [currentCampaign, campaignLoading, campaignError]);
 
   // デバッグ用のログ
   useEffect(() => {
@@ -100,7 +125,10 @@ export default function Home() {
                     key={post.id || index}
                     className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
                   >
-                    <Link href={`/post/${post.id}`}>
+                    <Link
+                      href={`/post/${post.id}`}
+                      className="relative block w-full h-full"
+                    >
                       <Image
                         src={imageUrl}
                         alt={post.title}
@@ -113,14 +141,29 @@ export default function Home() {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        if (!isAuthenticated) {
+                          // 未認証の場合は何もしない
+                          return;
+                        }
                         toggleFavorite(post.id!);
                       }}
-                      className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
+                      className={`absolute bottom-2 right-2 p-1 rounded-full bg-white/80 transition-colors ${
+                        isAuthenticated
+                          ? "hover:bg-white cursor-pointer"
+                          : "cursor-not-allowed opacity-60"
+                      }`}
+                      title={
+                        !isAuthenticated
+                          ? "ログインが必要です"
+                          : "お気に入りに追加"
+                      }
                     >
                       <FontAwesomeIcon
                         icon={faHeart}
                         className={`text-lg ${
-                          isFavorite(post.id!)
+                          !isAuthenticated
+                            ? "text-gray-300 hover:text-gray-400"
+                            : isFavorite(post.id!)
                             ? "text-red-500"
                             : "text-gray-400 hover:text-red-500"
                         }`}
@@ -156,7 +199,10 @@ export default function Home() {
                   key={post.id || index}
                   className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
                 >
-                  <Link href={`/post/${post.id}`}>
+                  <Link
+                    href={`/post/${post.id}`}
+                    className="relative block w-full h-full"
+                  >
                     <Image
                       src={imageUrl}
                       alt={post.title}
@@ -208,7 +254,10 @@ export default function Home() {
                   key={post.id || index}
                   className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
                 >
-                  <Link href={`/post/${post.id}`}>
+                  <Link
+                    href={`/post/${post.id}`}
+                    className="relative block w-full h-full"
+                  >
                     <Image
                       src={imageUrl}
                       alt={post.title}
@@ -246,109 +295,139 @@ export default function Home() {
         特集
       </div>
       <div className="mx-4 mb-5">
-        <SimpleBox className="h-137 flex flex-col justify-start items-center p-4">
-          <p className="text-center text-xl font-semibold text-red-600 mb-4">
-            クリスマス特集
+        <SimpleBox className="h-137 flex flex-col justify-start items-center p-4 relative">
+          <p
+            className={`text-center text-xl font-semibold ${colorClasses.title} mb-4`}
+          >
+            {currentCampaign.name}
           </p>
 
-          <div className="grid grid-cols-2 gap-2 w-full">
-            {postsWithImages.slice(0, 4).map((post, index) => {
-              const imageUrl = post.images?.[0];
+          <div className="flex-grow">
+            <div className="grid grid-cols-2 gap-2 w-full">
+              {postsWithImages.slice(0, 4).map((post, index) => {
+                const imageUrl = post.images?.[0];
 
-              // 画像が存在する場合のみ表示
-              if (!imageUrl) {
-                return null;
-              }
+                // 画像が存在する場合のみ表示
+                if (!imageUrl) {
+                  return null;
+                }
 
-              return (
-                <div key={post.id || index}>
-                  <BoxImage src={imageUrl} alt={post.title} />
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-6 px-4">
-            <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
-              <span className="text-red-500 font-semibold">心まで温まる</span>
-              、クリスマス限定のふわもこ毛布
-            </p>
-            <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
-              冬の夜をやさしく包み込む、
-              <br />
-              とっておきのブランケットをご用意しました
-            </p>
-            <p className="text-center text-gray-500 text-sm mt-3">
-              <span className="bg-red-50 text-red-600 px-2 py-1 rounded-full text-xs font-medium">
-                大切な人へのギフトにも、自分へのご褒美にもぴったり！
-              </span>
-            </p>
-            <div className="mt-4 text-right">
-              <Link href="/christmas">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="min-w-[150px] cursor-pointer"
-                >
-                  詳しくはこちら →
-                </Button>
-              </Link>
+                return (
+                  <div key={post.id || index}>
+                    <BoxImage src={imageUrl} alt={post.title} />
+                  </div>
+                );
+              })}
             </div>
+            <div className="mt-6 px-4">
+              <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
+                <span className={`${colorClasses.highlight} font-semibold`}>
+                  {currentCampaign.description.split("、")[0]}
+                </span>
+                、{currentCampaign.description.split("、")[1]}
+              </p>
+              <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
+                {currentCampaign.subtitle.split("、").map((text, i, array) => (
+                  <React.Fragment key={i}>
+                    {text}
+                    {i < array.length - 1 && (
+                      <>
+                        、
+                        <br />
+                      </>
+                    )}
+                  </React.Fragment>
+                ))}
+              </p>
+              <p className="text-center text-gray-500 text-sm mt-3">
+                <span
+                  className={`${colorClasses.badge} px-2 py-1 rounded-full text-xs font-medium`}
+                >
+                  {currentCampaign.highlight_text}
+                </span>
+              </p>
+            </div>
+          </div>
+          <div className="absolute bottom-4 right-4">
+            <Link href={currentCampaign.link_path}>
+              <Button
+                variant="primary"
+                size="sm"
+                className="min-w-[150px] cursor-pointer"
+              >
+                {currentCampaign.button_text}
+              </Button>
+            </Link>
           </div>
         </SimpleBox>
       </div>
 
       <div className="mx-4 mb-4">
-        <SimpleBox className="h-150 flex flex-col justify-start items-center p-4">
-          <div className="text-center text-xl font-semibold text-indigo-800 mb-4">
-            <p>受験応援！</p>
-            <p>あったか毛布特集</p>
-          </div>
-          <div className="grid grid-cols-2 gap-2 w-full">
-            {postsWithImages.slice(0, 4).map((post, index) => {
-              const imageUrl = post.images?.[0];
+        <SimpleBox className="h-137 flex flex-col justify-start items-center p-4 relative">
+          <p
+            className={`text-center text-xl font-semibold ${secondColorClasses.title} mb-4`}
+          >
+            {secondCampaign.name}
+          </p>
 
-              // 画像が存在する場合のみ表示
-              if (!imageUrl) {
-                return null;
-              }
+          <div className="flex-grow">
+            <div className="grid grid-cols-2 gap-2 w-full">
+              {postsWithImages.slice(0, 4).map((post, index) => {
+                const imageUrl = post.images?.[0];
 
-              return (
-                <div key={post.id || index}>
-                  <BoxImage src={imageUrl} alt={post.title} />
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-6 px-4">
-            <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
-              <span className="text-indigo-600 font-semibold">
-                合格への道を
-              </span>
-              、あたたかさで支える
-            </p>
-            <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
-              冬の受験勉強は、寒さとの戦いでもあります。
-              <br />
-              深夜まで机に向かうあなたの背中をやさしく包み込み、
-              <br />
-              心までほっと落ち着ける&ldquo;あったか毛布&rdquo;をご用意しました
-            </p>
-            <p className="text-center text-gray-500 text-sm mt-3">
-              <span className="bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full text-xs font-medium">
-                集中力を高める、あなただけの学習パートナー
-              </span>
-            </p>
-            <div className="mt-4 text-right">
-              <Link href="/exam-support">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="min-w-[150px] cursor-pointer"
-                >
-                  詳しくはこちら →
-                </Button>
-              </Link>
+                // 画像が存在する場合のみ表示
+                if (!imageUrl) {
+                  return null;
+                }
+
+                return (
+                  <div key={post.id || index}>
+                    <BoxImage src={imageUrl} alt={post.title} />
+                  </div>
+                );
+              })}
             </div>
+            <div className="mt-6 px-4">
+              <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
+                <span
+                  className={`${secondColorClasses.highlight} font-semibold`}
+                >
+                  {secondCampaign.description.split("、")[0]}
+                </span>
+                、{secondCampaign.description.split("、")[1]}
+              </p>
+              <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
+                {secondCampaign.subtitle.split("、").map((text, i, array) => (
+                  <React.Fragment key={i}>
+                    {text}
+                    {i < array.length - 1 && (
+                      <>
+                        、
+                        <br />
+                      </>
+                    )}
+                  </React.Fragment>
+                ))}
+              </p>
+              <p className="text-center text-gray-500 text-sm mt-3">
+                <span
+                  className={`${secondColorClasses.badge} px-2 py-1 rounded-full text-xs font-medium`}
+                >
+                  {secondCampaign.highlight_text}
+                </span>
+              </p>
+            </div>
+          </div>
+          <div className="absolute bottom-4 right-4">
+            <Link href={secondCampaign.link_path}>
+              <Button
+                variant="primary"
+                size="sm"
+                className="min-w-[150px] cursor-pointer"
+              >
+                {secondCampaign.button_text}
+              </Button>
+            </Link>
           </div>
         </SimpleBox>
       </div>
