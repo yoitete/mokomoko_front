@@ -28,8 +28,7 @@ export default function NewLifeSupportPage() {
             tag.toLowerCase().includes("spring") ||
             tag.toLowerCase().includes("new")
         )) ||
-      post.season === "spring" ||
-      post.season === "new-life" ||
+      post.season === "new-life-support" ||
       post.title?.toLowerCase().includes("新生活") ||
       post.title?.toLowerCase().includes("新学期") ||
       post.title?.toLowerCase().includes("一人暮らし")
@@ -109,7 +108,7 @@ export default function NewLifeSupportPage() {
                     {/* 価格 */}
                     {post.price && (
                       <div className="flex items-baseline space-x-1">
-                        <span className="text-lg font-bold text-green-600">
+                        <span className="text-lg font-bold text-red-600">
                           ¥{post.price.toLocaleString()}
                         </span>
                         <span className="text-xs text-gray-400">税込</span>

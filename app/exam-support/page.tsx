@@ -18,7 +18,6 @@ export default function ExamSupportPage() {
   // 受験応援特集の投稿をフィルタリング
   const examSupportPosts = postsWithImages.filter(
     (post) =>
-      post.season === "Exam Support" ||
       post.season === "exam-support" ||
       (post.tags &&
         post.tags.some(
@@ -103,7 +102,7 @@ export default function ExamSupportPage() {
                   {/* 価格 */}
                   {post.price && (
                     <div className="flex items-baseline space-x-1">
-                      <span className="text-lg font-bold text-indigo-600">
+                      <span className="text-lg font-bold text-red-600">
                         ¥{post.price.toLocaleString()}
                       </span>
                       <span className="text-xs text-gray-400">税込</span>

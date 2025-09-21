@@ -81,8 +81,8 @@ export default function Search() {
           new Date(a.created_at || 0).getTime()
         );
       } else {
-        // 人気順（仮実装：価格の高い順）
-        return (b.price || 0) - (a.price || 0);
+        // 人気順（お気に入り数ベース）
+        return (b.favorites_count || 0) - (a.favorites_count || 0);
       }
     });
   }, [filteredPosts, selectedSort]);

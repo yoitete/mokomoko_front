@@ -28,7 +28,6 @@ export default function HalloweenPage() {
             tag.toLowerCase().includes("オレンジ") ||
             tag.toLowerCase().includes("かぼちゃ")
         )) ||
-      post.season === "autumn" ||
       post.season === "halloween" ||
       post.title?.toLowerCase().includes("ハロウィン") ||
       post.title?.toLowerCase().includes("halloween") ||
@@ -109,7 +108,7 @@ export default function HalloweenPage() {
                     {/* 価格 */}
                     {post.price && (
                       <div className="flex items-baseline space-x-1">
-                        <span className="text-lg font-bold text-orange-600">
+                        <span className="text-lg font-bold text-red-600">
                           ¥{post.price.toLocaleString()}
                         </span>
                         <span className="text-xs text-gray-400">税込</span>

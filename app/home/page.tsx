@@ -79,15 +79,15 @@ export default function Home() {
     )
     .slice(0, 6);
 
-  // 春・夏の投稿を取得
-  const springSummerPosts = (posts || [])
-    .filter((post) => post.season === "spring" || post.season === "summer")
-    .slice(0, 4);
+  // 春・夏の人気投稿を取得（API版）
+  const { data: springSummerPosts, isLoading: springSummerLoading } = useGet<
+    Post[]
+  >("/posts/popular?season=spring-summer&with_images=true&limit=4");
 
-  // 秋・冬の投稿を取得
-  const autumnWinterPosts = (posts || [])
-    .filter((post) => post.season === "autumn" || post.season === "winter")
-    .slice(0, 4);
+  // 秋・冬の人気投稿を取得（API版）
+  const { data: autumnWinterPosts, isLoading: autumnWinterLoading } = useGet<
+    Post[]
+  >("/posts/popular?season=autumn-winter&with_images=true&limit=4");
 
   // 画像がある投稿のみをフィルタリング
   const postsWithImages = (posts || []).filter(
@@ -133,52 +133,58 @@ export default function Home() {
                 return (
                   <div
                     key={post.id || index}
-                    className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
+                    className="inline-block mr-4 w-40 rounded-lg overflow-hidden bg-white shadow-sm"
                   >
-                    <Link
-                      href={`/post/${post.id}`}
-                      className="relative block w-full h-full"
-                    >
-                      <Image
-                        src={imageUrl}
-                        alt={post.title}
-                        fill
-                        unoptimized={true}
-                        className="cursor-pointer object-cover"
-                      />
+                    <Link href={`/post/${post.id}`} className="block">
+                      {/* タイトルボックス（上部） */}
+                      <div className="p-2 bg-white">
+                        <h3 className="text-sm font-medium text-gray-800 line-clamp-2 leading-tight">
+                          {post.title}
+                        </h3>
+                      </div>
+                      <div className="relative w-full h-[118px] overflow-hidden">
+                        <Image
+                          src={imageUrl}
+                          alt={post.title}
+                          fill
+                          unoptimized={true}
+                          className="cursor-pointer object-cover"
+                        />
+                        {/* お気に入りボタン */}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!isAuthenticated) {
+                              // 未認証の場合は何もしない
+                              return;
+                            }
+                            toggleFavorite(post.id!);
+                          }}
+                          className={`absolute bottom-2 right-2 p-1 rounded-full bg-white/80 transition-colors ${
+                            isAuthenticated
+                              ? "hover:bg-white cursor-pointer"
+                              : "cursor-not-allowed opacity-60"
+                          }`}
+                          title={
+                            !isAuthenticated
+                              ? "ログインが必要です"
+                              : "お気に入りに追加"
+                          }
+                        >
+                          <FontAwesomeIcon
+                            icon={faHeart}
+                            className={`text-lg ${
+                              !isAuthenticated
+                                ? "text-gray-300 hover:text-gray-400"
+                                : isFavorite(post.id!)
+                                ? "text-red-500"
+                                : "text-gray-400 hover:text-red-500"
+                            }`}
+                          />
+                        </button>
+                      </div>
                     </Link>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (!isAuthenticated) {
-                          // 未認証の場合は何もしない
-                          return;
-                        }
-                        toggleFavorite(post.id!);
-                      }}
-                      className={`absolute bottom-2 right-2 p-1 rounded-full bg-white/80 transition-colors ${
-                        isAuthenticated
-                          ? "hover:bg-white cursor-pointer"
-                          : "cursor-not-allowed opacity-60"
-                      }`}
-                      title={
-                        !isAuthenticated
-                          ? "ログインが必要です"
-                          : "お気に入りに追加"
-                      }
-                    >
-                      <FontAwesomeIcon
-                        icon={faHeart}
-                        className={`text-lg ${
-                          !isAuthenticated
-                            ? "text-gray-300 hover:text-gray-400"
-                            : isFavorite(post.id!)
-                            ? "text-red-500"
-                            : "text-gray-400 hover:text-red-500"
-                        }`}
-                      />
-                    </button>
                   </div>
                 );
               })}
@@ -196,51 +202,89 @@ export default function Home() {
       <div className="flex justify-end">
         <SlideBox>
           <div className="gap-4">
-            {springSummerPosts.map((post, index) => {
-              const imageUrl = post.images?.[0];
+            {springSummerLoading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500 mx-auto"></div>
+                <p className="mt-2 text-gray-600">読み込み中...</p>
+              </div>
+            ) : (springSummerPosts || []).length === 0 ? (
+              <div className="text-center py-4 text-gray-500">
+                人気の投稿がありません
+              </div>
+            ) : (
+              (springSummerPosts || []).map((post, index) => {
+                const imageUrl = post.images?.[0];
 
-              // 画像が存在する場合のみ表示
-              if (!imageUrl) {
-                return null;
-              }
+                // 画像が存在する場合のみ表示
+                if (!imageUrl) {
+                  return null;
+                }
 
-              return (
-                <div
-                  key={post.id || index}
-                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
-                >
-                  <Link
-                    href={`/post/${post.id}`}
-                    className="relative block w-full h-full"
+                return (
+                  <div
+                    key={post.id || index}
+                    className="inline-block mr-4 w-40 rounded-lg overflow-hidden bg-white shadow-sm"
                   >
-                    <Image
-                      src={imageUrl}
-                      alt={post.title}
-                      fill
-                      unoptimized={true}
-                      className="cursor-pointer object-cover"
-                    />
-                  </Link>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleFavorite(post.id!);
-                    }}
-                    className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
-                  >
-                    <FontAwesomeIcon
-                      icon={faHeart}
-                      className={`text-lg ${
-                        isFavorite(post.id!)
-                          ? "text-red-500"
-                          : "text-gray-400 hover:text-red-500"
-                      }`}
-                    />
-                  </button>
-                </div>
-              );
-            })}
+                    <Link href={`/post/${post.id}`} className="block">
+                      {/* タイトルボックス（上部） */}
+                      <div className="p-2 bg-white">
+                        <div className="flex items-start gap-2">
+                          {/* 順位表示 */}
+                          <div className="flex-shrink-0 mt-0.5">
+                            {index === 0 && (
+                              <span className="text-yellow-500 text-lg">
+                                👑
+                              </span>
+                            )}
+                            {index === 1 && (
+                              <span className="text-gray-400 text-lg">👑</span>
+                            )}
+                            {index === 2 && (
+                              <span className="text-amber-600 text-lg">👑</span>
+                            )}
+                            {index >= 3 && index < 5 && (
+                              <span className="text-xs font-bold text-gray-600 bg-gray-200 rounded-full w-5 h-5 flex items-center justify-center">
+                                {index + 1}
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="text-sm font-medium text-gray-800 line-clamp-2 leading-tight flex-1">
+                            {post.title}
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="relative w-full h-[118px] overflow-hidden">
+                        <Image
+                          src={imageUrl}
+                          alt={post.title}
+                          fill
+                          unoptimized={true}
+                          className="cursor-pointer object-cover"
+                        />
+                        {/* お気に入りボタン */}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleFavorite(post.id!);
+                          }}
+                          className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
+                        >
+                          <FontAwesomeIcon
+                            icon={faHeart}
+                            className={`text-lg ${
+                              isFavorite(post.id!)
+                                ? "text-red-500"
+                                : "text-gray-400 hover:text-red-500"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </Link>
+                  </div>
+                );
+              })
+            )}
           </div>
         </SlideBox>
       </div>
@@ -251,51 +295,89 @@ export default function Home() {
       <div className="flex justify-end">
         <SlideBox>
           <div className="gap-4">
-            {autumnWinterPosts.map((post, index) => {
-              const imageUrl = post.images?.[0];
+            {autumnWinterLoading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500 mx-auto"></div>
+                <p className="mt-2 text-gray-600">読み込み中...</p>
+              </div>
+            ) : (autumnWinterPosts || []).length === 0 ? (
+              <div className="text-center py-4 text-gray-500">
+                人気の投稿がありません
+              </div>
+            ) : (
+              (autumnWinterPosts || []).map((post, index) => {
+                const imageUrl = post.images?.[0];
 
-              // 画像が存在する場合のみ表示
-              if (!imageUrl) {
-                return null;
-              }
+                // 画像が存在する場合のみ表示
+                if (!imageUrl) {
+                  return null;
+                }
 
-              return (
-                <div
-                  key={post.id || index}
-                  className="relative inline-block mr-4 w-40 h-[118px] overflow-hidden rounded-lg"
-                >
-                  <Link
-                    href={`/post/${post.id}`}
-                    className="relative block w-full h-full"
+                return (
+                  <div
+                    key={post.id || index}
+                    className="inline-block mr-4 w-40 rounded-lg overflow-hidden bg-white shadow-sm"
                   >
-                    <Image
-                      src={imageUrl}
-                      alt={post.title}
-                      fill
-                      unoptimized={true}
-                      className="cursor-pointer object-cover"
-                    />
-                  </Link>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleFavorite(post.id!);
-                    }}
-                    className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
-                  >
-                    <FontAwesomeIcon
-                      icon={faHeart}
-                      className={`text-lg ${
-                        isFavorite(post.id!)
-                          ? "text-red-500"
-                          : "text-gray-400 hover:text-red-500"
-                      }`}
-                    />
-                  </button>
-                </div>
-              );
-            })}
+                    <Link href={`/post/${post.id}`} className="block">
+                      {/* タイトルボックス（上部） */}
+                      <div className="p-2 bg-white">
+                        <div className="flex items-start gap-2">
+                          {/* 順位表示 */}
+                          <div className="flex-shrink-0 mt-0.5">
+                            {index === 0 && (
+                              <span className="text-yellow-500 text-lg">
+                                👑
+                              </span>
+                            )}
+                            {index === 1 && (
+                              <span className="text-gray-400 text-lg">👑</span>
+                            )}
+                            {index === 2 && (
+                              <span className="text-amber-600 text-lg">👑</span>
+                            )}
+                            {index >= 3 && index < 5 && (
+                              <span className="text-xs font-bold text-gray-600 bg-gray-200 rounded-full w-5 h-5 flex items-center justify-center">
+                                {index + 1}
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="text-sm font-medium text-gray-800 line-clamp-2 leading-tight flex-1">
+                            {post.title}
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="relative w-full h-[118px] overflow-hidden">
+                        <Image
+                          src={imageUrl}
+                          alt={post.title}
+                          fill
+                          unoptimized={true}
+                          className="cursor-pointer object-cover"
+                        />
+                        {/* お気に入りボタン */}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleFavorite(post.id!);
+                          }}
+                          className="absolute bottom-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
+                        >
+                          <FontAwesomeIcon
+                            icon={faHeart}
+                            className={`text-lg ${
+                              isFavorite(post.id!)
+                                ? "text-red-500"
+                                : "text-gray-400 hover:text-red-500"
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </Link>
+                  </div>
+                );
+              })
+            )}
           </div>
         </SlideBox>
       </div>
@@ -304,7 +386,7 @@ export default function Home() {
         <>
           <div className="mt-10"></div>
           <div className="mt-5 mb-10 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-amber-700 to-orange-800 bg-clip-text text-transparent">
-            特集
+            イベント投稿
           </div>
         </>
       )}

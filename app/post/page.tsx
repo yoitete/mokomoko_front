@@ -172,9 +172,6 @@ export default function Post() {
           <h1 className="text-3xl font-bold text-gray-800 text-center">
             新規投稿
           </h1>
-          <p className="text-gray-600 text-center mt-2">
-            あなたの素敵なコーディネートを共有しましょう
-          </p>
         </div>
       </header>
 
@@ -388,15 +385,12 @@ export default function Post() {
                 説明
               </label>
               <textarea
-                placeholder="コーディネートのポイントや着こなしのコツを教えてください..."
+                placeholder="ふわふわの触りごごちでとてもこれ一枚でも暖かい毛布です..."
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-lg"
                 rows={5}
                 value={combination.description}
                 onChange={(e) => handleChange("description", e.target.value)}
               />
-              <p className="text-sm text-gray-500">
-                他のユーザーが参考になるような詳細な説明を書いてみてください
-              </p>
             </div>
 
             {/* エラー表示 */}

@@ -29,7 +29,6 @@ export default function FathersDayPage() {
             tag.toLowerCase().includes("dad")
         )) ||
       post.season === "fathers-day" ||
-      post.season === "summer" ||
       post.title?.toLowerCase().includes("父の日") ||
       post.title?.toLowerCase().includes("お父さん") ||
       post.title?.toLowerCase().includes("fathers")
@@ -109,7 +108,7 @@ export default function FathersDayPage() {
                     {/* 価格 */}
                     {post.price && (
                       <div className="flex items-baseline space-x-1">
-                        <span className="text-lg font-bold text-blue-600">
+                        <span className="text-lg font-bold text-red-600">
                           ¥{post.price.toLocaleString()}
                         </span>
                         <span className="text-xs text-gray-400">税込</span>

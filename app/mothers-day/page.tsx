@@ -26,7 +26,6 @@ export default function MothersDayPage() {
             tag.toLowerCase().includes("mother")
         )) ||
       post.season === "mothers-day" ||
-      post.season === "spring" ||
       post.title?.toLowerCase().includes("母の日") ||
       post.title?.toLowerCase().includes("mothers")
   );
@@ -103,7 +102,7 @@ export default function MothersDayPage() {
                     {/* 価格 */}
                     {post.price && (
                       <div className="flex items-baseline space-x-1">
-                        <span className="text-lg font-bold text-pink-600">
+                        <span className="text-lg font-bold text-red-600">
                           ¥{post.price.toLocaleString()}
                         </span>
                         <span className="text-xs text-gray-400">税込</span>

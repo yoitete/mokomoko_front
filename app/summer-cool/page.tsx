@@ -27,8 +27,7 @@ export default function SummerCoolPage() {
             tag.toLowerCase().includes("cool") ||
             tag.toLowerCase().includes("summer")
         )) ||
-      post.season === "summer" ||
-      post.season === "summer-cool" ||
+      post.season === "spring-summer" ||
       post.title?.toLowerCase().includes("夏") ||
       post.title?.toLowerCase().includes("ひんやり") ||
       post.title?.toLowerCase().includes("涼しい")
@@ -108,7 +107,7 @@ export default function SummerCoolPage() {
                     {/* 価格 */}
                     {post.price && (
                       <div className="flex items-baseline space-x-1">
-                        <span className="text-lg font-bold text-blue-600">
+                        <span className="text-lg font-bold text-red-600">
                           ¥{post.price.toLocaleString()}
                         </span>
                         <span className="text-xs text-gray-400">税込</span>

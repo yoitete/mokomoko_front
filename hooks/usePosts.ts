@@ -12,6 +12,7 @@ export type Post = {
   description?: string;
   season: string;
   tags?: string[];
+  favorites_count?: number;
   created_at?: string;
   updated_at?: string;
   images?: string[];

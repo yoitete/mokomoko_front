@@ -24,7 +24,6 @@ export default function ChristmasPage() {
             tag.toLowerCase().includes("クリスマス") ||
             tag.toLowerCase().includes("christmas")
         )) ||
-      post.season === "Christmas Special" ||
       post.season === "christmas" ||
       post.title?.toLowerCase().includes("クリスマス") ||
       post.title?.toLowerCase().includes("christmas")
