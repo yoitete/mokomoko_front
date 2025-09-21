@@ -52,9 +52,16 @@ export const useGet = <T = unknown>(
       revalidateOnFocus: true, // フォーカス時に再検証（デフォルトtrue）
       revalidateOnReconnect: true, // 再接続時に再検証
       dedupingInterval: 0,
-      errorRetryCount: 3, // エラー時のリトライ回数
+      errorRetryCount: 1, // 404エラーの場合はリトライを減らす
       errorRetryInterval: 1000, // リトライ間隔（1秒）
       refreshInterval: 0, // 自動リフレッシュは無効（必要に応じて個別設定）
+      shouldRetryOnError: (error) => {
+        // 404エラーの場合はリトライしない
+        if (error?.response?.status === 404) {
+          return false;
+        }
+        return true;
+      },
       ...config, // ユーザー設定で上書き可能
     }
   );

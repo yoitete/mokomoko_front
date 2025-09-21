@@ -68,18 +68,15 @@ export default function AutumnRelaxPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            #秋のくつろぎ毛布特集
+          <h1 className="text-3xl font-bold text-green-800 mb-4">
+            秋のくつろぎ毛布特集
           </h1>
-          <p className="text-gray-600">
-            読書や映画鑑賞のお供に、心地よいくつろぎタイムを
-          </p>
         </div>
 
         {autumnRelaxPostsWithImages.length === 0 ? (
           <div className="text-center py-16">
             <h3 className="text-xl font-bold text-green-600 mb-4">
-              秋のくつろぎ毛布特集の投稿を準備中です...
+              投稿を準備中です...
             </h3>
           </div>
         ) : (

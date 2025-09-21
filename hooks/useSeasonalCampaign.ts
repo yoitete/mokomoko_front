@@ -261,13 +261,11 @@ export const useCurrentSeasonalCampaignAPI = () => {
     "/seasonal_campaigns/current"
   );
 
-  // フォールバック用のデフォルト特集
-  const defaultCampaign = getCurrentSeasonalCampaign();
-
-  const campaign = data || defaultCampaign;
+  // データが存在しない場合はnullを返す（フォールバックしない）
+  const campaign = data || null;
   const colorClasses = useMemo(
-    () => getColorClasses(campaign.color_theme),
-    [campaign.color_theme]
+    () => (campaign ? getColorClasses(campaign.color_theme) : null),
+    [campaign?.color_theme]
   );
 
   return {
@@ -284,13 +282,11 @@ export const useCurrentSecondSeasonalCampaignAPI = () => {
     "/seasonal_campaigns/current_secondary"
   );
 
-  // フォールバック用のデフォルト特集
-  const defaultCampaign = getCurrentSecondSeasonalCampaign();
-
-  const campaign = data || defaultCampaign;
+  // データが存在しない場合はnullを返す（フォールバックしない）
+  const campaign = data || null;
   const colorClasses = useMemo(
-    () => getColorClasses(campaign.color_theme),
-    [campaign.color_theme]
+    () => (campaign ? getColorClasses(campaign.color_theme) : null),
+    [campaign?.color_theme]
   );
 
   return {

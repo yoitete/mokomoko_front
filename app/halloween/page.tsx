@@ -66,18 +66,15 @@ export default function HalloweenPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            #ハロウィン特集
+          <h1 className="text-3xl font-bold text-orange-800 mb-4">
+            ハロウィン特集
           </h1>
-          <p className="text-gray-600">
-            オレンジと黒の特別なデザインで、秋の雰囲気を演出
-          </p>
         </div>
 
         {halloweenPostsWithImages.length === 0 ? (
           <div className="text-center py-16">
             <h3 className="text-xl font-bold text-orange-600 mb-4">
-              ハロウィン特集の投稿を準備中です...
+              投稿を準備中です...
             </h3>
           </div>
         ) : (

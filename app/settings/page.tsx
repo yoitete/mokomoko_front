@@ -539,39 +539,38 @@ export default function Settings() {
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <h4 className="font-medium text-blue-800 mb-2 flex items-center">
                     <FontAwesomeIcon icon={faCalendar} className="mr-2" />
-                    現在表示中の特集（9月）
+                    現在表示中の特集（有効な特集すべて）
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {campaigns
-                      ?.filter(
-                        (c) =>
-                          c.active &&
-                          (c.start_month || 0) <= 9 &&
-                          (c.end_month || 0) >= 9
-                      )
+                      ?.filter((c) => c.active)
                       .map((campaign) => (
                         <div
                           key={campaign.id}
                           className="bg-white p-3 rounded border border-blue-200"
                         >
                           <div className="flex justify-between items-center">
-                            <div>
-                              <span className="font-medium text-blue-800">
-                                {campaign.name}
-                              </span>
-                              <span
-                                className={`ml-2 px-2 py-1 rounded text-xs ${
-                                  (campaign.campaign_type || "primary") ===
+                            <div className="flex flex-col">
+                              <div className="flex items-center flex-wrap">
+                                <span className="font-medium text-blue-800 text-sm">
+                                  {campaign.name.length > 12
+                                    ? campaign.name.substring(0, 12) + "..."
+                                    : campaign.name}
+                                </span>
+                                <span
+                                  className={`ml-2 px-2 py-1 rounded text-xs ${
+                                    (campaign.campaign_type || "primary") ===
+                                    "primary"
+                                      ? "bg-blue-100 text-blue-700"
+                                      : "bg-purple-100 text-purple-700"
+                                  }`}
+                                >
+                                  {(campaign.campaign_type || "primary") ===
                                   "primary"
-                                    ? "bg-blue-100 text-blue-700"
-                                    : "bg-purple-100 text-purple-700"
-                                }`}
-                              >
-                                {(campaign.campaign_type || "primary") ===
-                                "primary"
-                                  ? "第1特集"
-                                  : "第2特集"}
-                              </span>
+                                    ? "第1特集"
+                                    : "第2特集"}
+                                </span>
+                              </div>
                             </div>
                             <div
                               className={`w-4 h-4 rounded-full bg-${campaign.color_theme}-500`}

@@ -66,18 +66,15 @@ export default function NewLifeSupportPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            #新生活応援特集
+          <h1 className="text-3xl font-bold text-green-800 mb-4">
+            新生活応援特集
           </h1>
-          <p className="text-gray-600">
-            新生活の始まりに、心地よい毛布で快適な環境を
-          </p>
         </div>
 
         {newLifePostsWithImages.length === 0 ? (
           <div className="text-center py-16">
             <h3 className="text-xl font-bold text-green-600 mb-4">
-              新生活応援特集の投稿を準備中です...
+              投稿を準備中です...
             </h3>
           </div>
         ) : (

@@ -87,19 +87,16 @@ export default function ChristmasPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            #クリスマス特集
+        <div className="text-center mb-8 relative z-30">
+          <h1 className="text-3xl font-bold text-red-800 mb-4 !cursor-default relative z-30">
+            クリスマス特集
           </h1>
-          <p className="text-gray-600">
-            冬の夜をやさしく包み込む、とっておきのブランケットをご用意しました
-          </p>
         </div>
 
         {christmasPostsWithImages.length === 0 ? (
           <div className="text-center py-16">
             <h3 className="text-xl font-bold text-red-600 mb-4">
-              クリスマス特集の投稿を準備中です...
+              投稿を準備中です...
             </h3>
           </div>
         ) : (

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import Image from "next/image";
 import { SlideBox } from "@/components/SlideBox/SlideBox";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
@@ -13,10 +13,7 @@ import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import {
-  useCurrentSeasonalCampaignAPI,
-  useCurrentSecondSeasonalCampaignAPI,
-} from "@/hooks/useSeasonalCampaign";
+import { SeasonalCampaign, getColorClasses } from "@/hooks/useSeasonalCampaign";
 
 export default function Home() {
   const { userId, isAuthenticated } = useCurrentUser();
@@ -27,17 +24,30 @@ export default function Home() {
   // お気に入り機能（ログインユーザーのIDを使用）
   const { toggleFavorite, isFavorite } = useFavorites(userId || 0);
 
-  // 現在の季節特集を取得（API版）
+  // 有効な特集をすべて取得（API版）
   const {
-    data: currentCampaign,
-    colorClasses,
+    data: activeCampaigns,
     isLoading: campaignLoading,
     error: campaignError,
-  } = useCurrentSeasonalCampaignAPI();
+  } = useGet<SeasonalCampaign[]>("/seasonal_campaigns/active");
 
-  // 現在の第2季節特集を取得（API版）
-  const { data: secondCampaign, colorClasses: secondColorClasses } =
-    useCurrentSecondSeasonalCampaignAPI();
+  // 第1特集と第2特集を分離
+  const currentCampaign =
+    activeCampaigns?.find((c) => c.campaign_type === "primary") || null;
+  const secondCampaign =
+    activeCampaigns?.find((c) => c.campaign_type === "secondary") || null;
+
+  // カラークラスを生成
+  const colorClasses = useMemo(
+    () =>
+      currentCampaign ? getColorClasses(currentCampaign.color_theme) : null,
+    [currentCampaign]
+  );
+
+  const secondColorClasses = useMemo(
+    () => (secondCampaign ? getColorClasses(secondCampaign.color_theme) : null),
+    [secondCampaign]
+  );
 
   // 一時的にログを出す（ユーザーIDを確認）
   useEffect(() => {
@@ -289,148 +299,160 @@ export default function Home() {
           </div>
         </SlideBox>
       </div>
-      {/* https://tailwindcss.com/docs/font-size */}
-      <div className="mt-10"></div>
-      <div className="mt-5 mb-10 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-amber-700 to-orange-800 bg-clip-text text-transparent">
-        特集
-      </div>
-      <div className="mx-4 mb-5">
-        <SimpleBox className="h-137 flex flex-col justify-start items-center p-4 relative">
-          <p
-            className={`text-center text-xl font-semibold ${colorClasses.title} mb-4`}
-          >
-            {currentCampaign.name}
-          </p>
+      {/* 特集セクション：特集が存在する場合のみ表示 */}
+      {(currentCampaign || secondCampaign) && (
+        <>
+          <div className="mt-10"></div>
+          <div className="mt-5 mb-10 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-amber-700 to-orange-800 bg-clip-text text-transparent">
+            特集
+          </div>
+        </>
+      )}
+      {/* 第1特集は存在する場合のみ表示 */}
+      {currentCampaign && colorClasses && (
+        <div className="mx-4 mb-5">
+          <SimpleBox className="h-137 flex flex-col justify-start items-center p-4 relative">
+            <p
+              className={`text-center text-xl font-semibold ${colorClasses.title} mb-4`}
+            >
+              {currentCampaign.name}
+            </p>
 
-          <div className="flex-grow">
-            <div className="grid grid-cols-2 gap-2 w-full">
-              {postsWithImages.slice(0, 4).map((post, index) => {
-                const imageUrl = post.images?.[0];
+            <div className="flex-grow">
+              <div className="grid grid-cols-2 gap-2 w-full">
+                {postsWithImages.slice(0, 4).map((post, index) => {
+                  const imageUrl = post.images?.[0];
 
-                // 画像が存在する場合のみ表示
-                if (!imageUrl) {
-                  return null;
-                }
+                  // 画像が存在する場合のみ表示
+                  if (!imageUrl) {
+                    return null;
+                  }
 
-                return (
-                  <div key={post.id || index}>
-                    <BoxImage src={imageUrl} alt={post.title} />
-                  </div>
-                );
-              })}
+                  return (
+                    <div key={post.id || index}>
+                      <BoxImage src={imageUrl} alt={post.title} />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-6 px-4">
+                <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
+                  <span className={`${colorClasses.highlight} font-semibold`}>
+                    {currentCampaign.description.split("、")[0]}
+                  </span>
+                  、{currentCampaign.description.split("、")[1]}
+                </p>
+                <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
+                  {currentCampaign.subtitle
+                    .split("、")
+                    .map((text, i, array) => (
+                      <React.Fragment key={i}>
+                        {text}
+                        {i < array.length - 1 && (
+                          <>
+                            、
+                            <br />
+                          </>
+                        )}
+                      </React.Fragment>
+                    ))}
+                </p>
+                <p className="text-center text-gray-500 text-sm mt-3">
+                  <span
+                    className={`${colorClasses.badge} px-2 py-1 rounded-full text-xs font-medium`}
+                  >
+                    {currentCampaign.highlight_text}
+                  </span>
+                </p>
+              </div>
             </div>
-            <div className="mt-6 px-4">
-              <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
-                <span className={`${colorClasses.highlight} font-semibold`}>
-                  {currentCampaign.description.split("、")[0]}
-                </span>
-                、{currentCampaign.description.split("、")[1]}
-              </p>
-              <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
-                {currentCampaign.subtitle.split("、").map((text, i, array) => (
-                  <React.Fragment key={i}>
-                    {text}
-                    {i < array.length - 1 && (
-                      <>
-                        、
-                        <br />
-                      </>
-                    )}
-                  </React.Fragment>
-                ))}
-              </p>
-              <p className="text-center text-gray-500 text-sm mt-3">
-                <span
-                  className={`${colorClasses.badge} px-2 py-1 rounded-full text-xs font-medium`}
+            <div className="absolute bottom-4 right-4">
+              <Link href={currentCampaign.link_path}>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="min-w-[150px] cursor-pointer"
                 >
-                  {currentCampaign.highlight_text}
-                </span>
-              </p>
+                  {currentCampaign.button_text}
+                </Button>
+              </Link>
             </div>
-          </div>
-          <div className="absolute bottom-4 right-4">
-            <Link href={currentCampaign.link_path}>
-              <Button
-                variant="primary"
-                size="sm"
-                className="min-w-[150px] cursor-pointer"
-              >
-                {currentCampaign.button_text}
-              </Button>
-            </Link>
-          </div>
-        </SimpleBox>
-      </div>
+          </SimpleBox>
+        </div>
+      )}
 
-      <div className="mx-4 mb-4">
-        <SimpleBox className="h-137 flex flex-col justify-start items-center p-4 relative">
-          <p
-            className={`text-center text-xl font-semibold ${secondColorClasses.title} mb-4`}
-          >
-            {secondCampaign.name}
-          </p>
+      {/* 第2特集は存在する場合のみ表示 */}
+      {secondCampaign && secondColorClasses && (
+        <div className="mx-4 mb-4">
+          <SimpleBox className="h-137 flex flex-col justify-start items-center p-4 relative">
+            <p
+              className={`text-center text-xl font-semibold ${secondColorClasses.title} mb-4`}
+            >
+              {secondCampaign.name}
+            </p>
 
-          <div className="flex-grow">
-            <div className="grid grid-cols-2 gap-2 w-full">
-              {postsWithImages.slice(0, 4).map((post, index) => {
-                const imageUrl = post.images?.[0];
+            <div className="flex-grow">
+              <div className="grid grid-cols-2 gap-2 w-full">
+                {postsWithImages.slice(0, 4).map((post, index) => {
+                  const imageUrl = post.images?.[0];
 
-                // 画像が存在する場合のみ表示
-                if (!imageUrl) {
-                  return null;
-                }
+                  // 画像が存在する場合のみ表示
+                  if (!imageUrl) {
+                    return null;
+                  }
 
-                return (
-                  <div key={post.id || index}>
-                    <BoxImage src={imageUrl} alt={post.title} />
-                  </div>
-                );
-              })}
+                  return (
+                    <div key={post.id || index}>
+                      <BoxImage src={imageUrl} alt={post.title} />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-6 px-4">
+                <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
+                  <span
+                    className={`${secondColorClasses.highlight} font-semibold`}
+                  >
+                    {secondCampaign.description.split("、")[0]}
+                  </span>
+                  、{secondCampaign.description.split("、")[1]}
+                </p>
+                <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
+                  {secondCampaign.subtitle.split("、").map((text, i, array) => (
+                    <React.Fragment key={i}>
+                      {text}
+                      {i < array.length - 1 && (
+                        <>
+                          、
+                          <br />
+                        </>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </p>
+                <p className="text-center text-gray-500 text-sm mt-3">
+                  <span
+                    className={`${secondColorClasses.badge} px-2 py-1 rounded-full text-xs font-medium`}
+                  >
+                    {secondCampaign.highlight_text}
+                  </span>
+                </p>
+              </div>
             </div>
-            <div className="mt-6 px-4">
-              <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
-                <span
-                  className={`${secondColorClasses.highlight} font-semibold`}
+            <div className="absolute bottom-4 right-4">
+              <Link href={secondCampaign.link_path}>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="min-w-[150px] cursor-pointer"
                 >
-                  {secondCampaign.description.split("、")[0]}
-                </span>
-                、{secondCampaign.description.split("、")[1]}
-              </p>
-              <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
-                {secondCampaign.subtitle.split("、").map((text, i, array) => (
-                  <React.Fragment key={i}>
-                    {text}
-                    {i < array.length - 1 && (
-                      <>
-                        、
-                        <br />
-                      </>
-                    )}
-                  </React.Fragment>
-                ))}
-              </p>
-              <p className="text-center text-gray-500 text-sm mt-3">
-                <span
-                  className={`${secondColorClasses.badge} px-2 py-1 rounded-full text-xs font-medium`}
-                >
-                  {secondCampaign.highlight_text}
-                </span>
-              </p>
+                  {secondCampaign.button_text}
+                </Button>
+              </Link>
             </div>
-          </div>
-          <div className="absolute bottom-4 right-4">
-            <Link href={secondCampaign.link_path}>
-              <Button
-                variant="primary"
-                size="sm"
-                className="min-w-[150px] cursor-pointer"
-              >
-                {secondCampaign.button_text}
-              </Button>
-            </Link>
-          </div>
-        </SimpleBox>
-      </div>
+          </SimpleBox>
+        </div>
+      )}
     </div>
   );
 }

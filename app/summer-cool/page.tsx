@@ -64,19 +64,16 @@ export default function SummerCoolPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            #夏でも快適！ひんやり毛布特集
+        <div className="text-center mb-8 relative z-30">
+          <h1 className="text-3xl font-bold text-blue-800 mb-4 !cursor-default relative z-30">
+            夏でも快適！ひんやり毛布特集
           </h1>
-          <p className="text-gray-600">
-            エアコンの効いた部屋で、快適な眠りをサポートします
-          </p>
         </div>
 
         {summerCoolPostsWithImages.length === 0 ? (
           <div className="text-center py-16">
             <h3 className="text-xl font-bold text-blue-600 mb-4">
-              夏でも快適！ひんやり毛布特集の投稿を準備中です...
+              投稿を準備中です...
             </h3>
           </div>
         ) : (

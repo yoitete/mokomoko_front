@@ -194,10 +194,7 @@ export default function Post() {
                 value={combination.title}
                 onChange={(e) => handleChange("title", e.target.value)}
               />
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-500">
-                  タイトルは投稿の第一印象を決めます
-                </p>
+              <div className="flex justify-end items-center">
                 <p className="text-sm font-medium text-gray-600">
                   {combination.title.length}/20文字
                 </p>
@@ -301,8 +298,12 @@ export default function Post() {
                   <option value="">季節を選択してください</option>
                   <option value="spring-summer">春・夏</option>
                   <option value="autumn-winter">秋・冬</option>
-                  <option value="christmas">クリスマス特集</option>
-                  <option value="exam-support">受験応援特集</option>
+                  <option value="christmas">クリスマス</option>
+                  <option value="exam-support">受験応援</option>
+                  <option value="mothers-day">母の日</option>
+                  <option value="new-life-support">新生活応援</option>
+                  <option value="fathers-day">父の日</option>
+                  <option value="halloween">ハロウィン</option>
                   <option value="new-arrivals">新着情報</option>
                 </select>
               </div>

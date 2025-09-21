@@ -62,16 +62,13 @@ export default function MothersDayPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">#母の日特集</h1>
-          <p className="text-gray-600">
-            日頃の感謝の気持ちを込めて、心地よい温もりをお届けします
-          </p>
+          <h1 className="text-3xl font-bold text-pink-800 mb-4">母の日特集</h1>
         </div>
 
         {mothersDayPostsWithImages.length === 0 ? (
           <div className="text-center py-16">
             <h3 className="text-xl font-bold text-pink-600 mb-4">
-              母の日特集の投稿を準備中です...
+              投稿を準備中です...
             </h3>
           </div>
         ) : (
