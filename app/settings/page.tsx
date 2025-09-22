@@ -484,7 +484,7 @@ export default function Settings() {
                 <Button
                   variant="outline"
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="w-full text-red-600 border-red-300 hover:bg-red-50"
+                  className="w-full !text-red-600 !border-red-300 !hover:bg-red-50 !hover:text-red-700 hover:!bg-red-50 hover:!text-red-700"
                   disabled={isLoading}
                 >
                   <FontAwesomeIcon icon={faTrash} className="mr-2" />
@@ -494,7 +494,7 @@ export default function Settings() {
                 <Button
                   variant="outline"
                   onClick={handleLogout}
-                  className="w-full text-gray-600 border-gray-300 hover:bg-gray-50"
+                  className="w-full !text-gray-600 !border-gray-300 !hover:bg-gray-50 !hover:text-gray-700 hover:!bg-gray-50 hover:!text-gray-700"
                   disabled={isLoading}
                 >
                   ログアウト
@@ -539,11 +539,12 @@ export default function Settings() {
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <h4 className="font-medium text-blue-800 mb-2 flex items-center">
                     <FontAwesomeIcon icon={faCalendar} className="mr-2" />
-                    現在表示中の特集（有効な特集すべて）
+                    現在表示中の特集（最大2つまで表示）
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {campaigns
                       ?.filter((c) => c.active)
+                      .slice(0, 2)
                       .map((campaign) => (
                         <div
                           key={campaign.id}

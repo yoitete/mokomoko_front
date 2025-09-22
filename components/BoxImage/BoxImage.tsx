@@ -10,13 +10,14 @@ export const BoxImage = ({
   alt: string;
   className?: string;
 }) => (
-  <Image
-    src={src}
-    alt={alt}
-    width={160}
-    height={118}
-    className={`object-cover rounded-lg ${className}`}
-    style={{ width: "auto", height: "auto" }}
-    unoptimized={true}
-  />
+  <div className="w-full h-[118px] overflow-hidden rounded-lg">
+    <Image
+      src={src}
+      alt={alt}
+      width={160}
+      height={118}
+      className={`w-full h-full object-cover ${className}`}
+      unoptimized={true}
+    />
+  </div>
 );

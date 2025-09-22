@@ -209,7 +209,7 @@ export default function Search() {
         </div>
       </div>
 
-      {/* フィルターと並び替え */}
+      {/* 絞り込み */}
       <div className="mr-6 mt-2 flex justify-end">
         <div className="relative dropdown-container">
           <button
@@ -218,24 +218,13 @@ export default function Search() {
           >
             <FontAwesomeIcon icon={faList} size="lg" className="text-black" />
             <span>
-              並べ替え：{selectedSort === "newest" ? "新着順" : "人気順"}
+              絞り込み：{selectedSort === "newest" ? "新着順" : "人気順"}
             </span>
           </button>
 
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
               <div className="py-1">
-                <button
-                  onClick={() => {
-                    setSelectedSeason(null);
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    !selectedSeason ? "bg-blue-50 text-blue-600" : ""
-                  }`}
-                >
-                  すべて
-                </button>
                 <button
                   onClick={() => {
                     setSelectedSort("newest");
@@ -257,58 +246,6 @@ export default function Search() {
                   }`}
                 >
                   人気順
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedSeason("spring");
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    selectedSeason === "spring"
-                      ? "bg-blue-50 text-blue-600"
-                      : ""
-                  }`}
-                >
-                  春
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedSeason("summer");
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    selectedSeason === "summer"
-                      ? "bg-blue-50 text-blue-600"
-                      : ""
-                  }`}
-                >
-                  夏
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedSeason("autumn");
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    selectedSeason === "autumn"
-                      ? "bg-blue-50 text-blue-600"
-                      : ""
-                  }`}
-                >
-                  秋
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedSeason("winter");
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    selectedSeason === "winter"
-                      ? "bg-blue-50 text-blue-600"
-                      : ""
-                  }`}
-                >
-                  冬
                 </button>
               </div>
             </div>
@@ -347,7 +284,7 @@ export default function Search() {
               {/* 左：画像 */}
               <div className="md:w-1/3 w-full">
                 {post.images?.[0] ? (
-                  <div className="w-full h-[118px] overflow-hidden rounded-lg relative">
+                  <div className="w-full h-[118px] overflow-hidden relative">
                     <Image
                       src={post.images[0]}
                       alt={post.title}
@@ -357,7 +294,7 @@ export default function Search() {
                     />
                   </div>
                 ) : (
-                  <div className="h-[118px] bg-gray-200 flex items-center justify-center rounded-lg">
+                  <div className="h-[118px] bg-gray-200 flex items-center justify-center">
                     No Image
                   </div>
                 )}

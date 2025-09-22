@@ -167,7 +167,7 @@ export default function FavoritePage() {
           {/* 左：画像 */}
           <div className="md:w-1/3 w-full">
             {post.images?.[0] ? (
-              <div className="w-full h-[118px] overflow-hidden rounded-lg relative">
+              <div className="w-full h-[118px] overflow-hidden relative">
                 <Image
                   src={post.images[0]}
                   alt={post.title}
@@ -177,7 +177,7 @@ export default function FavoritePage() {
                 />
               </div>
             ) : (
-              <div className="h-[118px] bg-gray-200 flex items-center justify-center rounded-lg">
+              <div className="h-[118px] bg-gray-200 flex items-center justify-center">
                 No Image
               </div>
             )}
