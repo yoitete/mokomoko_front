@@ -11,13 +11,12 @@ import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function FavoritePage() {
-  const { isUnauthenticated, loading, userId, userData, firebaseUID, error } =
+  const { isUnauthenticated, loading, userId, firebaseUID, error } =
     useCurrentUser();
 
   // デバッグログ（必要に応じてコメントアウト）
   // console.log("FavoritePage - User ID:", userId);
   // console.log("FavoritePage - Firebase UID:", firebaseUID);
-  // console.log("FavoritePage - User Data:", userData);
   // console.log("FavoritePage - Error:", error);
 
   // SWRを使用してデータを取得（デフォルト設定を使用）
@@ -104,10 +103,10 @@ export default function FavoritePage() {
             <br />
             ログインまたは新規登録が必要です。
           </p>
-          <div className="space-y-3">
-            <Link href="/signup">
-              <Button className="w-full">新規アカウント作成</Button>
-            </Link>
+          <Link href="/signup">
+            <Button className="w-full">新規アカウント作成</Button>
+          </Link>
+          <div className="mt-4">
             <Link href="/login">
               <Button variant="outline" className="w-full">
                 ログイン

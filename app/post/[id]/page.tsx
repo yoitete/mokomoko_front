@@ -51,10 +51,10 @@ export default function PostDetail() {
             <br />
             ログインまたは新規登録が必要です。
           </p>
-          <div className="space-y-3">
-            <Link href="/signup">
-              <Button className="w-full">新規アカウント作成</Button>
-            </Link>
+          <Link href="/signup">
+            <Button className="w-full">新規アカウント作成</Button>
+          </Link>
+          <div className="mt-4">
             <Link href="/login">
               <Button variant="outline" className="w-full">
                 ログイン

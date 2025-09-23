@@ -8,6 +8,7 @@ import { useAtomValue } from "jotai";
 import { authTokenAtom } from "@/lib/authAtoms";
 import Link from "next/link";
 import Input from "@/components/Input/Input";
+import PasswordInput from "@/components/PasswordInput/PasswordInput";
 import Button from "@/components/Button/Button";
 
 export default function Signup() {
@@ -215,9 +216,8 @@ export default function Signup() {
               >
                 パスワード
               </label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="6文字以上で入力"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -237,9 +237,8 @@ export default function Signup() {
               >
                 パスワード（確認）
               </label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 placeholder="パスワードを再入力"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}

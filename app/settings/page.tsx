@@ -8,6 +8,7 @@ import { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button/Button";
 import Input from "@/components/Input/Input";
+import PasswordInput from "@/components/PasswordInput/PasswordInput";
 import {
   faUser,
   faEnvelope,
@@ -255,10 +256,10 @@ export default function Settings() {
             <br />
             ログインまたは新規登録が必要です。
           </p>
-          <div className="space-y-3">
-            <Link href="/signup">
-              <Button className="w-full">新規アカウント作成</Button>
-            </Link>
+          <Link href="/signup">
+            <Button className="w-full">新規アカウント作成</Button>
+          </Link>
+          <div className="mt-4">
             <Link href="/login">
               <Button variant="outline" className="w-full">
                 ログイン
@@ -363,8 +364,7 @@ export default function Settings() {
                         <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
                           現在のパスワード
                         </label>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           placeholder="現在のパスワードを入力"
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
@@ -376,8 +376,7 @@ export default function Settings() {
                         <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
                           新しいパスワード
                         </label>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           placeholder="新しいパスワードを入力"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
@@ -389,8 +388,7 @@ export default function Settings() {
                         <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
                           新しいパスワード（確認）
                         </label>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           placeholder="新しいパスワードを再入力"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
