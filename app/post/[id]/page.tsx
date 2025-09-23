@@ -51,10 +51,10 @@ export default function PostDetail() {
             <br />
             ログインまたは新規登録が必要です。
           </p>
-          <div className="space-y-3">
-            <Link href="/signup">
-              <Button className="w-full">新規アカウント作成</Button>
-            </Link>
+          <Link href="/signup">
+            <Button className="w-full">新規アカウント作成</Button>
+          </Link>
+          <div className="mt-4">
             <Link href="/login">
               <Button variant="outline" className="w-full">
                 ログイン
@@ -116,7 +116,7 @@ export default function PostDetail() {
 
       <div className="max-w-4xl mx-auto p-4">
         {/* 投稿内容 */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white overflow-hidden">
           {/* 画像 */}
           {post.images && post.images.length > 0 && (
             <div className="relative">
@@ -138,7 +138,7 @@ export default function PostDetail() {
             </h2>
 
             {post.price && (
-              <p className="text-xl font-semibold text-blue-600 mb-4">
+              <p className="text-xl font-semibold text-red-600 mb-4">
                 ¥{post.price.toLocaleString()}
               </p>
             )}
@@ -153,16 +153,24 @@ export default function PostDetail() {
             <div className="mb-4">
               <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
                 {post.season === "new-arrivals" && "新着情報"}
-                {post.season === "spring-summer" && "春夏"}
-                {post.season === "autumn-winter" && "秋冬"}
-                {post.season === "christmas" && "クリスマス特集"}
+                {post.season === "spring-summer" && "春・夏"}
+                {post.season === "autumn-winter" && "秋・冬"}
+                {post.season === "christmas" && "クリスマス"}
                 {post.season === "exam-support" && "受験応援"}
+                {post.season === "mothers-day" && "母の日"}
+                {post.season === "new-life-support" && "新生活応援"}
+                {post.season === "fathers-day" && "父の日"}
+                {post.season === "halloween" && "ハロウィン"}
                 {![
                   "new-arrivals",
                   "spring-summer",
                   "autumn-winter",
                   "christmas",
                   "exam-support",
+                  "mothers-day",
+                  "new-life-support",
+                  "fathers-day",
+                  "halloween",
                 ].includes(post.season) && post.season}
               </span>
             </div>

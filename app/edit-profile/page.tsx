@@ -6,6 +6,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { profileAtom, updateProfileAtom } from "@/lib/profileAtoms";
 import { useProfile } from "@/hooks/useProfile";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { mutate } from "swr";
 import Button from "@/components/Button/Button";
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
 import IconSelector from "@/components/IconSelector/IconSelector";
@@ -114,6 +115,12 @@ export default function EditProfile() {
           bio,
           selectedIcon,
         });
+
+        // SWRキャッシュを強制的に再検証
+        await mutate(`/users/${userId}`);
+        await mutate(`/users/by_firebase_uid/${firebaseUID}`);
+
+        console.log("SWRキャッシュを更新しました");
       } else {
         console.warn(
           "ユーザーIDが取得できませんでした。ローカルのみ更新されました。",

@@ -6,7 +6,7 @@ import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 
-export default function ChristmasPage() {
+export default function AutumnRelaxPage() {
   // SWRを使用してデータを取得（デフォルト設定を使用）
   const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
 
@@ -15,51 +15,31 @@ export default function ChristmasPage() {
     (post) => post.images && post.images.length > 0
   );
 
-  // クリスマス関連の投稿をフィルタリング（#クリスマスタグまたはChristmas Special）
-  const christmasPostsWithImages = postsWithImages.filter(
+  // 秋のくつろぎ関連の投稿をフィルタリング
+  const autumnRelaxPostsWithImages = postsWithImages.filter(
     (post) =>
       (post.tags &&
         post.tags.some(
           (tag) =>
-            tag.toLowerCase().includes("クリスマス") ||
-            tag.toLowerCase().includes("christmas")
+            tag.toLowerCase().includes("秋") ||
+            tag.toLowerCase().includes("くつろぎ") ||
+            tag.toLowerCase().includes("リラックス") ||
+            tag.toLowerCase().includes("読書") ||
+            tag.toLowerCase().includes("映画") ||
+            tag.toLowerCase().includes("autumn") ||
+            tag.toLowerCase().includes("relax") ||
+            tag.toLowerCase().includes("cozy")
         )) ||
-      post.season === "christmas" ||
-      post.title?.toLowerCase().includes("クリスマス") ||
-      post.title?.toLowerCase().includes("christmas")
+      post.season === "autumn-winter" ||
+      post.title?.toLowerCase().includes("秋") ||
+      post.title?.toLowerCase().includes("くつろぎ") ||
+      post.title?.toLowerCase().includes("リラックス")
   );
 
   // デバッグ用ログ
   console.log("All posts:", posts);
   console.log("Posts with images:", postsWithImages);
-  console.log("Christmas posts with images:", christmasPostsWithImages);
-  console.log(
-    "Posts with Christmas season:",
-    posts?.filter(
-      (post) =>
-        post.season === "Christmas Special" || post.season === "christmas"
-    )
-  );
-  console.log(
-    "Posts with Christmas tags:",
-    posts?.filter(
-      (post) =>
-        post.tags &&
-        post.tags.some(
-          (tag) =>
-            tag.toLowerCase().includes("クリスマス") ||
-            tag.toLowerCase().includes("christmas")
-        )
-    )
-  );
-  console.log(
-    "Posts with Christmas in title:",
-    posts?.filter(
-      (post) =>
-        post.title?.toLowerCase().includes("クリスマス") ||
-        post.title?.toLowerCase().includes("christmas")
-    )
-  );
+  console.log("Autumn relax posts with images:", autumnRelaxPostsWithImages);
 
   if (isLoading) {
     return (
@@ -86,21 +66,21 @@ export default function ChristmasPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="text-center mb-8 relative z-30">
-          <h1 className="text-3xl font-bold text-red-800 mb-4 !cursor-default relative z-30">
-            クリスマス特集
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-green-800 mb-4">
+            秋のくつろぎ毛布特集
           </h1>
         </div>
 
-        {christmasPostsWithImages.length === 0 ? (
+        {autumnRelaxPostsWithImages.length === 0 ? (
           <div className="text-center py-16">
-            <h3 className="text-xl font-bold text-red-600 mb-4">
+            <h3 className="text-xl font-bold text-green-600 mb-4">
               投稿を準備中です...
             </h3>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            {christmasPostsWithImages.map((post, index) => {
+            {autumnRelaxPostsWithImages.map((post, index) => {
               const imageUrl = post.images?.[0];
 
               // 画像が存在する場合のみ表示

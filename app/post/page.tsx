@@ -149,10 +149,10 @@ export default function Post() {
             <br />
             ログインまたは新規登録が必要です。
           </p>
-          <div className="space-y-3">
-            <Link href="/signup">
-              <Button className="w-full">新規アカウント作成</Button>
-            </Link>
+          <Link href="/signup">
+            <Button className="w-full">新規アカウント作成</Button>
+          </Link>
+          <div className="mt-4">
             <Link href="/login">
               <Button variant="outline" className="w-full">
                 ログイン
@@ -172,9 +172,6 @@ export default function Post() {
           <h1 className="text-3xl font-bold text-gray-800 text-center">
             新規投稿
           </h1>
-          <p className="text-gray-600 text-center mt-2">
-            あなたの素敵なコーディネートを共有しましょう
-          </p>
         </div>
       </header>
 
@@ -194,10 +191,7 @@ export default function Post() {
                 value={combination.title}
                 onChange={(e) => handleChange("title", e.target.value)}
               />
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-500">
-                  タイトルは投稿の第一印象を決めます
-                </p>
+              <div className="flex justify-end items-center">
                 <p className="text-sm font-medium text-gray-600">
                   {combination.title.length}/20文字
                 </p>
@@ -301,8 +295,12 @@ export default function Post() {
                   <option value="">季節を選択してください</option>
                   <option value="spring-summer">春・夏</option>
                   <option value="autumn-winter">秋・冬</option>
-                  <option value="christmas">クリスマス特集</option>
-                  <option value="exam-support">受験応援特集</option>
+                  <option value="christmas">クリスマス</option>
+                  <option value="exam-support">受験応援</option>
+                  <option value="mothers-day">母の日</option>
+                  <option value="new-life-support">新生活応援</option>
+                  <option value="fathers-day">父の日</option>
+                  <option value="halloween">ハロウィン</option>
                   <option value="new-arrivals">新着情報</option>
                 </select>
               </div>
@@ -387,15 +385,12 @@ export default function Post() {
                 説明
               </label>
               <textarea
-                placeholder="コーディネートのポイントや着こなしのコツを教えてください..."
+                placeholder="ふわふわの触りごごちでとてもこれ一枚でも暖かい毛布です..."
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-lg"
                 rows={5}
                 value={combination.description}
                 onChange={(e) => handleChange("description", e.target.value)}
               />
-              <p className="text-sm text-gray-500">
-                他のユーザーが参考になるような詳細な説明を書いてみてください
-              </p>
             </div>
 
             {/* エラー表示 */}

@@ -6,6 +6,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { profileAtom, updateProfileAtom } from "@/lib/profileAtoms";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuth } from "@/hooks/useAuth";
+import { useMyPosts } from "@/hooks/useMyPosts";
 import Button from "@/components/Button/Button";
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
 import {
@@ -35,6 +36,7 @@ export default function Mypage() {
   const profile = useAtomValue(profileAtom);
   const updateProfile = useSetAtom(updateProfileAtom);
   const router = useRouter();
+  const { posts } = useMyPosts();
 
   // APIから取得したプロフィールデータをローカル状態に同期
   useEffect(() => {
@@ -48,6 +50,17 @@ export default function Mypage() {
       });
     }
   }, [userData, updateProfile]);
+
+  // ページ表示時にキャッシュを再検証（プロフィール編集から戻った場合など）
+  useEffect(() => {
+    if (userData?.id) {
+      // プロフィールデータを最新に更新
+      import("swr").then(({ mutate }) => {
+        mutate(`/users/${userData.id}`);
+        mutate(`/users/by_firebase_uid/${userData.firebase_uid}`);
+      });
+    }
+  }, [userData?.id, userData?.firebase_uid]);
 
   // デバッグ用ログ（必要に応じてコメントアウト）
   // console.log("Mypage - profile:", profile);
@@ -89,10 +102,10 @@ export default function Mypage() {
             <br />
             ログインまたは新規登録が必要です。
           </p>
-          <div className="space-y-3">
-            <Link href="/signup">
-              <Button className="w-full">新規アカウント作成</Button>
-            </Link>
+          <Link href="/signup">
+            <Button className="w-full">新規アカウント作成</Button>
+          </Link>
+          <div className="mt-4">
             <Link href="/login">
               <Button variant="outline" className="w-full">
                 ログイン
@@ -220,6 +233,29 @@ export default function Mypage() {
                   {profile.bio}
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* 区切り線 */}
+          <div className="border-t border-gray-200 my-6"></div>
+
+          {/* 投稿管理セクション */}
+          <div className="space-y-3 mb-6">
+            <div className="flex justify-between items-center">
+              <label className="block text-sm font-medium text-[#5A4A4A]">
+                <FontAwesomeIcon icon={faUser} className="mr-2" />
+                投稿管理
+              </label>
+              <span className="text-sm text-gray-500">
+                {posts ? `${posts.length}件` : ""}
+              </span>
+            </div>
+            <div className="space-y-2">
+              <Link href="/mypage/posts">
+                <Button className="w-full bg-sky-100 hover:bg-sky-200 text-sky-700 border border-sky-200">
+                  投稿一覧・管理
+                </Button>
+              </Link>
             </div>
           </div>
 

@@ -5,6 +5,7 @@ import { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Input from "@/components/Input/Input";
+import PasswordInput from "@/components/PasswordInput/PasswordInput";
 import Button from "@/components/Button/Button";
 import PasswordResetModal from "@/components/PasswordResetModal/PasswordResetModal";
 
@@ -104,9 +105,8 @@ export default function Login() {
               >
                 パスワード
               </label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="パスワードを入力"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -136,7 +136,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => setShowResetModal(true)}
-              className="text-[#7E6565] hover:text-[#6B5555] text-sm underline"
+              className="text-red-500 hover:text-red-600 text-sm underline"
               disabled={isLoading}
             >
               パスワードを忘れた方はこちら
@@ -145,7 +145,7 @@ export default function Login() {
 
           {/* アカウント作成リンク */}
           <div className="mt-6 text-center border-t pt-4">
-            <p className="text-[#5A4A4A] text-sm mb-3">
+            <p className="text-cyan-500 text-sm mb-3">
               アカウントをお持ちでない方は
             </p>
             <Link href="/signup">

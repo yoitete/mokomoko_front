@@ -60,7 +60,7 @@ export default function Footer() {
           icon={faUser}
           size="2x"
           className={`cursor-pointer text-[#F1F6F7] ${
-            pathname === "/mypage" ? "text-pink-300" : ""
+            pathname === "/mypage" ? "text-green-300" : ""
           }`}
         />
       </Link>

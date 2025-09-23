@@ -18,7 +18,6 @@ export default function ExamSupportPage() {
   // 受験応援特集の投稿をフィルタリング
   const examSupportPosts = postsWithImages.filter(
     (post) =>
-      post.season === "Exam Support" ||
       post.season === "exam-support" ||
       (post.tags &&
         post.tags.some(
@@ -59,26 +58,16 @@ export default function ExamSupportPage() {
       {/* ヘッダー */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-indigo-800 mb-4">
-          📚 受験応援！あったか毛布特集 📚
+          受験応援！あったか毛布特集
         </h1>
-        <p className="text-gray-600 text-lg">
-          合格への道を、あたたかさで支える
-        </p>
-        <p className="text-gray-500 text-sm mt-2">
-          冬の受験勉強は、寒さとの戦いでもあります。
-          <br />
-          深夜まで机に向かうあなたの背中をやさしく包み込み、
-          <br />
-          心までほっと落ち着ける&ldquo;あったか毛布&rdquo;をご用意しました
-        </p>
       </div>
 
       {/* 商品一覧 */}
       {examSupportPosts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">
-            受験応援特集の商品を準備中です...
-          </p>
+        <div className="text-center py-16">
+          <h3 className="text-xl font-bold text-indigo-600 mb-4">
+            投稿を準備中です...
+          </h3>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-2">
@@ -113,7 +102,7 @@ export default function ExamSupportPage() {
                   {/* 価格 */}
                   {post.price && (
                     <div className="flex items-baseline space-x-1">
-                      <span className="text-lg font-bold text-indigo-600">
+                      <span className="text-lg font-bold text-red-600">
                         ¥{post.price.toLocaleString()}
                       </span>
                       <span className="text-xs text-gray-400">税込</span>
