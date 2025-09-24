@@ -109,6 +109,7 @@ export const useAuth = (): {
       setToken(newToken);
       return newToken;
     } catch (error) {
+      console.error("トークンのリフレッシュに失敗しました:", error);
       setError("トークンのリフレッシュに失敗しました");
       throw error;
     }

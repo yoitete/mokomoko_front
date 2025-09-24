@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
@@ -11,86 +11,55 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 
+interface SearchResponse {
+  posts: Post[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total_count: number;
+    total_pages: number;
+  };
+}
+
 export default function Search() {
   const { isUnauthenticated, loading } = useAuth();
 
-  // SWRを使用してデータを取得（デフォルト設定を使用）
-  const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
-
-  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
   const [selectedSort, setSelectedSort] = useState<"newest" | "popular">(
     "newest"
   );
 
-  // postsが更新されたときにfilteredPostsを更新
-  useEffect(() => {
-    if (posts) {
-      setFilteredPosts(posts);
-    }
-  }, [posts]);
-
-  // 検索機能
-  useEffect(() => {
-    let filtered = posts || [];
-
-    // テキスト検索
+  // 検索パラメータを構築
+  const buildSearchParams = useCallback(() => {
+    const params = new URLSearchParams();
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((post) => {
-        return (
-          post.title?.toLowerCase().includes(query) ||
-          post.description?.toLowerCase().includes(query) ||
-          (post.tags &&
-            post.tags.some((tag) => tag.toLowerCase().includes(query))) ||
-          post.season?.toLowerCase().includes(query)
-        );
-      });
+      params.append("search", searchQuery.trim());
     }
-
-    // 季節フィルター
-    if (selectedSeason) {
-      filtered = filtered.filter((post) => {
-        if (selectedSeason === "spring") {
-          return post.season === "spring-summer";
-        } else if (selectedSeason === "summer") {
-          return post.season === "spring-summer";
-        } else if (selectedSeason === "autumn") {
-          return post.season === "autumn-winter";
-        } else if (selectedSeason === "winter") {
-          return post.season === "autumn-winter";
-        }
-        return post.season === selectedSeason;
-      });
+    if (selectedSort) {
+      params.append("sort", selectedSort);
     }
+    params.append("with_images", "true");
+    params.append("page", currentPage.toString());
+    params.append("per_page", "6");
+    return params.toString();
+  }, [searchQuery, selectedSort, currentPage]);
 
-    setFilteredPosts(filtered);
-    setCurrentPage(1); // 検索時にページを1にリセット
-  }, [searchQuery, posts, selectedSeason]);
+  // APIから検索結果を取得
+  const {
+    data: searchData,
+    error,
+    isLoading,
+  } = useGet<SearchResponse>(`/posts?${buildSearchParams()}`);
 
-  // 並び替え機能
-  const sortedPosts = React.useMemo(() => {
-    return [...filteredPosts].sort((a, b) => {
-      if (selectedSort === "newest") {
-        return (
-          new Date(b.created_at || 0).getTime() -
-          new Date(a.created_at || 0).getTime()
-        );
-      } else {
-        // 人気順（お気に入り数ベース）
-        return (b.favorites_count || 0) - (a.favorites_count || 0);
-      }
-    });
-  }, [filteredPosts, selectedSort]);
+  const posts = searchData?.posts || [];
+  const pagination = searchData?.pagination;
 
-  // 並び替え変更時にページを1にリセット
+  // 検索クエリが変更されたときにページを1にリセット
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedSort]);
+  }, [searchQuery, selectedSort]);
 
   // ドロップダウンメニューの外側クリックで閉じる
   useEffect(() => {
@@ -108,17 +77,6 @@ export default function Search() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen]);
-
-  // 画像がある投稿のみをフィルタリング
-  const postsWithImages = sortedPosts.filter(
-    (post) => post.images && post.images.length > 0
-  );
-
-  // ページネーション計算
-  const totalPages = Math.ceil(postsWithImages.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentPosts = postsWithImages.slice(startIndex, endIndex);
 
   // ページ変更時にトップにスクロール
   const handlePageChange = (page: number) => {
@@ -257,26 +215,26 @@ export default function Search() {
       <div className="mt-4 ml-6">
         <p className="text-sm text-gray-600">
           {searchQuery
-            ? `"${searchQuery}" の検索結果: ${postsWithImages.length}件`
-            : `全投稿: ${postsWithImages.length}件`}
+            ? `"${searchQuery}" の検索結果: ${pagination?.total_count || 0}件`
+            : `全投稿: ${pagination?.total_count || 0}件`}
         </p>
-        {totalPages > 1 && (
+        {pagination && pagination.total_pages > 1 && (
           <p className="text-sm text-gray-500 mt-1">
-            {currentPage} / {totalPages} ページ
+            {pagination.current_page} / {pagination.total_pages} ページ
           </p>
         )}
       </div>
 
       {/* 投稿一覧 */}
       <div className="mt-10 mx-4 space-y-4">
-        {postsWithImages.length === 0 ? (
+        {posts.length === 0 ? (
           <p className="text-center mt-10 text-gray-600">
             {searchQuery
               ? "検索結果が見つかりませんでした"
               : "投稿がありません"}
           </p>
         ) : (
-          currentPosts.map((post) => (
+          posts.map((post) => (
             <SimpleBox
               key={post.id}
               className="flex flex-col md:flex-row items-start p-4"
@@ -331,7 +289,7 @@ export default function Search() {
       </div>
 
       {/* ページネーション */}
-      {totalPages >= 1 && (
+      {pagination && pagination.total_pages > 1 && (
         <div className="flex justify-center items-center space-x-4 mt-8 mb-3">
           <Button
             onClick={() => handlePageChange(currentPage - 1)}
@@ -345,13 +303,13 @@ export default function Search() {
 
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-900 font-semibold">
-              {currentPage} / {totalPages}
+              {pagination.current_page} / {pagination.total_pages}
             </span>
           </div>
 
           <Button
             onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === pagination.total_pages}
             variant="outline"
             size="md"
             className="min-w-[100px]"

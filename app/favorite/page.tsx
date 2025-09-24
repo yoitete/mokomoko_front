@@ -21,10 +21,13 @@ export default function FavoritePage() {
 
   // SWRを使用してデータを取得（デフォルト設定を使用）
   const {
-    data: posts,
+    data: postsResponse,
     error: postsError,
     isLoading: postsLoading,
-  } = useGet<Post[]>("/posts");
+  } = useGet<{ posts: Post[] }>("/posts");
+
+  // APIレスポンスからposts配列を抽出
+  const posts = postsResponse?.posts || [];
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;

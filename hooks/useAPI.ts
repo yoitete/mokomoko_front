@@ -9,35 +9,40 @@ export const useAPI = () => {
 
   // トークン付きでAPIリクエストを作成する関数
   const createAuthenticatedRequest = useCallback(async () => {
-    const api = axios.create({
-      baseURL: API_BASE_URL,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    });
+    try {
+      const api = axios.create({
+        baseURL: API_BASE_URL,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
 
-    // レスポンスインターセプターでトークン期限切れを処理
-    api.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        if (error.response?.status === 401 && token) {
-          try {
-            // トークンをリフレッシュして再試行
-            const newToken = await refreshToken();
-            const config = error.config;
-            config.headers.Authorization = `Bearer ${newToken}`;
-            return axios(config);
-          } catch {
-            // リフレッシュに失敗した場合は元のエラーを返す
-            return Promise.reject(error);
+      // レスポンスインターセプターでトークン期限切れを処理
+      api.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+          if (error.response?.status === 401 && token) {
+            try {
+              // トークンをリフレッシュして再試行
+              const newToken = await refreshToken();
+              const config = error.config;
+              config.headers.Authorization = `Bearer ${newToken}`;
+              return axios(config);
+            } catch {
+              // リフレッシュに失敗した場合は元のエラーを返す
+              return Promise.reject(error);
+            }
           }
+          return Promise.reject(error);
         }
-        return Promise.reject(error);
-      }
-    );
+      );
 
-    return api;
+      return api;
+    } catch (error) {
+      console.error("API request creation failed:", error);
+      throw error;
+    }
   }, [token, refreshToken]);
   const get = useCallback(
     async <T = unknown>(url: string) => {
