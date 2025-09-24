@@ -8,7 +8,14 @@ import Button from "@/components/Button/Button";
 
 export default function FathersDayPage() {
   // SWRを使用してデータを取得（デフォルト設定を使用）
-  const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
+  const {
+    data: postsResponse,
+    error,
+    isLoading,
+  } = useGet<{ posts: Post[] }>("/posts");
+
+  // APIレスポンスからposts配列を抽出
+  const posts = postsResponse?.posts || [];
 
   // 画像がある投稿のみをフィルタリング
   const postsWithImages = (posts || []).filter(

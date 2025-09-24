@@ -17,7 +17,14 @@ export default function Home() {
   const { userId, isAuthenticated } = useCurrentUser();
 
   // SWRを使用してデータを取得（デフォルト設定を使用）
-  const { data: posts, error, isLoading } = useGet<Post[]>("/posts");
+  const {
+    data: postsResponse,
+    error,
+    isLoading,
+  } = useGet<{ posts: Post[] }>("/posts");
+
+  // APIレスポンスからposts配列を抽出
+  const posts = useMemo(() => postsResponse?.posts || [], [postsResponse]);
 
   // お気に入り機能（ログインユーザーのIDを使用）
   const { toggleFavorite, isFavorite } = useFavorites(userId || 0);
@@ -66,16 +73,11 @@ export default function Home() {
     console.log("SWR posts data:", posts);
     console.log("SWR loading:", isLoading);
     console.log("SWR error:", error);
-  }, [posts, isLoading, error]);
+    console.log("postsResponse:", postsResponse);
+  }, [posts, isLoading, error, postsResponse]);
 
-  // 新着投稿を取得（作成日時でソート）
-  const newPosts = (posts || [])
-    .sort(
-      (a, b) =>
-        new Date(b.created_at || 0).getTime() -
-        new Date(a.created_at || 0).getTime()
-    )
-    .slice(0, 6);
+  // 新着投稿を取得（API側で既にソート済み）
+  const newPosts = (posts || []).slice(0, 6);
 
   // 春・夏の人気投稿を取得（API版）
   const { data: springSummerPosts, isLoading: springSummerLoading } = useGet<
@@ -104,8 +106,15 @@ export default function Home() {
   if (error) {
     return (
       <div className="text-center mt-10">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-        <p className="mt-2">読み込み中...</p>
+        <div className="text-red-500 text-lg font-semibold">
+          エラーが発生しました
+        </div>
+        <p className="mt-2 text-gray-600">
+          データの取得に失敗しました。しばらくしてから再度お試しください。
+        </p>
+        <p className="mt-2 text-sm text-gray-500">
+          エラー詳細: {error.message || "不明なエラー"}
+        </p>
       </div>
     );
   }
