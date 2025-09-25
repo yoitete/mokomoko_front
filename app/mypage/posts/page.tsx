@@ -168,7 +168,7 @@ export default function MyPostsPage() {
                         {post.description}
                       </p>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                           <span>
                             {new Date(post.created_at || "").toLocaleDateString(
@@ -178,12 +178,18 @@ export default function MyPostsPage() {
                           <span>♥ {post.favorites_count || 0}</span>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex gap-1.5 flex-wrap">
                           <Link
                             href={`/post/${post.id}`}
-                            className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded transition-colors"
+                            className="px-2.5 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition-colors min-w-[50px] text-center font-medium flex-shrink-0"
                           >
                             詳細
+                          </Link>
+                          <Link
+                            href={`/post/edit/${post.id}`}
+                            className="px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded transition-colors min-w-[50px] text-center font-medium flex-shrink-0"
+                          >
+                            編集
                           </Link>
                           <button
                             onClick={() => {
@@ -196,7 +202,7 @@ export default function MyPostsPage() {
                               }
                             }}
                             disabled={isDeleting}
-                            className="px-3 py-1 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white text-sm rounded transition-colors"
+                            className="px-2.5 py-1 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white text-xs rounded transition-colors min-w-[50px] text-center font-medium flex-shrink-0"
                           >
                             {isDeleting ? "削除中..." : "削除"}
                           </button>

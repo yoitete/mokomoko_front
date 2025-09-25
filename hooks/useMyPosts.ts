@@ -6,13 +6,10 @@ import { useState } from "react";
 
 export const useMyPosts = () => {
   const {
-    data: postsResponse,
+    data: posts,
     error,
     isLoading,
-  } = useGet<{ posts: Post[] }>("/posts/my", { requireAuth: true });
-
-  // APIレスポンスからposts配列を抽出
-  const posts = postsResponse?.posts || [];
+  } = useGet<Post[]>("/posts/my", { requireAuth: true });
   const { delete: deleteAPI } = useAPI();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -38,7 +35,7 @@ export const useMyPosts = () => {
   };
 
   return {
-    posts,
+    posts: posts || [],
     error,
     isLoading,
     deletePost: handleDeletePost,

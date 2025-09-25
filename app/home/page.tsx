@@ -74,6 +74,14 @@ export default function Home() {
     console.log("SWR loading:", isLoading);
     console.log("SWR error:", error);
     console.log("postsResponse:", postsResponse);
+    console.log(
+      "Posts with images:",
+      posts.filter((post) => post.images && post.images.length > 0)
+    );
+    console.log(
+      "Posts without images:",
+      posts.filter((post) => !post.images || post.images.length === 0)
+    );
   }, [posts, isLoading, error, postsResponse]);
 
   // 新着投稿を取得（API側で既にソート済み）
@@ -122,7 +130,18 @@ export default function Home() {
   return (
     <div>
       <div className="mt-10">
-        <SectionHeader title="投稿新着一覧" />
+        <div className="flex justify-between items-center mb-4">
+          <SectionHeader title="投稿新着一覧" />
+          <Link href="/posts/all?sort=newest">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-blue-600 border-blue-300 hover:bg-blue-50"
+            >
+              全て表示
+            </Button>
+          </Link>
+        </div>
         <p className="text-lg font-semibold ml-4 text-orange-600">New</p>
         <PostList
           posts={newPosts}
@@ -135,11 +154,22 @@ export default function Home() {
       </div>
 
       <div className="mt-10"></div>
-      <SectionHeader
-        title="投稿人気ランキング"
-        gradientFrom="from-blue-900"
-        gradientTo="to-slate-800"
-      />
+      <div className="flex justify-between items-center mb-4">
+        <SectionHeader
+          title="投稿人気ランキング"
+          gradientFrom="from-blue-900"
+          gradientTo="to-slate-800"
+        />
+        <Link href="/posts/all?sort=popular">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-blue-600 border-blue-300 hover:bg-blue-50"
+          >
+            全て表示
+          </Button>
+        </Link>
+      </div>
       <SectionHeader subtitle="春・夏" borderColor="border-green-500" />
       <PostList
         posts={springSummerPosts || []}
