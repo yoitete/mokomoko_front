@@ -44,6 +44,7 @@ export default function AllPostsPage() {
     "newest"
   );
   const [selectedSeason, setSelectedSeason] = useState<string>("");
+  const postsPerPage = 5;
 
   // URLパラメータから初期値を設定
   useEffect(() => {
@@ -67,7 +68,7 @@ export default function AllPostsPage() {
     }
     params.append("with_images", "true");
     params.append("page", currentPage.toString());
-    params.append("per_page", "12");
+    params.append("per_page", postsPerPage.toString());
     return params.toString();
   }, [selectedSort, selectedSeason, currentPage]);
 
@@ -344,8 +345,11 @@ export default function AllPostsPage() {
       <div className="text-center text-sm text-gray-500 mb-4">
         {pagination
           ? `${pagination.total_count}件中 ${
-              (currentPage - 1) * 12 + 1
-            }-${Math.min(currentPage * 12, pagination.total_count)}件を表示`
+              (currentPage - 1) * postsPerPage + 1
+            }-${Math.min(
+              currentPage * postsPerPage,
+              pagination.total_count
+            )}件を表示`
           : ""}
       </div>
 
