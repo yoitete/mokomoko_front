@@ -60,7 +60,7 @@ export default function AllPostsPage() {
   // ログイン前の表示
   if (isUnauthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
           <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
             このページはログイン後に表示されます
@@ -86,7 +86,7 @@ export default function AllPostsPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-[#E2D8D8]">
       <div className="mt-10 mx-4 space-y-4">
         {/* ヘッダー */}
         <div className="flex items-center justify-between mb-6">
@@ -210,6 +210,6 @@ export default function AllPostsPage() {
           )}
         </>
       )}
-    </>
+    </div>
   );
 }

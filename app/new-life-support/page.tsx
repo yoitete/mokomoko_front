@@ -5,8 +5,11 @@ import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function NewLifeSupportPage() {
+  const { isUnauthenticated, loading: authLoading } = useCurrentUser();
+
   // SWRを使用してデータを取得（デフォルト設定を使用）
   const {
     data: postsResponse,
@@ -45,6 +48,46 @@ export default function NewLifeSupportPage() {
   console.log("All posts:", posts);
   console.log("Posts with images:", postsWithImages);
   console.log("New life posts with images:", newLifePostsWithImages);
+
+  // ローディング中の表示
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ログイン前の表示
+  if (isUnauthenticated) {
+    return (
+      <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+            このページはログイン後に表示されます
+          </h2>
+          <p className="text-gray-600 mb-6 text-center">
+            この機能をご利用いただくには
+            <br />
+            ログインまたは新規登録が必要です。
+          </p>
+          <Link href="/signup">
+            <Button className="w-full">新規アカウント作成</Button>
+          </Link>
+          <div className="mt-4">
+            <Link href="/login">
+              <Button variant="outline" className="w-full">
+                ログイン
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
