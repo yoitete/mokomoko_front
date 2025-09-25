@@ -69,7 +69,7 @@ export default function Login() {
         {/* ロゴ・タイトル */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-[#5A4A4A] mb-2">MokoMoko</h1>
-          <p className="text-[#7E6565]">毛布共有コミュニティ</p>
+          <p className="text-[#7E6565]">もこもこで見つける小さな幸せ</p>
         </div>
 
         {/* ログインフォーム */}

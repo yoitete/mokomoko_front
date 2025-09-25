@@ -81,6 +81,21 @@ export default function Post() {
       return;
     }
 
+    if (!combination.image) {
+      alert("画像を選択してください");
+      return;
+    }
+
+    if (!combination.price || combination.price <= 0) {
+      alert("価格を入力してください（1円以上）");
+      return;
+    }
+
+    if (!combination.description || !combination.description.trim()) {
+      alert("説明を入力してください");
+      return;
+    }
+
     if (!isUserDataReady || !userId) {
       alert(
         "ユーザー情報の取得に失敗しました。ページを再読み込みしてください。"
@@ -308,7 +323,7 @@ export default function Post() {
               {/* 価格 */}
               <div className="space-y-2">
                 <label className="block text-lg font-semibold text-gray-800">
-                  価格（円）
+                  価格（円） <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">
@@ -316,9 +331,9 @@ export default function Post() {
                   </span>
                   <input
                     type="number"
-                    min="0"
+                    min="1"
                     inputMode="numeric"
-                    placeholder="3000"
+                    placeholder="価格を入力してください（必須）"
                     className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
                     value={combination.price ?? ""}
                     onChange={(e) => {
@@ -382,10 +397,10 @@ export default function Post() {
             {/* 説明セクション */}
             <div className="space-y-2">
               <label className="block text-lg font-semibold text-gray-800">
-                説明
+                説明 <span className="text-red-500">*</span>
               </label>
               <textarea
-                placeholder="ふわふわの触りごごちでとてもこれ一枚でも暖かい毛布です..."
+                placeholder="ふわふわの触りごごちでとてもこれ一枚でも暖かい毛布です...（必須）"
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-lg"
                 rows={5}
                 value={combination.description}

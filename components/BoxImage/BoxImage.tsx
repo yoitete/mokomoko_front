@@ -17,6 +17,7 @@ export const BoxImage = ({
       width={160}
       height={118}
       className={`w-full h-full object-cover ${className}`}
+      style={{ width: "auto", height: "auto" }}
       unoptimized={true}
     />
   </div>

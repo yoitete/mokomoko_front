@@ -25,17 +25,27 @@ export default function Search() {
   const { isUnauthenticated, loading } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState<"newest" | "popular">(
     "newest"
   );
 
+  // デバウンス機能：2000ms後に検索クエリを更新
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // 検索パラメータを構築
   const buildSearchParams = useCallback(() => {
     const params = new URLSearchParams();
-    if (searchQuery.trim()) {
-      params.append("search", searchQuery.trim());
+    if (debouncedSearchQuery.trim()) {
+      params.append("search", debouncedSearchQuery.trim());
     }
     if (selectedSort) {
       params.append("sort", selectedSort);
@@ -44,7 +54,7 @@ export default function Search() {
     params.append("page", currentPage.toString());
     params.append("per_page", "6");
     return params.toString();
-  }, [searchQuery, selectedSort, currentPage]);
+  }, [debouncedSearchQuery, selectedSort, currentPage]);
 
   // APIから検索結果を取得
   const {
@@ -59,7 +69,7 @@ export default function Search() {
   // 検索クエリが変更されたときにページを1にリセット
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedSort]);
+  }, [debouncedSearchQuery, selectedSort]);
 
   // ドロップダウンメニューの外側クリックで閉じる
   useEffect(() => {
