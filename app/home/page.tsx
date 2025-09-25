@@ -130,19 +130,23 @@ export default function Home() {
   return (
     <div>
       <div className="mt-10">
-        <div className="flex justify-between items-center mb-4">
+        <div className="mb-4">
           <SectionHeader title="投稿新着一覧" />
-          <Link href="/posts/all?sort=newest">
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-blue-600 border-blue-300 hover:bg-blue-50"
-            >
-              全て表示
-            </Button>
-          </Link>
         </div>
-        <p className="text-lg font-semibold ml-4 text-orange-600">New</p>
+        <div className="relative">
+          <p className="text-lg font-semibold ml-4 text-orange-600">New</p>
+          <div className="absolute top-0 right-0">
+            <Link href="/posts/all?sort=newest">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-blue-600 border-blue-300 hover:bg-blue-50"
+              >
+                全て表示
+              </Button>
+            </Link>
+          </div>
+        </div>
         <PostList
           posts={newPosts}
           showRanking={false}
@@ -154,23 +158,27 @@ export default function Home() {
       </div>
 
       <div className="mt-10"></div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-4">
         <SectionHeader
           title="投稿人気ランキング"
           gradientFrom="from-blue-900"
           gradientTo="to-slate-800"
         />
-        <Link href="/posts/all?sort=popular">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-blue-600 border-blue-300 hover:bg-blue-50"
-          >
-            全て表示
-          </Button>
-        </Link>
       </div>
-      <SectionHeader subtitle="春・夏" borderColor="border-green-500" />
+      <div className="relative">
+        <SectionHeader subtitle="春・夏" borderColor="border-green-500" />
+        <div className="absolute top-0 right-0">
+          <Link href="/posts/all?sort=popular&season=spring-summer">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-blue-600 border-blue-300 hover:bg-blue-50"
+            >
+              全て表示
+            </Button>
+          </Link>
+        </div>
+      </div>
       <PostList
         posts={springSummerPosts || []}
         showRanking={true}
@@ -182,7 +190,20 @@ export default function Home() {
         currentUserId={userId || undefined}
       />
 
-      <SectionHeader subtitle="秋・冬" borderColor="border-orange-500" />
+      <div className="relative">
+        <SectionHeader subtitle="秋・冬" borderColor="border-orange-500" />
+        <div className="absolute top-0 right-0">
+          <Link href="/posts/all?sort=popular&season=autumn-winter">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-blue-600 border-blue-300 hover:bg-blue-50"
+            >
+              全て表示
+            </Button>
+          </Link>
+        </div>
+      </div>
       <PostList
         posts={autumnWinterPosts || []}
         showRanking={true}
