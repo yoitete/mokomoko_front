@@ -179,7 +179,7 @@ export default function AllPostsPage() {
           ))}
 
           {/* ページネーション */}
-          {pagination && pagination.total_pages > 1 && (
+          {pagination && (
             <div className="flex justify-center items-center space-x-4 mt-8 mb-3">
               <Button
                 onClick={() => handlePageChange(currentPage - 1)}
