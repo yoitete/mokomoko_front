@@ -140,7 +140,7 @@ export default function Home() {
               <Button
                 variant="outline"
                 size="sm"
-                className="mr-4 text-blue-600 border-blue-300 hover:bg-blue-50"
+                className="mr-4 text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-600"
               >
                 全て表示
               </Button>
@@ -172,7 +172,7 @@ export default function Home() {
             <Button
               variant="outline"
               size="sm"
-              className="mr-4 text-blue-600 border-blue-300 hover:bg-blue-50"
+              className="mr-4 text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-600"
             >
               全て表示
             </Button>
@@ -197,7 +197,7 @@ export default function Home() {
             <Button
               variant="outline"
               size="sm"
-              className="mr-4 text-blue-600 border-blue-300 hover:bg-blue-50"
+              className="mr-4 text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-600"
             >
               全て表示
             </Button>

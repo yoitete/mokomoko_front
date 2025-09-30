@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { usePosts } from "@/hooks/usePosts";
@@ -24,9 +24,23 @@ interface Combination {
   image?: File;
 }
 
-export default function EditPost({ params }: { params: { id: string } }) {
+interface PostUpdateData {
+  title: string;
+  description: string;
+  price?: number;
+  season: string;
+  tags: string[];
+  image?: File;
+}
+
+export default function EditPost({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const router = useRouter();
-  const postId = params.id;
+  const resolvedParams = use(params);
+  const postId = resolvedParams.id;
   const {
     isUnauthenticated,
     loading: authLoading,
@@ -137,18 +151,14 @@ export default function EditPost({ params }: { params: { id: string } }) {
 
     try {
       // 投稿データを準備
-      const postData: Partial<Combination> = {
+      const postData: PostUpdateData = {
         title: combination.title,
         description: combination.description || "",
         price: combination.price,
         season: combination.category,
         tags: combination.tags,
+        image: combination.image,
       };
-
-      // 画像がある場合は追加
-      if (combination.image) {
-        (postData as any).image = combination.image;
-      }
 
       // 投稿を更新
       await updatePost(parseInt(postId), postData);
@@ -276,13 +286,17 @@ export default function EditPost({ params }: { params: { id: string } }) {
             </label>
             <input
               type="number"
+              min="0"
               value={combination.price || ""}
-              onChange={(e) =>
-                handleChange(
-                  "price",
-                  e.target.value ? parseInt(e.target.value) : undefined
-                )
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (
+                  value === "" ||
+                  (parseInt(value) >= 0 && !isNaN(parseInt(value)))
+                ) {
+                  handleChange("price", value ? parseInt(value) : undefined);
+                }
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="価格を入力してください（任意）"
             />
@@ -322,13 +336,14 @@ export default function EditPost({ params }: { params: { id: string } }) {
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="タグを入力してEnterキーを押してください"
               />
-              <button
-                type="button"
+              <Button
                 onClick={addTag}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                size="md"
+                className="px-6"
+                disabled={!tagInput.trim() || tags.includes(tagInput.trim())}
               >
-                <FontAwesomeIcon icon={faPlus} />
-              </button>
+                追加
+              </Button>
             </div>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag, index) => (
