@@ -29,7 +29,10 @@ export default function Header() {
 
   return (
     <div className="sticky top-0 bg-[#7E6565] p-4 flex justify-between items-center z-50">
-      <h1 className="text-5xl font-sans text-[#F1F6F7] mx-auto text-center tracking-wide pl-9">
+      <h1
+        className="text-4xl text-[#F1F6F7] mx-auto text-center pl-9"
+        style={{ fontFamily: "Pomeranian, cursive" }}
+      >
         MokoMoko
       </h1>
 

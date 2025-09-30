@@ -1,5 +1,11 @@
-@import "tailwindcss";
+@font-face {
+  font-family: 'Pomeranian';
+  src: url('/Pomeranian-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
+@import "tailwindcss";
 body {
   background-color: #ece6e6;
   font-family: 'Noto Sans JP', sans-serif;

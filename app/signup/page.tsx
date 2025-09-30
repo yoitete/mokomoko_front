@@ -161,7 +161,12 @@ export default function Signup() {
       <div className="max-w-md w-full">
         {/* ロゴ・タイトル */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#5A4A4A] mb-2">MokoMoko</h1>
+          <h1
+            className="text-4xl text-[#F1F6F7] mx-auto text-center pl-9"
+            style={{ fontFamily: "Pomeranian, cursive" }}
+          >
+            MokoMoko
+          </h1>
           <p className="text-[#7E6565]">もこもこで見つける小さな幸せ</p>
         </div>
 

@@ -571,9 +571,6 @@ export default function Settings() {
                                 </span>
                               </div>
                             </div>
-                            <div
-                              className={`w-4 h-4 rounded-full bg-${campaign.color_theme}-500`}
-                            ></div>
                           </div>
                         </div>
                       ))}
