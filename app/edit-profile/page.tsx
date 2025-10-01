@@ -200,7 +200,10 @@ export default function EditProfile() {
                 size="lg"
               />
             </Link>
-            <h2 className="text-2xl font-semibold text-[#5A4A4A]">
+            <h2 
+              className="text-2xl font-semibold text-[#5A4A4A]"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
               プロフィール編集
             </h2>
           </div>

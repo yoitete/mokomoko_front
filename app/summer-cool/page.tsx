@@ -114,14 +114,20 @@ export default function SummerCoolPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="text-center mb-8 relative z-30">
-          <h1 className="text-3xl font-bold text-blue-800 mb-4 !cursor-default relative z-30">
+          <h1
+            className="text-3xl font-bold text-blue-800 mb-4 !cursor-default relative z-30"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
             夏でも快適！ひんやり毛布特集
           </h1>
         </div>
 
         {summerCoolPostsWithImages.length === 0 ? (
           <div className="text-center py-16">
-            <h3 className="text-xl font-bold text-blue-600 mb-4">
+            <h3
+              className="text-xl font-bold text-blue-600 mb-4"
+              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
               投稿を準備中です...
             </h3>
           </div>

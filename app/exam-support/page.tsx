@@ -107,7 +107,10 @@ export default function ExamSupportPage() {
     <div className="mt-10 mx-4">
       {/* ヘッダー */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-indigo-800 mb-4">
+        <h1
+          className="text-3xl font-bold text-indigo-800 mb-4"
+          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+        >
           受験応援！あったか毛布特集
         </h1>
       </div>
@@ -115,7 +118,10 @@ export default function ExamSupportPage() {
       {/* 商品一覧 */}
       {examSupportPosts.length === 0 ? (
         <div className="text-center py-16">
-          <h3 className="text-xl font-bold text-indigo-600 mb-4">
+          <h3
+            className="text-xl font-bold text-indigo-600 mb-4"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
             投稿を準備中です...
           </h3>
         </div>

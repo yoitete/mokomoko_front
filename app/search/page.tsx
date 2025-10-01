@@ -158,7 +158,12 @@ export default function Search() {
 
   return (
     <div className="mt-5 mb-5">
-      <div className="mt-5 ml-7 text-left font-semibold text-2xl">検索</div>
+      <div
+        className="mt-5 ml-7 text-left font-semibold text-2xl"
+        style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+      >
+        検索
+      </div>
 
       {/* 検索バー */}
       <div className="ml-6 mt-3 flex items-center gap-2">
@@ -167,7 +172,8 @@ export default function Search() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-white p-3 border w-full rounded-xl pr-10"
+            className="w-full p-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] pr-10 bg-white"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
             placeholder="タグ、タイトル、説明で検索..."
           />
           <FontAwesomeIcon
@@ -183,6 +189,7 @@ export default function Search() {
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-black"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
           >
             <FontAwesomeIcon icon={faList} size="lg" className="text-black" />
             <span>
@@ -201,6 +208,7 @@ export default function Search() {
                   className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
                     selectedSort === "newest" ? "bg-blue-50 text-blue-600" : ""
                   }`}
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
                 >
                   新着順
                 </button>
@@ -212,6 +220,7 @@ export default function Search() {
                   className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
                     selectedSort === "popular" ? "bg-blue-50 text-blue-600" : ""
                   }`}
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
                 >
                   人気順
                 </button>
@@ -223,13 +232,19 @@ export default function Search() {
 
       {/* 検索結果 */}
       <div className="mt-4 ml-6">
-        <p className="text-sm text-gray-600">
+        <p
+          className="text-sm text-gray-600"
+          style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+        >
           {searchQuery
             ? `"${searchQuery}" の検索結果: ${pagination?.total_count || 0}件`
             : `全投稿: ${pagination?.total_count || 0}件`}
         </p>
         {pagination && pagination.total_pages > 1 && (
-          <p className="text-sm text-gray-500 mt-1">
+          <p
+            className="text-sm text-gray-500 mt-1"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
             {pagination.current_page} / {pagination.total_pages} ページ
           </p>
         )}
@@ -312,7 +327,10 @@ export default function Search() {
           </Button>
 
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-900 font-semibold">
+            <span
+              className="text-sm text-gray-900 font-semibold"
+              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
               {pagination.current_page} / {pagination.total_pages}
             </span>
           </div>

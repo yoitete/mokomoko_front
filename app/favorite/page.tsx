@@ -151,12 +151,18 @@ export default function FavoritePage() {
 
   return (
     <div className="mt-10 mx-4 space-y-4">
-      <h1 className="text-2xl font-light text-center mb-6 text-gray-600">
+      <h1
+        className="text-3xl font-bold text-center mb-6 text-black tracking-wide"
+        style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+      >
         お気に入り一覧
       </h1>
 
       {/* ページ情報表示 */}
-      <div className="text-center text-sm text-gray-500 mb-4">
+      <div
+        className="text-center text-sm text-gray-500 mb-4"
+        style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+      >
         {favoritePosts.length}件中 {startIndex + 1}-
         {Math.min(endIndex, favoritePosts.length)}件を表示
       </div>
@@ -215,7 +221,10 @@ export default function FavoritePage() {
           </Button>
 
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-900 font-semibold">
+            <span
+              className="text-sm text-gray-900 font-semibold"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
               {currentPage} / {totalPages}
             </span>
           </div>

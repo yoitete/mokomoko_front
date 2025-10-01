@@ -172,7 +172,10 @@ export default function Signup() {
 
         {/* アカウント作成フォーム */}
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold text-[#5A4A4A] text-center mb-6">
+          <h2 
+            className="text-2xl font-semibold text-[#5A4A4A] text-center mb-6"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
             新規アカウント作成
           </h2>
 

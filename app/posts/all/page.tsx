@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
@@ -21,7 +21,7 @@ interface SearchResponse {
   };
 }
 
-export default function AllPostsPage() {
+function AllPostsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isUnauthenticated, loading: authLoading } = useCurrentUser();
@@ -111,7 +111,10 @@ export default function AllPostsPage() {
       </div>
 
       {/* ページ情報表示 */}
-      <div className="text-center text-sm text-gray-500 mb-4">
+      <div
+        className="text-center text-sm text-gray-500 mb-4"
+        style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+      >
         {pagination
           ? `${pagination.total_count}件中 ${
               (currentPage - 1) * postsPerPage + 1
@@ -213,7 +216,10 @@ export default function AllPostsPage() {
           </Button>
 
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-900 font-semibold">
+            <span
+              className="text-sm text-gray-900 font-semibold"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
               {currentPage} / {pagination.total_pages}
             </span>
           </div>
@@ -230,5 +236,22 @@ export default function AllPostsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AllPostsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="mt-2">読み込み中...</p>
+          </div>
+        </div>
+      }
+    >
+      <AllPostsContent />
+    </Suspense>
   );
 }

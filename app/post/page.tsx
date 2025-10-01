@@ -180,29 +180,36 @@ export default function Post() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-[#E2D8D8]">
       {/* ヘッダー */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-800 text-center">
+      <div className="mt-10">
+        <div className="mb-4">
+          <div
+            className="mt-5 text-center text-3xl font-bold tracking-wide text-black"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
             新規投稿
-          </h1>
+          </div>
         </div>
-      </header>
+      </div>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-8 space-y-8">
             {/* タイトルセクション */}
             <div className="space-y-2">
-              <label className="block text-lg font-semibold text-gray-800">
+              <label
+                className="block text-lg font-semibold text-gray-800"
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+              >
                 タイトル <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 maxLength={20}
                 placeholder="魅力的なタイトルを入力してください"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                className="w-full px-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-lg"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
                 value={combination.title}
                 onChange={(e) => handleChange("title", e.target.value)}
               />
@@ -215,7 +222,10 @@ export default function Post() {
 
             {/* 画像アップロードセクション */}
             <div className="space-y-4">
-              <label className="block text-lg font-semibold text-gray-800">
+              <label
+                className="block text-lg font-semibold text-gray-800"
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+              >
                 投稿画像 <span className="text-red-500">*</span>
               </label>
               <div className="flex justify-center">
@@ -299,11 +309,15 @@ export default function Post() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* 季節カテゴリー */}
               <div className="space-y-2">
-                <label className="block text-lg font-semibold text-gray-800">
+                <label
+                  className="block text-lg font-semibold text-gray-800"
+                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                >
                   季節 <span className="text-red-500">*</span>
                 </label>
                 <select
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                  className="w-full px-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-lg h-14"
+                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                   value={combination.category ?? ""}
                   onChange={(e) => handleChange("category", e.target.value)}
                 >
@@ -322,7 +336,10 @@ export default function Post() {
 
               {/* 価格 */}
               <div className="space-y-2">
-                <label className="block text-lg font-semibold text-gray-800">
+                <label
+                  className="block text-lg font-semibold text-gray-800"
+                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                >
                   価格（円） <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -334,7 +351,8 @@ export default function Post() {
                     min="1"
                     inputMode="numeric"
                     placeholder="価格を入力してください（必須）"
-                    className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                    className="w-full pl-8 pr-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-lg h-14"
+                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
                     value={combination.price ?? ""}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -351,14 +369,18 @@ export default function Post() {
 
             {/* タグ入力セクション */}
             <div className="space-y-4">
-              <label className="block text-lg font-semibold text-gray-800">
+              <label
+                className="block text-lg font-semibold text-gray-800"
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+              >
                 タグ
               </label>
               <div className="flex gap-3">
                 <input
                   type="text"
                   placeholder="タグを入力してEnterキーで追加"
-                  className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
+                  className="flex-1 px-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-lg"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={handleTagKeyPress}
@@ -396,12 +418,16 @@ export default function Post() {
 
             {/* 説明セクション */}
             <div className="space-y-2">
-              <label className="block text-lg font-semibold text-gray-800">
+              <label
+                className="block text-lg font-semibold text-gray-800"
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+              >
                 説明 <span className="text-red-500">*</span>
               </label>
               <textarea
                 placeholder="ふわふわの触りごごちでとてもこれ一枚でも暖かい毛布です...（必須）"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-lg"
+                className="w-full px-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 resize-none text-lg"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
                 rows={5}
                 value={combination.description}
                 onChange={(e) => handleChange("description", e.target.value)}

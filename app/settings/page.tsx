@@ -285,7 +285,12 @@ export default function Settings() {
                 size="lg"
               />
             </Link>
-            <h2 className="text-2xl font-semibold text-[#5A4A4A]">設定</h2>
+            <h2 
+              className="text-2xl font-semibold text-[#5A4A4A]"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
+              設定
+            </h2>
           </div>
 
           {/* 個人情報セクション */}
