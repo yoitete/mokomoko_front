@@ -6,8 +6,10 @@ import Image from "next/image";
 import { Post } from "@/hooks/usePosts";
 import { useGet } from "@/hooks/useSWRAPI";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useFavorites } from "@/hooks/useFavorites";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 
@@ -15,6 +17,7 @@ export default function PostDetail() {
   const params = useParams();
   const router = useRouter();
   const { isUnauthenticated, loading } = useAuth();
+  const { userId, isAuthenticated } = useCurrentUser();
 
   // SWRを使用してデータを取得
   const {
@@ -25,6 +28,12 @@ export default function PostDetail() {
     revalidateOnFocus: true, // 詳細ページでは頻繁な再検証は不要
     dedupingInterval: 0, // 詳細ページは長めのキャッシュ
   });
+
+  // お気に入り機能（ログインユーザーのIDを使用）
+  const { toggleFavorite, isFavorite } = useFavorites(userId);
+
+  // 自分の投稿かどうかを判定
+  const isOwnPost = post && userId && post.user_id === userId;
 
   // ローディング中の表示
   if (loading) {
@@ -108,9 +117,17 @@ export default function PostDetail() {
             onClick={() => router.back()}
             className="p-2 hover:bg-gray-100 rounded-full"
           >
-            <FontAwesomeIcon icon={faArrowLeft} className="text-gray-600" />
+            <FontAwesomeIcon
+              icon={faArrowLeft}
+              className="text-[#7E6565] hover:text-[#6B5555] transition-colors cursor-pointer"
+            />
           </button>
-          <h1 className="text-lg font-semibold">投稿詳細</h1>
+          <h1
+            className="text-lg font-semibold text-[#5A4A4A]"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
+            投稿詳細
+          </h1>
         </div>
       </div>
 
@@ -128,6 +145,39 @@ export default function PostDetail() {
                 className="w-full h-64 object-cover"
                 unoptimized={true}
               />
+              {/* お気に入りボタン（画像の右下にオーバーレイ） */}
+              {isAuthenticated && !isOwnPost && post?.id && (
+                <button
+                  onClick={() => {
+                    console.log("お気に入りボタンクリック - post.id:", post.id);
+                    console.log("お気に入りボタンクリック - userId:", userId);
+                    console.log(
+                      "お気に入りボタンクリック - isFavorite:",
+                      post.id ? isFavorite(post.id) : false
+                    );
+                    if (post.id) {
+                      toggleFavorite(post.id);
+                    }
+                  }}
+                  className={`absolute bottom-4 right-4 p-3 rounded-full transition-colors ${
+                    isFavorite(post.id)
+                      ? "text-red-500 bg-white/90 hover:bg-white shadow-lg"
+                      : "text-gray-400 bg-white/70 hover:bg-white/90 hover:text-red-500 shadow-lg"
+                  }`}
+                  title={
+                    isFavorite(post.id)
+                      ? "お気に入りから削除"
+                      : "お気に入りに追加"
+                  }
+                >
+                  <FontAwesomeIcon
+                    icon={faHeart}
+                    className={`text-xl ${
+                      isFavorite(post.id) ? "text-red-500" : "text-gray-400"
+                    }`}
+                  />
+                </button>
+              )}
             </div>
           )}
 

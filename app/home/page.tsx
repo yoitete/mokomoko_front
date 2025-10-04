@@ -27,7 +27,7 @@ export default function Home() {
   const posts = useMemo(() => postsResponse?.posts || [], [postsResponse]);
 
   // お気に入り機能（ログインユーザーのIDを使用）
-  const { toggleFavorite, isFavorite } = useFavorites(userId || 0);
+  const { toggleFavorite, isFavorite } = useFavorites(userId);
 
   // 有効な特集をすべて取得（API版）
   const {
@@ -134,8 +134,8 @@ export default function Home() {
           <SectionHeader title="投稿新着一覧" />
         </div>
         <div className="relative">
-          <p className="text-lg font-semibold ml-4 text-orange-600">New</p>
-          <div className="absolute top-0 right-0">
+          <SectionHeader subtitle="New" noBorder={true} />
+          <div className="absolute top-2 right-0">
             <Link href="/posts/all?sort=newest">
               <Button
                 variant="outline"
@@ -166,8 +166,8 @@ export default function Home() {
         />
       </div>
       <div className="relative">
-        <SectionHeader subtitle="春・夏" borderColor="border-green-500" />
-        <div className="absolute top-0 right-0">
+        <SectionHeader subtitle="春・夏" borderColor="border-orange-500" />
+        <div className="absolute -top-1 right-0">
           <Link href="/posts/all?sort=popular&season=spring-summer">
             <Button
               variant="outline"
@@ -192,7 +192,7 @@ export default function Home() {
 
       <div className="relative">
         <SectionHeader subtitle="秋・冬" borderColor="border-orange-500" />
-        <div className="absolute top-0 right-0">
+        <div className="absolute -top-1 right-0">
           <Link href="/posts/all?sort=popular&season=autumn-winter">
             <Button
               variant="outline"
@@ -218,9 +218,10 @@ export default function Home() {
       {(currentCampaign || secondCampaign) && (
         <>
           <div className="mt-10"></div>
-          <div className="mt-5 mb-10 text-center text-3xl font-medium font-sans tracking-wide bg-gradient-to-r from-amber-700 to-orange-800 bg-clip-text text-transparent">
-            イベント投稿
-          </div>
+          <div
+            className="mt-5 mb-10 text-center text-3xl font-bold tracking-wide bg-gradient-to-r from-amber-700 to-orange-800 bg-clip-text text-transparent"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          ></div>
         </>
       )}
       {/* 第1特集は存在する場合のみ表示 */}
@@ -229,35 +230,53 @@ export default function Home() {
           <SimpleBox className="h-145 flex flex-col justify-start items-center p-4 relative">
             <p
               className={`text-center text-xl font-semibold ${colorClasses.title} mb-6 mt-4`}
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
             >
               {currentCampaign.name}
             </p>
 
             <div className="flex-grow">
               <div className="grid grid-cols-2 gap-2 w-full mt-4">
-                {postsWithImages.slice(0, 4).map((post, index) => {
-                  const imageUrl = post.images?.[0];
-
-                  // 画像が存在する場合のみ表示
-                  if (!imageUrl) {
-                    return null;
-                  }
-
-                  return (
-                    <div key={post.id || index}>
-                      <BoxImage src={imageUrl} alt={post.title} />
-                    </div>
-                  );
-                })}
+                {/* 第1特集用の固定画像4種類 */}
+                <div>
+                  <BoxImage
+                    src="/images/blanket_beige_1.png"
+                    alt="ベージュブランケット"
+                  />
+                </div>
+                <div>
+                  <BoxImage
+                    src="/images/blanket_brown_1.png"
+                    alt="ブラウンブランケット"
+                  />
+                </div>
+                <div>
+                  <BoxImage
+                    src="/images/blanket_gray_1.png"
+                    alt="グレーブランケット"
+                  />
+                </div>
+                <div>
+                  <BoxImage
+                    src="/images/blanket_white_1.png"
+                    alt="ホワイトブランケット"
+                  />
+                </div>
               </div>
               <div className="mt-6 px-4 pb-16">
-                <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
+                <p
+                  className="text-center text-gray-600 text-base leading-relaxed font-medium"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
                   <span className={`${colorClasses.highlight} font-semibold`}>
                     {currentCampaign.description.split("、")[0]}
                   </span>
                   、{currentCampaign.description.split("、")[1]}
                 </p>
-                <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
+                <p
+                  className="text-center text-gray-600 text-sm leading-relaxed mt-2"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
                   {currentCampaign.subtitle
                     .split("、")
                     .map((text, i, array) => (
@@ -272,7 +291,10 @@ export default function Home() {
                       </React.Fragment>
                     ))}
                 </p>
-                <p className="text-center text-gray-500 text-sm mt-3">
+                <p
+                  className="text-center text-gray-500 text-sm mt-3"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
                   <span
                     className={`${colorClasses.badge} px-2 py-1 rounded-full text-xs font-medium`}
                   >
@@ -302,29 +324,44 @@ export default function Home() {
           <SimpleBox className="h-145 flex flex-col justify-start items-center p-4 relative">
             <p
               className={`text-center text-xl font-semibold ${secondColorClasses.title} mb-6 mt-4`}
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
             >
               {secondCampaign.name}
             </p>
 
             <div className="flex-grow">
               <div className="grid grid-cols-2 gap-2 w-full mt-4">
-                {postsWithImages.slice(0, 4).map((post, index) => {
-                  const imageUrl = post.images?.[0];
-
-                  // 画像が存在する場合のみ表示
-                  if (!imageUrl) {
-                    return null;
-                  }
-
-                  return (
-                    <div key={post.id || index}>
-                      <BoxImage src={imageUrl} alt={post.title} />
-                    </div>
-                  );
-                })}
+                {/* 第2特集用の固定画像4種類 */}
+                <div>
+                  <BoxImage
+                    src="/images/blanket_black_1.png"
+                    alt="ブラックブランケット"
+                  />
+                </div>
+                <div>
+                  <BoxImage
+                    src="/images/blanket_lightgray_1.png"
+                    alt="ライトグレーブランケット"
+                  />
+                </div>
+                <div>
+                  <BoxImage
+                    src="/images/blanket_pattern_1.png"
+                    alt="パターンブランケット"
+                  />
+                </div>
+                <div>
+                  <BoxImage
+                    src="/images/blanket_white2_1.png"
+                    alt="ホワイト2ブランケット"
+                  />
+                </div>
               </div>
               <div className="mt-6 px-4 pb-16">
-                <p className="text-center text-gray-600 text-base leading-relaxed font-medium">
+                <p
+                  className="text-center text-gray-600 text-base leading-relaxed font-medium"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
                   <span
                     className={`${secondColorClasses.highlight} font-semibold`}
                   >
@@ -332,7 +369,10 @@ export default function Home() {
                   </span>
                   、{secondCampaign.description.split("、")[1]}
                 </p>
-                <p className="text-center text-gray-600 text-sm leading-relaxed mt-2">
+                <p
+                  className="text-center text-gray-600 text-sm leading-relaxed mt-2"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
                   {secondCampaign.subtitle.split("、").map((text, i, array) => (
                     <React.Fragment key={i}>
                       {text}
@@ -345,7 +385,10 @@ export default function Home() {
                     </React.Fragment>
                   ))}
                 </p>
-                <p className="text-center text-gray-500 text-sm mt-3">
+                <p
+                  className="text-center text-gray-500 text-sm mt-3"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
                   <span
                     className={`${secondColorClasses.badge} px-2 py-1 rounded-full text-xs font-medium`}
                   >

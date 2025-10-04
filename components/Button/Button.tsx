@@ -34,6 +34,7 @@ export default function Button({
   return (
     <button
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
       {...props}
     >
       {children}

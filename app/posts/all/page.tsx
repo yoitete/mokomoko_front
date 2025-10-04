@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useFavorites } from "@/hooks/useFavorites";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faHeart } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
 interface SearchResponse {
@@ -21,10 +22,13 @@ interface SearchResponse {
   };
 }
 
-export default function AllPostsPage() {
+function AllPostsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isUnauthenticated, loading: authLoading } = useCurrentUser();
+  const { isUnauthenticated, loading: authLoading, userId } = useCurrentUser();
+
+  // お気に入り機能
+  const { toggleFavorite, isFavorite } = useFavorites(userId);
 
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 5;
@@ -111,7 +115,10 @@ export default function AllPostsPage() {
       </div>
 
       {/* ページ情報表示 */}
-      <div className="text-center text-sm text-gray-500 mb-4">
+      <div
+        className="text-center text-sm text-gray-500 mb-4"
+        style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+      >
         {pagination
           ? `${pagination.total_count}件中 ${
               (currentPage - 1) * postsPerPage + 1
@@ -161,6 +168,39 @@ export default function AllPostsPage() {
                       alt={post.title}
                       className="w-full h-full object-cover"
                     />
+                    {/* お気に入りボタン（自分の投稿以外） */}
+                    {post.user_id !== userId && post.id && (
+                      <button
+                        onClick={() => {
+                          console.log(
+                            "お気に入りボタンクリック - post.id:",
+                            post.id
+                          );
+                          console.log(
+                            "お気に入りボタンクリック - userId:",
+                            userId
+                          );
+                          console.log(
+                            "お気に入りボタンクリック - isFavorite:",
+                            post.id ? isFavorite(post.id) : false
+                          );
+                          if (post.id) {
+                            toggleFavorite(post.id);
+                          }
+                        }}
+                        className="absolute bottom-2 right-2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 transition-all duration-200 shadow-md hover:shadow-lg"
+                        style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faHeart}
+                          className={`text-lg ${
+                            post.id && isFavorite(post.id)
+                              ? "text-red-500"
+                              : "text-gray-400 hover:text-red-400"
+                          } transition-colors duration-200`}
+                        />
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="h-[118px] bg-gray-200 flex items-center justify-center">
@@ -213,7 +253,10 @@ export default function AllPostsPage() {
           </Button>
 
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-900 font-semibold">
+            <span
+              className="text-sm text-gray-900 font-semibold"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
               {currentPage} / {pagination.total_pages}
             </span>
           </div>
@@ -230,5 +273,22 @@ export default function AllPostsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AllPostsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="mt-2">読み込み中...</p>
+          </div>
+        </div>
+      }
+    >
+      <AllPostsContent />
+    </Suspense>
   );
 }

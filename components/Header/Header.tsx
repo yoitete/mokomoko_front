@@ -10,12 +10,19 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useState } from "react";
 import Link from "next/link";
 
 export default function Header() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, signIn } = useAuth();
+  const { nickname, userData } = useCurrentUser();
   const [showMenu, setShowMenu] = useState(false);
+
+  // デバッグログ（プロフィール編集後の反映確認用）
+  console.log("Header - nickname:", nickname);
+  console.log("Header - userData:", userData);
+  console.log("Header - user?.email:", user?.email);
 
   const handleLogout = async () => {
     try {
@@ -27,9 +34,21 @@ export default function Header() {
     }
   };
 
+  const handleGuestLogin = async () => {
+    try {
+      await signIn("admin@guest.com", "33443344");
+      setShowMenu(false);
+    } catch (error) {
+      console.error("ゲストログインに失敗しました:", error);
+    }
+  };
+
   return (
     <div className="sticky top-0 bg-[#7E6565] p-4 flex justify-between items-center z-50">
-      <h1 className="text-5xl font-sans text-[#F1F6F7] mx-auto text-center tracking-wide pl-9">
+      <h1
+        className="text-4xl text-[#F1F6F7] mx-auto text-center pl-9"
+        style={{ fontFamily: "Pomeranian, cursive" }}
+      >
         MokoMoko
       </h1>
 
@@ -58,8 +77,11 @@ export default function Header() {
                       icon={faUser}
                       className="text-[#7E6565] mr-2"
                     />
-                    <span className="text-sm text-[#5A4A4A] truncate">
-                      {user?.email}
+                    <span
+                      className="text-sm text-[#5A4A4A] truncate"
+                      style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                    >
+                      {nickname || userData?.nickname || user?.email}
                     </span>
                   </div>
                 </div>
@@ -67,6 +89,7 @@ export default function Header() {
                 <Link href="/mypage">
                   <button
                     className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                     onClick={() => setShowMenu(false)}
                   >
                     <FontAwesomeIcon icon={faUser} className="mr-2" />
@@ -77,6 +100,7 @@ export default function Header() {
                 <Link href="/settings">
                   <button
                     className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                     onClick={() => setShowMenu(false)}
                   >
                     <FontAwesomeIcon icon={faCog} className="mr-2" />
@@ -86,6 +110,7 @@ export default function Header() {
 
                 <button
                   className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                   onClick={() => setShowMenu(false)}
                 >
                   <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
@@ -96,6 +121,7 @@ export default function Header() {
 
                 <button
                   className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors flex items-center"
+                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                   onClick={handleLogout}
                 >
                   <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
@@ -108,6 +134,7 @@ export default function Header() {
                 <Link href="/login">
                   <button
                     className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                     onClick={() => setShowMenu(false)}
                   >
                     <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
@@ -115,9 +142,19 @@ export default function Header() {
                   </button>
                 </Link>
 
+                <button
+                  className="w-full text-left px-4 py-2 text-blue-600 hover:bg-blue-50 transition-colors flex items-center"
+                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                  onClick={handleGuestLogin}
+                >
+                  <FontAwesomeIcon icon={faUser} className="mr-2" />
+                  ゲストユーザーでログイン
+                </button>
+
                 <Link href="/settings">
                   <button
                     className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                     onClick={() => setShowMenu(false)}
                   >
                     <FontAwesomeIcon icon={faCog} className="mr-2" />
@@ -127,6 +164,7 @@ export default function Header() {
 
                 <button
                   className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                   onClick={() => setShowMenu(false)}
                 >
                   <FontAwesomeIcon icon={faEnvelope} className="mr-2" />

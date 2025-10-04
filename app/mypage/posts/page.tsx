@@ -79,16 +79,20 @@ export default function MyPostsPage() {
     <div className="min-h-screen bg-[#E2D8D8]">
       <div className="mt-10 mx-4 space-y-4">
         {/* ヘッダー */}
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={handleGoBack}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} className="text-black" />
+        <div className="flex items-center mb-6">
+          <button onClick={handleGoBack} className="mr-4">
+            <FontAwesomeIcon
+              icon={faArrowLeft}
+              className="text-[#7E6565] hover:text-[#6B5555] transition-colors cursor-pointer"
+              size="lg"
+            />
           </button>
-          <h1 className="text-2xl font-light text-center text-black">
+          <h2
+            className="text-2xl font-semibold text-[#5A4A4A]"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
             投稿管理
-          </h1>
+          </h2>
         </div>
       </div>
 
@@ -216,7 +220,10 @@ export default function MyPostsPage() {
           </Button>
 
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-900 font-semibold">
+            <span
+              className="text-sm text-gray-900 font-semibold"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
               {currentPage} / {pagination.total_pages}
             </span>
           </div>

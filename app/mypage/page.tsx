@@ -83,7 +83,12 @@ export default function Mypage() {
       <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-2">認証状態を確認中...</p>
+          <p
+            className="mt-2"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
+            認証状態を確認中...
+          </p>
         </div>
       </div>
     );
@@ -94,10 +99,16 @@ export default function Mypage() {
     return (
       <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center whitespace-nowrap">
+          <h2
+            className="text-xl font-bold text-gray-800 mb-4 text-center whitespace-nowrap"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
             このページはログイン後に表示されます
           </h2>
-          <p className="text-gray-600 mb-6 text-center">
+          <p
+            className="text-gray-600 mb-6 text-center"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
             この機能をご利用いただくには
             <br />
             ログインまたは新規登録が必要です。
@@ -214,22 +225,36 @@ export default function Mypage() {
               onImageUpload={() => {}}
             />
             <div className="ml-4 flex-1">
-              <h3 className="text-lg font-semibold text-[#5A4A4A]">
+              <h3
+                className="text-lg font-semibold text-[#5A4A4A]"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
                 {profile.nickname}
               </h3>
-              <p className="text-sm text-[#7E6565]">プロフィール</p>
+              <p
+                className="text-sm text-[#7E6565]"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
+                プロフィール
+              </p>
             </div>
           </div>
 
           {/* 自己紹介欄 */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
+              <label
+                className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
                 <FontAwesomeIcon icon={faUser} className="mr-2" />
                 自己紹介
               </label>
               <div className="p-3 bg-gray-50 border border-[#C4B5B5] rounded-lg min-h-[150px]">
-                <p className="text-[#5A4A4A] whitespace-pre-wrap">
+                <p
+                  className="text-[#5A4A4A] whitespace-pre-wrap"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
                   {profile.bio}
                 </p>
               </div>
@@ -242,11 +267,17 @@ export default function Mypage() {
           {/* 投稿管理セクション */}
           <div className="space-y-3 mb-6">
             <div className="flex justify-between items-center">
-              <label className="block text-sm font-medium text-[#5A4A4A]">
+              <label
+                className="block text-sm font-medium text-[#5A4A4A]"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
                 <FontAwesomeIcon icon={faUser} className="mr-2" />
                 投稿管理
               </label>
-              <span className="text-sm text-gray-500">
+              <span
+                className="text-sm text-gray-500"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
                 {posts ? `${posts.length}件` : ""}
               </span>
             </div>

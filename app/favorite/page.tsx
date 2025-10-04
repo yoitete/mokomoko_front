@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import { useGet } from "@/hooks/useSWRAPI";
@@ -9,6 +9,7 @@ import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { mutate } from "swr";
 
 export default function FavoritePage() {
   const { isUnauthenticated, loading, userId, firebaseUID, error } =
@@ -19,26 +20,82 @@ export default function FavoritePage() {
   // console.log("FavoritePage - Firebase UID:", firebaseUID);
   // console.log("FavoritePage - Error:", error);
 
-  // SWRを使用してデータを取得（デフォルト設定を使用）
+  // SWRを使用してデータを取得（全件取得）
   const {
     data: postsResponse,
     error: postsError,
     isLoading: postsLoading,
-  } = useGet<{ posts: Post[] }>("/posts");
+  } = useGet<{ posts: Post[] }>("/posts?per_page=100"); // 全件取得のため大きな値を設定
 
   // APIレスポンスからposts配列を抽出
   const posts = postsResponse?.posts || [];
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 10; // お気に入り一覧では10件表示
 
   // お気に入り機能（ログインユーザーのIDを使用）
-  const { favorites, isLoading: favoritesLoading } = useFavorites(userId || 0);
+  const { favorites, isLoading: favoritesLoading } = useFavorites(userId);
+
+  // ページ表示時にキャッシュを再検証
+  useEffect(() => {
+    if (userId) {
+      console.log(
+        "FavoritePage - forcing cache revalidation for userId:",
+        userId
+      );
+      mutate(`/favorites?user_id=${userId}`);
+    }
+  }, [userId]);
+
+  // ページがフォーカスされた時にもキャッシュを更新
+  useEffect(() => {
+    const handleFocus = () => {
+      if (userId) {
+        console.log(
+          "FavoritePage - page focused, updating cache for userId:",
+          userId
+        );
+        mutate(`/favorites?user_id=${userId}`);
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [userId]);
 
   // お気に入り投稿のみ抽出
-  const favoritePosts = (posts || []).filter((post) =>
-    favorites.includes(post.id!)
+  const favoritePosts = (posts || []).filter(
+    (post) => post.id && favorites.includes(post.id)
   );
+
+  // デバッグログ
+  console.log("FavoritePage - userId:", userId);
+  console.log("FavoritePage - favorites:", favorites);
+  console.log("FavoritePage - favorites length:", favorites.length);
+  console.log(
+    "FavoritePage - all posts:",
+    posts.map((p) => ({ id: p.id, title: p.title }))
+  );
+  console.log("FavoritePage - favoritePosts count:", favoritePosts.length);
+  console.log(
+    "FavoritePage - favoritePosts:",
+    favoritePosts.map((p) => ({ id: p.id, title: p.title }))
+  );
+
+  // 除外された投稿を確認
+  const excludedPosts = posts.filter(
+    (post) => post.id && !favorites.includes(post.id)
+  );
+  console.log(
+    "FavoritePage - excluded posts:",
+    excludedPosts.map((p) => ({ id: p.id, title: p.title }))
+  );
+
+  // お気に入りIDに対応する投稿がない場合を確認
+  const missingPosts = favorites.filter(
+    (favId) => !posts.some((post) => post.id === favId)
+  );
+  console.log("FavoritePage - missing posts for favorite IDs:", missingPosts);
 
   // ページネーション計算
   const totalPages = Math.ceil(favoritePosts.length / itemsPerPage);
@@ -122,7 +179,7 @@ export default function FavoritePage() {
   }
 
   // ローディング状態
-  if (postsLoading || favoritesLoading) {
+  if (postsLoading || favoritesLoading || !userId) {
     return (
       <div className="text-center mt-10">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
@@ -151,12 +208,18 @@ export default function FavoritePage() {
 
   return (
     <div className="mt-10 mx-4 space-y-4">
-      <h1 className="text-2xl font-light text-center mb-6 text-gray-600">
+      <h1
+        className="text-3xl font-bold text-center mb-6 text-black tracking-wide"
+        style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+      >
         お気に入り一覧
       </h1>
 
       {/* ページ情報表示 */}
-      <div className="text-center text-sm text-gray-500 mb-4">
+      <div
+        className="text-center text-sm text-gray-500 mb-4"
+        style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+      >
         {favoritePosts.length}件中 {startIndex + 1}-
         {Math.min(endIndex, favoritePosts.length)}件を表示
       </div>
@@ -215,7 +278,10 @@ export default function FavoritePage() {
           </Button>
 
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-900 font-semibold">
+            <span
+              className="text-sm text-gray-900 font-semibold"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
               {currentPage} / {totalPages}
             </span>
           </div>
