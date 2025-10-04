@@ -6,6 +6,7 @@ import { useCallback, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { authTokenAtom } from "@/lib/authAtoms";
+import { mutate } from "swr";
 import Link from "next/link";
 import Input from "@/components/Input/Input";
 import PasswordInput from "@/components/PasswordInput/PasswordInput";
@@ -116,11 +117,21 @@ export default function Signup() {
         const obtainedToken = await waitForToken();
 
         // 3. バックエンドにユーザー情報を保存
-        await createUserInDatabase({
+        const userResponse = await createUserInDatabase({
           email,
           name: name.trim() || undefined,
           token: obtainedToken,
         });
+
+        // 4. SWRキャッシュを再検証してユーザー情報を最新化
+        if (
+          userResponse &&
+          typeof userResponse === "object" &&
+          "firebase_uid" in userResponse
+        ) {
+          const response = userResponse as { firebase_uid: string };
+          await mutate(`/users/by_firebase_uid/${response.firebase_uid}`);
+        }
 
         // 成功時はuseEffectでリダイレクトされる
       } catch (err) {
@@ -162,17 +173,17 @@ export default function Signup() {
         {/* ロゴ・タイトル */}
         <div className="text-center mb-8">
           <h1
-            className="text-4xl text-[#F1F6F7] mx-auto text-center pl-9"
+            className="text-2xl text-[#7E6565] mx-auto text-center pl-4"
             style={{ fontFamily: "Pomeranian, cursive" }}
           >
             MokoMoko
           </h1>
-          <p className="text-[#7E6565]">もこもこで見つける小さな幸せ</p>
+          <p className="text-[#7E6565] pl-2">もこもこで見つける小さな幸せ</p>
         </div>
 
         {/* アカウント作成フォーム */}
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 
+          <h2
             className="text-2xl font-semibold text-[#5A4A4A] text-center mb-6"
             style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
           >

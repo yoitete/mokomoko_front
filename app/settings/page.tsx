@@ -6,6 +6,7 @@ import { useAPI } from "@/hooks/useAPI";
 import { useSeasonalCampaigns } from "@/hooks/useSeasonalCampaign";
 import { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { mutate } from "swr";
 import Button from "@/components/Button/Button";
 import Input from "@/components/Input/Input";
 import PasswordInput from "@/components/PasswordInput/PasswordInput";
@@ -47,6 +48,9 @@ export default function Settings() {
   const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+
+  // ゲストユーザーかどうかを判定
+  const isGuestUser = user?.email === "admin@guest.com";
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -89,6 +93,14 @@ export default function Settings() {
           selected_icon: userData?.selected_icon || "user",
         },
       });
+
+      // SWRキャッシュを再検証してユーザー情報を最新化
+      if (userData?.firebase_uid) {
+        await mutate(`/users/by_firebase_uid/${userData.firebase_uid}`);
+      }
+      if (userId) {
+        await mutate(`/users/${userId}`);
+      }
 
       // 実際の実装では、ここでFirebaseのemailも更新する必要があります
       console.log("ユーザー情報を更新:", { name, email });
@@ -237,7 +249,12 @@ export default function Settings() {
       <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-2">設定を読み込み中...</p>
+          <p
+            className="mt-2"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
+            設定を読み込み中...
+          </p>
         </div>
       </div>
     );
@@ -248,10 +265,16 @@ export default function Settings() {
     return (
       <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center whitespace-nowrap">
+          <h2
+            className="text-xl font-bold text-gray-800 mb-4 text-center whitespace-nowrap"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
             このページはログイン後に表示されます
           </h2>
-          <p className="text-gray-600 mb-6 text-center">
+          <p
+            className="text-gray-600 mb-6 text-center"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
             この機能をご利用いただくには
             <br />
             ログインまたは新規登録が必要です。
@@ -285,7 +308,7 @@ export default function Settings() {
                 size="lg"
               />
             </Link>
-            <h2 
+            <h2
               className="text-2xl font-semibold text-[#5A4A4A]"
               style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
             >
@@ -296,14 +319,20 @@ export default function Settings() {
           {/* 個人情報セクション */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center">
+              <h3
+                className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center"
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+              >
                 <FontAwesomeIcon icon={faUser} className="mr-2" />
                 個人情報
               </h3>
               <div className="space-y-4">
                 {/* お名前 */}
                 <div>
-                  <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
+                  <label
+                    className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                  >
                     お名前
                   </label>
                   <Input
@@ -318,7 +347,10 @@ export default function Settings() {
 
                 {/* メールアドレス */}
                 <div>
-                  <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
+                  <label
+                    className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                  >
                     <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
                     メールアドレス
                   </label>
@@ -346,7 +378,10 @@ export default function Settings() {
 
             {/* セキュリティセクション */}
             <div>
-              <h3 className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center">
+              <h3
+                className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center"
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+              >
                 <FontAwesomeIcon icon={faShieldAlt} className="mr-2" />
                 セキュリティ
               </h3>
@@ -366,7 +401,10 @@ export default function Settings() {
                   {showPasswordSection && (
                     <div className="mt-4 space-y-4 p-4 bg-gray-50 rounded-lg">
                       <div>
-                        <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
+                        <label
+                          className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                          style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                        >
                           現在のパスワード
                         </label>
                         <PasswordInput
@@ -378,7 +416,10 @@ export default function Settings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
+                        <label
+                          className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                          style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                        >
                           新しいパスワード
                         </label>
                         <PasswordInput
@@ -390,7 +431,10 @@ export default function Settings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
+                        <label
+                          className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                          style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                        >
                           新しいパスワード（確認）
                         </label>
                         <PasswordInput
@@ -436,14 +480,24 @@ export default function Settings() {
             {/* 成功メッセージ */}
             {successMessage && (
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-600 text-sm">{successMessage}</p>
+                <p
+                  className="text-green-600 text-sm"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  {successMessage}
+                </p>
               </div>
             )}
 
             {/* エラーメッセージ */}
             {formError && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm">{formError}</p>
+                <p
+                  className="text-red-600 text-sm"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  {formError}
+                </p>
               </div>
             )}
           </div>
@@ -453,7 +507,10 @@ export default function Settings() {
 
           {/* アカウント管理 */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center">
+            <h3
+              className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
               <FontAwesomeIcon icon={faTrash} className="mr-2" />
               アカウント管理
             </h3>
@@ -461,7 +518,10 @@ export default function Settings() {
             {/* アカウント削除確認 */}
             {showDeleteConfirm ? (
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm mb-4">
+                <p
+                  className="text-red-600 text-sm mb-4"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
                   アカウントを削除すると、すべてのデータが永久に失われます。この操作は取り消せません。
                 </p>
                 <div className="flex space-x-2">
@@ -510,7 +570,10 @@ export default function Settings() {
           <div className="border-t border-gray-200 my-6"></div>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center">
+            <h3
+              className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
               <FontAwesomeIcon icon={faCog} className="mr-2" />
               特集管理
             </h3>
@@ -518,13 +581,23 @@ export default function Settings() {
             {/* 成功・エラーメッセージ */}
             {campaignMessage && (
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-600 text-sm">{campaignMessage}</p>
+                <p
+                  className="text-green-600 text-sm"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  {campaignMessage}
+                </p>
               </div>
             )}
 
             {campaignError && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm">{campaignError}</p>
+                <p
+                  className="text-red-600 text-sm"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  {campaignError}
+                </p>
               </div>
             )}
 
@@ -532,7 +605,10 @@ export default function Settings() {
             {campaignsLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
-                <span className="ml-2 text-gray-600">
+                <span
+                  className="ml-2 text-gray-600"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
                   特集データを読み込み中...
                 </span>
               </div>
@@ -540,7 +616,10 @@ export default function Settings() {
               <div className="space-y-4">
                 {/* 現在の特集表示 */}
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-blue-800 mb-2 flex items-center">
+                  <h4
+                    className="font-medium text-blue-800 mb-2 flex items-center"
+                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                  >
                     <FontAwesomeIcon icon={faCalendar} className="mr-2" />
                     現在表示中の特集（最大2つまで表示）
                   </h4>
@@ -584,7 +663,12 @@ export default function Settings() {
 
                 {/* 全特集管理 */}
                 <div className="space-y-3">
-                  <h4 className="font-medium text-gray-700">全特集一覧</h4>
+                  <h4
+                    className="font-medium text-gray-700"
+                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                  >
+                    全特集一覧
+                  </h4>
                   {campaigns?.map((campaign) => (
                     <div
                       key={campaign.id}
@@ -593,10 +677,16 @@ export default function Settings() {
                       {/* 特集基本情報 */}
                       <div className="flex justify-between items-start mb-3">
                         <div>
-                          <h5 className="font-medium text-gray-800">
+                          <h5
+                            className="font-medium text-gray-800"
+                            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                          >
                             {campaign.name}
                           </h5>
-                          <p className="text-sm text-gray-600">
+                          <p
+                            className="text-sm text-gray-600"
+                            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                          >
                             <span
                               className={`px-2 py-1 rounded text-xs mr-2 ${
                                 (campaign.campaign_type || "primary") ===
@@ -626,117 +716,165 @@ export default function Settings() {
                           >
                             {campaign.active ? "有効" : "無効"}
                           </span>
-                          <Button
-                            size="sm"
-                            onClick={() =>
-                              toggleCampaignActive(
-                                campaign.id!,
-                                campaign.active ?? true
-                              )
-                            }
-                            disabled={isLoading}
-                            className={`${
-                              campaign.active
-                                ? "bg-red-600 hover:bg-red-700"
-                                : "bg-green-600 hover:bg-green-700"
-                            } text-white`}
-                          >
-                            <FontAwesomeIcon
-                              icon={campaign.active ? faToggleOff : faToggleOn}
-                              className="mr-1"
-                            />
-                            {campaign.active ? "無効化" : "有効化"}
-                          </Button>
+                          {isGuestUser ? (
+                            <Button
+                              size="sm"
+                              onClick={() =>
+                                toggleCampaignActive(
+                                  campaign.id!,
+                                  campaign.active ?? true
+                                )
+                              }
+                              disabled={isLoading}
+                              className={`${
+                                campaign.active
+                                  ? "bg-red-600 hover:bg-red-700"
+                                  : "bg-green-600 hover:bg-green-700"
+                              } text-white`}
+                            >
+                              <FontAwesomeIcon
+                                icon={
+                                  campaign.active ? faToggleOff : faToggleOn
+                                }
+                                className="mr-1"
+                              />
+                              {campaign.active ? "無効化" : "有効化"}
+                            </Button>
+                          ) : (
+                            <span
+                              className="px-3 py-1 text-xs text-gray-500 bg-gray-100 rounded"
+                              style={{
+                                fontFamily: "'Noto Sans JP', sans-serif",
+                              }}
+                            >
+                              変更不可
+                            </span>
+                          )}
                         </div>
                       </div>
 
                       {/* 編集フォーム */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t border-gray-300">
-                        {/* 開始月 */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">
-                            開始月
-                          </label>
-                          <select
-                            value={campaign.start_month || 1}
-                            onChange={(e) =>
-                              updateCampaignPeriod(
-                                campaign.id!,
-                                parseInt(e.target.value),
-                                campaign.end_month || 1
-                              )
-                            }
-                            disabled={isLoading}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            {Array.from({ length: 12 }, (_, i) => i + 1).map(
-                              (month) => (
-                                <option key={month} value={month}>
-                                  {month}月
-                                </option>
-                              )
-                            )}
-                          </select>
-                        </div>
+                      {isGuestUser ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t border-gray-300">
+                          {/* 開始月 */}
+                          <div>
+                            <label
+                              className="block text-xs font-medium text-gray-600 mb-1"
+                              style={{
+                                fontFamily: "'Noto Sans JP', sans-serif",
+                              }}
+                            >
+                              開始月
+                            </label>
+                            <select
+                              value={campaign.start_month || 1}
+                              onChange={(e) =>
+                                updateCampaignPeriod(
+                                  campaign.id!,
+                                  parseInt(e.target.value),
+                                  campaign.end_month || 1
+                                )
+                              }
+                              disabled={isLoading}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                                (month) => (
+                                  <option key={month} value={month}>
+                                    {month}月
+                                  </option>
+                                )
+                              )}
+                            </select>
+                          </div>
 
-                        {/* 終了月 */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">
-                            終了月
-                          </label>
-                          <select
-                            value={campaign.end_month || 1}
-                            onChange={(e) =>
-                              updateCampaignPeriod(
-                                campaign.id!,
-                                campaign.start_month || 1,
-                                parseInt(e.target.value)
-                              )
-                            }
-                            disabled={isLoading}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            {Array.from({ length: 12 }, (_, i) => i + 1).map(
-                              (month) => (
-                                <option key={month} value={month}>
-                                  {month}月
-                                </option>
-                              )
-                            )}
-                          </select>
-                        </div>
+                          {/* 終了月 */}
+                          <div>
+                            <label
+                              className="block text-xs font-medium text-gray-600 mb-1"
+                              style={{
+                                fontFamily: "'Noto Sans JP', sans-serif",
+                              }}
+                            >
+                              終了月
+                            </label>
+                            <select
+                              value={campaign.end_month || 1}
+                              onChange={(e) =>
+                                updateCampaignPeriod(
+                                  campaign.id!,
+                                  campaign.start_month || 1,
+                                  parseInt(e.target.value)
+                                )
+                              }
+                              disabled={isLoading}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                                (month) => (
+                                  <option key={month} value={month}>
+                                    {month}月
+                                  </option>
+                                )
+                              )}
+                            </select>
+                          </div>
 
-                        {/* カラーテーマ */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">
-                            カラーテーマ
-                          </label>
-                          <select
-                            value={campaign.color_theme}
-                            onChange={(e) =>
-                              updateCampaignColor(campaign.id!, e.target.value)
-                            }
-                            disabled={isLoading}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="red">赤</option>
-                            <option value="pink">ピンク</option>
-                            <option value="blue">青</option>
-                            <option value="orange">オレンジ</option>
-                            <option value="green">緑</option>
-                            <option value="indigo">藍</option>
-                            <option value="yellow">黄</option>
-                          </select>
+                          {/* カラーテーマ */}
+                          <div>
+                            <label
+                              className="block text-xs font-medium text-gray-600 mb-1"
+                              style={{
+                                fontFamily: "'Noto Sans JP', sans-serif",
+                              }}
+                            >
+                              カラーテーマ
+                            </label>
+                            <select
+                              value={campaign.color_theme}
+                              onChange={(e) =>
+                                updateCampaignColor(
+                                  campaign.id!,
+                                  e.target.value
+                                )
+                              }
+                              disabled={isLoading}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="red">赤</option>
+                              <option value="pink">ピンク</option>
+                              <option value="blue">青</option>
+                              <option value="orange">オレンジ</option>
+                              <option value="green">緑</option>
+                              <option value="indigo">藍</option>
+                              <option value="yellow">黄</option>
+                            </select>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="mt-3 pt-3 border-t border-gray-300">
+                          <p
+                            className="text-sm text-gray-500 text-center py-2"
+                            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                          >
+                            特集設定の変更は管理者のみ可能です
+                          </p>
+                        </div>
+                      )}
 
                       {/* 特集の説明 */}
                       <div className="mt-3 pt-3 border-t border-gray-300">
-                        <p className="text-sm text-gray-600">
+                        <p
+                          className="text-sm text-gray-600"
+                          style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                        >
                           <span className="font-medium">説明:</span>{" "}
                           {campaign.description}
                         </p>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p
+                          className="text-sm text-gray-600 mt-1"
+                          style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                        >
                           <span className="font-medium">リンク:</span>{" "}
                           {campaign.link_path}
                         </p>

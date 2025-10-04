@@ -30,7 +30,7 @@ export default function PostDetail() {
   });
 
   // お気に入り機能（ログインユーザーのIDを使用）
-  const { toggleFavorite, isFavorite } = useFavorites(userId || 0);
+  const { toggleFavorite, isFavorite } = useFavorites(userId);
 
   // 自分の投稿かどうかを判定
   const isOwnPost = post && userId && post.user_id === userId;
@@ -148,7 +148,17 @@ export default function PostDetail() {
               {/* お気に入りボタン（画像の右下にオーバーレイ） */}
               {isAuthenticated && !isOwnPost && post?.id && (
                 <button
-                  onClick={() => post.id && toggleFavorite(post.id)}
+                  onClick={() => {
+                    console.log("お気に入りボタンクリック - post.id:", post.id);
+                    console.log("お気に入りボタンクリック - userId:", userId);
+                    console.log(
+                      "お気に入りボタンクリック - isFavorite:",
+                      post.id ? isFavorite(post.id) : false
+                    );
+                    if (post.id) {
+                      toggleFavorite(post.id);
+                    }
+                  }}
                   className={`absolute bottom-4 right-4 p-3 rounded-full transition-colors ${
                     isFavorite(post.id)
                       ? "text-red-500 bg-white/90 hover:bg-white shadow-lg"

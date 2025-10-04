@@ -15,9 +15,14 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function Header() {
-  const { user, isAuthenticated, logout } = useAuth();
-  const { nickname } = useCurrentUser();
+  const { user, isAuthenticated, logout, signIn } = useAuth();
+  const { nickname, userData } = useCurrentUser();
   const [showMenu, setShowMenu] = useState(false);
+
+  // デバッグログ（プロフィール編集後の反映確認用）
+  console.log("Header - nickname:", nickname);
+  console.log("Header - userData:", userData);
+  console.log("Header - user?.email:", user?.email);
 
   const handleLogout = async () => {
     try {
@@ -26,6 +31,15 @@ export default function Header() {
       setShowMenu(false);
     } catch (error) {
       console.error("ログアウトに失敗しました:", error);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      await signIn("admin@guest.com", "33443344");
+      setShowMenu(false);
+    } catch (error) {
+      console.error("ゲストログインに失敗しました:", error);
     }
   };
 
@@ -67,7 +81,7 @@ export default function Header() {
                       className="text-sm text-[#5A4A4A] truncate"
                       style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                     >
-                      {nickname || user?.email}
+                      {nickname || userData?.nickname || user?.email}
                     </span>
                   </div>
                 </div>
@@ -127,6 +141,15 @@ export default function Header() {
                     ログイン
                   </button>
                 </Link>
+
+                <button
+                  className="w-full text-left px-4 py-2 text-blue-600 hover:bg-blue-50 transition-colors flex items-center"
+                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                  onClick={handleGuestLogin}
+                >
+                  <FontAwesomeIcon icon={faUser} className="mr-2" />
+                  ゲストユーザーでログイン
+                </button>
 
                 <Link href="/settings">
                   <button

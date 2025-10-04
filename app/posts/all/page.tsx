@@ -7,8 +7,9 @@ import { Post } from "@/hooks/usePosts";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useFavorites } from "@/hooks/useFavorites";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faHeart } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
 interface SearchResponse {
@@ -24,7 +25,10 @@ interface SearchResponse {
 function AllPostsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isUnauthenticated, loading: authLoading } = useCurrentUser();
+  const { isUnauthenticated, loading: authLoading, userId } = useCurrentUser();
+
+  // お気に入り機能
+  const { toggleFavorite, isFavorite } = useFavorites(userId);
 
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 5;
@@ -164,6 +168,39 @@ function AllPostsContent() {
                       alt={post.title}
                       className="w-full h-full object-cover"
                     />
+                    {/* お気に入りボタン（自分の投稿以外） */}
+                    {post.user_id !== userId && post.id && (
+                      <button
+                        onClick={() => {
+                          console.log(
+                            "お気に入りボタンクリック - post.id:",
+                            post.id
+                          );
+                          console.log(
+                            "お気に入りボタンクリック - userId:",
+                            userId
+                          );
+                          console.log(
+                            "お気に入りボタンクリック - isFavorite:",
+                            post.id ? isFavorite(post.id) : false
+                          );
+                          if (post.id) {
+                            toggleFavorite(post.id);
+                          }
+                        }}
+                        className="absolute bottom-2 right-2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 transition-all duration-200 shadow-md hover:shadow-lg"
+                        style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faHeart}
+                          className={`text-lg ${
+                            post.id && isFavorite(post.id)
+                              ? "text-red-500"
+                              : "text-gray-400 hover:text-red-400"
+                          } transition-colors duration-200`}
+                        />
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="h-[118px] bg-gray-200 flex items-center justify-center">

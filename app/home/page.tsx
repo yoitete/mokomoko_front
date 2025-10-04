@@ -27,7 +27,7 @@ export default function Home() {
   const posts = useMemo(() => postsResponse?.posts || [], [postsResponse]);
 
   // お気に入り機能（ログインユーザーのIDを使用）
-  const { toggleFavorite, isFavorite } = useFavorites(userId || 0);
+  const { toggleFavorite, isFavorite } = useFavorites(userId);
 
   // 有効な特集をすべて取得（API版）
   const {
