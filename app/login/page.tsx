@@ -8,6 +8,7 @@ import Input from "@/components/Input/Input";
 import PasswordInput from "@/components/PasswordInput/PasswordInput";
 import Button from "@/components/Button/Button";
 import PasswordResetModal from "@/components/PasswordResetModal/PasswordResetModal";
+import Toast from "@/components/Toast/Toast";
 
 export default function Login() {
   const { signIn, loading, error, isAuthenticated } = useAuth();
@@ -16,6 +17,11 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState("");
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "error"
+  );
   const router = useRouter();
 
   // ログイン済みの場合はホームページにリダイレクト
@@ -30,7 +36,9 @@ export default function Login() {
       e.preventDefault();
 
       if (!email.trim() || !password.trim()) {
-        setFormError("メールアドレスとパスワードを入力してください");
+        setToastMessage("メールアドレスとパスワードを入力してください");
+        setToastType("error");
+        setShowToast(true);
         return;
       }
 
@@ -41,9 +49,11 @@ export default function Login() {
         await signIn(email, password);
         // 成功時はuseEffectでリダイレクトされる
       } catch {
-        setFormError(
+        setToastMessage(
           "ログインに失敗しました。メールアドレスとパスワードをご確認ください。"
         );
+        setToastType("error");
+        setShowToast(true);
       } finally {
         setIsLoading(false);
       }
@@ -124,12 +134,6 @@ export default function Login() {
               />
             </div>
 
-            {(formError || error) && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm">{formError || error}</p>
-              </div>
-            )}
-
             <Button
               type="submit"
               className="w-full"
@@ -169,6 +173,15 @@ export default function Login() {
       <PasswordResetModal
         isOpen={showResetModal}
         onClose={() => setShowResetModal(false)}
+      />
+
+      {/* トースト通知 */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={5000}
       />
     </div>
   );

@@ -106,9 +106,12 @@ function AllPostsContent() {
             onClick={() => router.push("/home")}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <FontAwesomeIcon icon={faArrowLeft} className="text-black" />
+            <FontAwesomeIcon icon={faArrowLeft} className="text-[#5A4A4A]" />
           </button>
-          <h1 className="text-2xl font-light text-center text-black">
+          <h1
+            className="text-2xl font-light text-center text-[#5A4A4A]"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
             投稿一覧
           </h1>
         </div>
@@ -212,7 +215,7 @@ function AllPostsContent() {
               {/* 右：タイトル＋本文サマリー */}
               <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
                 <p className="text-lg font-semibold text-black">{post.title}</p>
-                <p className="text-sm text-black line-clamp-3 mt-1">
+                <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
                   {post.description}
                 </p>
                 {post.tags && post.tags.length > 0 && (

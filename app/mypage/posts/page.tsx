@@ -157,7 +157,7 @@ export default function MyPostsPage() {
               {/* 右：タイトル＋本文サマリー */}
               <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
                 <p className="text-lg font-semibold text-black">{post.title}</p>
-                <p className="text-sm text-black line-clamp-3 mt-1">
+                <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
                   {post.description}
                 </p>
 

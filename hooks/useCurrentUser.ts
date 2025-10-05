@@ -34,6 +34,7 @@ export const useCurrentUser = () => {
     // API側のユーザーデータ
     userData,
     userId: userData?.id || null,
+    name: userData?.name || null,
     nickname: userData?.nickname || null,
     bio: userData?.bio || null,
     profileImage: userData?.profile_image || null,

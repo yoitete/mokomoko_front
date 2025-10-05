@@ -59,6 +59,7 @@ export default function PasswordResetModal({
           <label
             htmlFor="email"
             className="block text-sm font-medium text-[#5A4A4A] mb-2"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
           >
             メールアドレス
           </label>

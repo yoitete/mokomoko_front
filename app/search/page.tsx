@@ -286,7 +286,7 @@ export default function Search() {
               {/* 右：タイトル＋本文サマリー */}
               <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
                 <p className="text-lg font-semibold">{post.title}</p>
-                <p className="text-sm text-gray-600 line-clamp-3 mt-1">
+                <p className="text-sm text-gray-600 line-clamp-3 mt-1 whitespace-pre-wrap">
                   {post.description}
                 </p>
                 {post.tags && post.tags.length > 0 && (

@@ -209,7 +209,7 @@ export default function FavoritePage() {
   return (
     <div className="mt-10 mx-4 space-y-4">
       <h1
-        className="text-3xl font-bold text-center mb-6 text-black tracking-wide"
+        className="text-3xl font-bold text-center mb-6 text-pink-300 tracking-wide"
         style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
       >
         お気に入り一覧
@@ -251,7 +251,7 @@ export default function FavoritePage() {
           {/* 右：タイトル＋本文サマリー */}
           <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
             <p className="text-lg font-semibold">{post.title}</p>
-            <p className="text-sm text-gray-600 line-clamp-3 mt-1">
+            <p className="text-sm text-gray-600 line-clamp-3 mt-1 whitespace-pre-wrap">
               {post.description}
             </p>
             <Link

@@ -27,7 +27,10 @@ export default function BioSection({
     <div className="space-y-4">
       {/* 自己紹介 */}
       <div>
-        <label className="block text-sm font-medium text-[#5A4A4A] mb-2">
+        <label
+          className="block text-sm font-medium text-[#5A4A4A] mb-2"
+          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+        >
           <FontAwesomeIcon icon={faQuoteLeft} className="mr-2" />
           自己紹介
         </label>
