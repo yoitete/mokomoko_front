@@ -54,7 +54,10 @@ export const useAPI = () => {
         return response.data;
       } catch (error) {
         // 404エラーの場合は詳細なログを出さない
-        if ((error as any)?.response?.status === 404) {
+        if (
+          (error as unknown as { response?: { status: number } })?.response
+            ?.status === 404
+        ) {
           console.log("API 404:", API_BASE_URL + url);
         } else {
           console.error("API Error:", error);
