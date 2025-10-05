@@ -39,7 +39,6 @@ export default function EditProfile() {
     profile.selectedIcon
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [formError, setFormError] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "error" | "info">(
@@ -95,7 +94,6 @@ export default function EditProfile() {
 
   const handleSave = useCallback(async () => {
     setIsLoading(true);
-    setFormError("");
 
     try {
       // ローカル状態を更新

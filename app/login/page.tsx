@@ -11,11 +11,11 @@ import PasswordResetModal from "@/components/PasswordResetModal/PasswordResetMod
 import Toast from "@/components/Toast/Toast";
 
 export default function Login() {
-  const { signIn, loading, error, isAuthenticated } = useAuth();
+  const { signIn, loading, isAuthenticated } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [formError, setFormError] = useState("");
+
   const [showResetModal, setShowResetModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -43,7 +43,6 @@ export default function Login() {
       }
 
       setIsLoading(true);
-      setFormError("");
 
       try {
         await signIn(email, password);
@@ -60,6 +59,21 @@ export default function Login() {
     },
     [email, password, signIn]
   );
+
+  const handleGuestLogin = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      await signIn("admin@guest.com", "guest123");
+      // 成功時はuseEffectでリダイレクトされる
+    } catch {
+      setToastMessage("ゲストログインに失敗しました。");
+      setToastType("error");
+      setShowToast(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [signIn]);
 
   // 認証状態の初期読み込み中
   if (loading) {
@@ -140,6 +154,17 @@ export default function Login() {
               disabled={isLoading || !email.trim() || !password.trim()}
             >
               {isLoading ? "ログイン中..." : "ログイン"}
+            </Button>
+
+            {/* ゲストログインボタン */}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full text-lg py-3 bg-blue-500 hover:bg-blue-600 text-white border-blue-500 hover:border-blue-600"
+              onClick={handleGuestLogin}
+              disabled={isLoading}
+            >
+              {isLoading ? "ログイン中..." : "ゲストユーザーでログイン"}
             </Button>
           </form>
 

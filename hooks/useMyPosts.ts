@@ -2,7 +2,7 @@ import { useGet } from "./useSWRAPI";
 import { useAPI } from "./useAPI";
 import { Post } from "./usePosts";
 import { mutate } from "swr";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 
 interface MyPostsResponse {
   posts: Post[];

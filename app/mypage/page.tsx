@@ -23,16 +23,7 @@ import Link from "next/link";
 
 export default function Mypage() {
   const { logout } = useAuth();
-  const {
-    isUnauthenticated,
-    loading,
-    userData,
-    nickname,
-    bio,
-    profileImage,
-    selectedIcon,
-    error: userError,
-  } = useCurrentUser();
+  const { isUnauthenticated, loading, userData } = useCurrentUser();
   const profile = useAtomValue(profileAtom);
   const updateProfile = useSetAtom(updateProfileAtom);
   const router = useRouter();

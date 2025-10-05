@@ -14,7 +14,7 @@ import Button from "@/components/Button/Button";
 import Toast from "@/components/Toast/Toast";
 
 export default function Signup() {
-  const { signUp, loading, error, isAuthenticated } = useAuth();
+  const { signUp, loading, isAuthenticated } = useAuth();
   const { post } = useAPI();
   const currentToken = useAtomValue(authTokenAtom); // 現在のトークン値を直接取得
   const tokenRef = useRef<string | null>(null);
@@ -23,7 +23,6 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [formError, setFormError] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "error" | "info">(
@@ -121,7 +120,6 @@ export default function Signup() {
       }
 
       setIsLoading(true);
-      setFormError("");
 
       try {
         // 1. Firebaseでアカウント作成

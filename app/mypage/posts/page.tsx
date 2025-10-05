@@ -130,7 +130,7 @@ export default function MyPostsPage() {
             </p>
           </div>
         ) : (
-          posts.map((post, index) => (
+          posts.map((post) => (
             <SimpleBox
               key={post.id}
               className="flex flex-col md:flex-row items-start p-4"

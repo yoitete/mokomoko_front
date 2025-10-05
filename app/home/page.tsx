@@ -98,9 +98,6 @@ export default function Home() {
   >("/posts/popular?season=autumn-winter&with_images=true&limit=4");
 
   // 画像がある投稿のみをフィルタリング
-  const postsWithImages = (posts || []).filter(
-    (post) => post.images && post.images.length > 0
-  );
 
   if (isLoading) {
     return (
