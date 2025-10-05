@@ -16,10 +16,11 @@ import Link from "next/link";
 
 export default function Header() {
   const { user, isAuthenticated, logout, signIn } = useAuth();
-  const { nickname, userData } = useCurrentUser();
+  const { name, nickname, userData } = useCurrentUser();
   const [showMenu, setShowMenu] = useState(false);
 
   // デバッグログ（プロフィール編集後の反映確認用）
+  console.log("Header - name:", name);
   console.log("Header - nickname:", nickname);
   console.log("Header - userData:", userData);
   console.log("Header - user?.email:", user?.email);
@@ -81,7 +82,11 @@ export default function Header() {
                       className="text-sm text-[#5A4A4A] truncate"
                       style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                     >
-                      {nickname || userData?.nickname || user?.email}
+                      {nickname ||
+                        userData?.nickname ||
+                        name ||
+                        userData?.name ||
+                        user?.email}
                     </span>
                   </div>
                 </div>
@@ -143,7 +148,7 @@ export default function Header() {
                 </Link>
 
                 <button
-                  className="w-full text-left px-4 py-2 text-blue-600 hover:bg-blue-50 transition-colors flex items-center"
+                  className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
                   style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                   onClick={handleGuestLogin}
                 >

@@ -69,7 +69,7 @@ export const MyPostCard = ({ post, onDelete, isDeleting }: MyPostCardProps) => {
           )}
 
           <p
-            className="text-gray-600 text-sm mb-3 overflow-hidden"
+            className="text-gray-600 text-sm mb-3 overflow-hidden whitespace-pre-wrap"
             style={
               {
                 display: "-webkit-box",

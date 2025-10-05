@@ -8,6 +8,7 @@ import Button from "@/components/Button/Button";
 import { usePosts, CreatePostWithImageData } from "@/hooks/usePosts";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import Link from "next/link";
+import Toast from "@/components/Toast/Toast";
 
 interface Combination {
   title: string;
@@ -36,6 +37,11 @@ export default function Post() {
     category: "",
     tags: [],
   });
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { createPostWithImage, loading, error } = usePosts();
 
@@ -72,34 +78,46 @@ export default function Post() {
   const handleSubmit = async () => {
     // バリデーション
     if (!combination.title.trim()) {
-      alert("タイトルを入力してください");
+      setToastMessage("タイトルを入力してください");
+      setToastType("error");
+      setShowToast(true);
       return;
     }
 
     if (!combination.category) {
-      alert("季節を選択してください");
+      setToastMessage("カテゴリーを選択してください");
+      setToastType("error");
+      setShowToast(true);
       return;
     }
 
     if (!combination.image) {
-      alert("画像を選択してください");
+      setToastMessage("画像を選択してください");
+      setToastType("error");
+      setShowToast(true);
       return;
     }
 
     if (!combination.price || combination.price <= 0) {
-      alert("価格を入力してください（1円以上）");
+      setToastMessage("価格を入力してください（1円以上）");
+      setToastType("error");
+      setShowToast(true);
       return;
     }
 
     if (!combination.description || !combination.description.trim()) {
-      alert("説明を入力してください");
+      setToastMessage("説明を入力してください");
+      setToastType("error");
+      setShowToast(true);
       return;
     }
 
     if (!isUserDataReady || !userId) {
-      alert(
+      setToastMessage(
         "ユーザー情報の取得に失敗しました。ページを再読み込みしてください。"
       );
+      setToastType("error");
+      setShowToast(true);
       return;
     }
 
@@ -118,7 +136,10 @@ export default function Post() {
       // 投稿を作成
       await createPostWithImage(postData);
 
-      alert("投稿が完了しました！");
+      // トースト通知を表示
+      setToastMessage("投稿が完了しました！");
+      setToastType("success");
+      setShowToast(true);
 
       // フォームをリセット
       setCombination({
@@ -135,7 +156,9 @@ export default function Post() {
       }
     } catch (err) {
       console.error("投稿エラー:", err);
-      alert("投稿中にエラーが発生しました。");
+      setToastMessage("投稿中にエラーが発生しました。");
+      setToastType("error");
+      setShowToast(true);
     }
   };
 
@@ -185,7 +208,7 @@ export default function Post() {
       <div className="mt-10">
         <div className="mb-4">
           <div
-            className="mt-5 text-center text-3xl font-bold tracking-wide text-black"
+            className="mt-5 text-center text-3xl font-bold tracking-wide text-[#5A4A4A]"
             style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
           >
             新規投稿
@@ -307,13 +330,13 @@ export default function Post() {
 
             {/* フォームセクション */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* 季節カテゴリー */}
+              {/* カテゴリー */}
               <div className="space-y-2">
                 <label
                   className="block text-lg font-semibold text-gray-800"
                   style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                 >
-                  季節 <span className="text-red-500">*</span>
+                  カテゴリー <span className="text-red-500">*</span>
                 </label>
                 <select
                   className="w-full px-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-lg h-14"
@@ -321,7 +344,7 @@ export default function Post() {
                   value={combination.category ?? ""}
                   onChange={(e) => handleChange("category", e.target.value)}
                 >
-                  <option value="">季節を選択してください</option>
+                  <option value="">カテゴリーを選択してください</option>
                   <option value="spring-summer">春・夏</option>
                   <option value="autumn-winter">秋・冬</option>
                   <option value="christmas">クリスマス</option>
@@ -465,6 +488,15 @@ export default function Post() {
           </div>
         </div>
       </main>
+
+      {/* トースト通知 */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={5000}
+      />
     </div>
   );
 }

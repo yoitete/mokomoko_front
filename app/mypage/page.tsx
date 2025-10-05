@@ -227,7 +227,7 @@ export default function Mypage() {
             <div className="ml-4 flex-1">
               <h3
                 className="text-lg font-semibold text-[#5A4A4A]"
-                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
               >
                 {profile.nickname}
               </h3>
@@ -245,7 +245,7 @@ export default function Mypage() {
             <div>
               <label
                 className="block text-sm font-medium text-[#5A4A4A] mb-2"
-                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
               >
                 <FontAwesomeIcon icon={faUser} className="mr-2" />
                 自己紹介
@@ -269,7 +269,7 @@ export default function Mypage() {
             <div className="flex justify-between items-center">
               <label
                 className="block text-sm font-medium text-[#5A4A4A]"
-                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
               >
                 <FontAwesomeIcon icon={faUser} className="mr-2" />
                 投稿管理

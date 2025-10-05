@@ -14,6 +14,7 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import Toast from "@/components/Toast/Toast";
 
 interface Combination {
   title: string;
@@ -60,6 +61,11 @@ export default function EditPost({
   });
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { updatePost, loading, error } = usePosts();
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
 
   // 既存の投稿データを取得
   const {
@@ -85,7 +91,9 @@ export default function EditPost({
   // 権限チェック：投稿の所有者のみ編集可能
   useEffect(() => {
     if (postData && userId && postData.user_id !== userId) {
-      alert("この投稿を編集する権限がありません。");
+      setToastMessage("この投稿を編集する権限がありません。");
+      setToastType("error");
+      setShowToast(true);
       router.push("/mypage/posts");
     }
   }, [postData, userId, router]);
@@ -133,19 +141,25 @@ export default function EditPost({
   const handleSubmit = async () => {
     // バリデーション
     if (!combination.title.trim()) {
-      alert("タイトルを入力してください");
+      setToastMessage("タイトルを入力してください");
+      setToastType("error");
+      setShowToast(true);
       return;
     }
 
     if (!combination.category) {
-      alert("季節を選択してください");
+      setToastMessage("カテゴリーを選択してください");
+      setToastType("error");
+      setShowToast(true);
       return;
     }
 
     if (!isUserDataReady || !userId) {
-      alert(
+      setToastMessage(
         "ユーザー情報の取得に失敗しました。ページを再読み込みしてください。"
       );
+      setToastType("error");
+      setShowToast(true);
       return;
     }
 
@@ -163,11 +177,19 @@ export default function EditPost({
       // 投稿を更新
       await updatePost(parseInt(postId), postData);
 
-      alert("投稿が更新されました！");
-      router.push("/mypage/posts");
+      setToastMessage("投稿が更新されました！");
+      setToastType("success");
+      setShowToast(true);
+
+      // 少し遅延してからマイページにリダイレクト
+      setTimeout(() => {
+        router.push("/mypage/posts");
+      }, 1500);
     } catch (err) {
       console.error("投稿更新エラー:", err);
-      alert("投稿の更新中にエラーが発生しました。");
+      setToastMessage("投稿の更新中にエラーが発生しました。");
+      setToastType("error");
+      setShowToast(true);
     }
   };
 
@@ -302,17 +324,17 @@ export default function EditPost({
             />
           </div>
 
-          {/* 季節 */}
+          {/* カテゴリー */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              季節 <span className="text-red-500">*</span>
+              カテゴリー <span className="text-red-500">*</span>
             </label>
             <select
               value={combination.category}
               onChange={(e) => handleChange("category", e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">季節を選択してください</option>
+              <option value="">カテゴリーを選択してください</option>
               <option value="spring">春</option>
               <option value="summer">夏</option>
               <option value="autumn">秋</option>
@@ -423,6 +445,15 @@ export default function EditPost({
           </div>
         </div>
       </div>
+
+      {/* トースト通知 */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={5000}
+      />
     </div>
   );
 }

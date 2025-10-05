@@ -11,6 +11,7 @@ import Button from "@/components/Button/Button";
 import ProfileImage from "@/components/ProfileImage/ProfileImage";
 import IconSelector from "@/components/IconSelector/IconSelector";
 import BioSection from "@/components/BioSection/BioSection";
+import Toast from "@/components/Toast/Toast";
 import {
   faUser,
   faCat,
@@ -39,6 +40,11 @@ export default function EditProfile() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success"
+  );
   const router = useRouter();
 
   // プロフィール情報が変更されたらローカル状態を更新
@@ -131,7 +137,9 @@ export default function EditProfile() {
       router.push("/mypage");
     } catch (err) {
       console.error("プロフィール更新エラー:", err);
-      setFormError("プロフィールの更新に失敗しました");
+      setToastMessage("プロフィールの更新に失敗しました");
+      setToastType("error");
+      setShowToast(true);
     } finally {
       setIsLoading(false);
     }
@@ -200,7 +208,7 @@ export default function EditProfile() {
                 size="lg"
               />
             </Link>
-            <h2 
+            <h2
               className="text-2xl font-semibold text-[#5A4A4A]"
               style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
             >
@@ -247,13 +255,6 @@ export default function EditProfile() {
             showActions={false}
           />
 
-          {/* エラーメッセージ */}
-          {formError && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
-              <p className="text-red-600 text-sm">{formError}</p>
-            </div>
-          )}
-
           {/* アクションボタン */}
           <div className="flex space-x-3 mt-6">
             <Button
@@ -275,6 +276,15 @@ export default function EditProfile() {
           </div>
         </div>
       </div>
+
+      {/* トースト通知 */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={5000}
+      />
     </div>
   );
 }

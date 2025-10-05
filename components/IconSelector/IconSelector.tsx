@@ -25,7 +25,10 @@ export default function IconSelector({
 }: IconSelectorProps) {
   return (
     <div className="mb-6">
-      <label className="block text-sm font-medium text-[#5A4A4A] mb-3">
+      <label
+        className="block text-sm font-medium text-[#5A4A4A] mb-3"
+        style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+      >
         アイコンを選択
       </label>
       <div className="grid grid-cols-3 gap-3 ml-4">
@@ -41,10 +44,7 @@ export default function IconSelector({
           >
             {option.type === "fontawesome" ? (
               <div className="w-10 h-10 flex items-center justify-center mb-1">
-                <FontAwesomeIcon
-                  icon={option.icon!}
-                  size="lg"
-                />
+                <FontAwesomeIcon icon={option.icon!} size="lg" />
               </div>
             ) : (
               <div className="w-14 h-14 flex items-center justify-center mb-1">
@@ -57,7 +57,9 @@ export default function IconSelector({
                 />
               </div>
             )}
-            <span className="text-xs text-center leading-tight">{option.label}</span>
+            <span className="text-xs text-center leading-tight">
+              {option.label}
+            </span>
           </button>
         ))}
       </div>

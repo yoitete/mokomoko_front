@@ -11,6 +11,7 @@ import Link from "next/link";
 import Input from "@/components/Input/Input";
 import PasswordInput from "@/components/PasswordInput/PasswordInput";
 import Button from "@/components/Button/Button";
+import Toast from "@/components/Toast/Toast";
 
 export default function Signup() {
   const { signUp, loading, error, isAuthenticated } = useAuth();
@@ -23,6 +24,11 @@ export default function Signup() {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "error"
+  );
   const router = useRouter();
 
   // トークンが更新されたらrefに保存
@@ -80,19 +86,27 @@ export default function Signup() {
 
   const validateForm = useCallback(() => {
     if (!email.trim()) {
-      setFormError("メールアドレスを入力してください");
+      setToastMessage("メールアドレスを入力してください");
+      setToastType("error");
+      setShowToast(true);
       return false;
     }
     if (!password.trim()) {
-      setFormError("パスワードを入力してください");
+      setToastMessage("パスワードを入力してください");
+      setToastType("error");
+      setShowToast(true);
       return false;
     }
     if (password.length < 6) {
-      setFormError("パスワードは6文字以上で入力してください");
+      setToastMessage("パスワードは6文字以上で入力してください");
+      setToastType("error");
+      setShowToast(true);
       return false;
     }
     if (password !== confirmPassword) {
-      setFormError("パスワードが一致しません");
+      setToastMessage("パスワードが一致しません");
+      setToastType("error");
+      setShowToast(true);
       return false;
     }
     return true;
@@ -135,11 +149,13 @@ export default function Signup() {
 
         // 成功時はuseEffectでリダイレクトされる
       } catch (err) {
-        setFormError(
+        setToastMessage(
           err instanceof Error
             ? err.message
             : "アカウント作成に失敗しました。入力内容をご確認ください。"
         );
+        setToastType("error");
+        setShowToast(true);
       } finally {
         setIsLoading(false);
       }
@@ -267,12 +283,6 @@ export default function Signup() {
               />
             </div>
 
-            {(formError || error) && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 text-sm">{formError || error}</p>
-              </div>
-            )}
-
             <Button
               type="submit"
               className="w-full"
@@ -309,6 +319,15 @@ export default function Signup() {
           </div>
         </div>
       </div>
+
+      {/* トースト通知 */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={5000}
+      />
     </div>
   );
 }

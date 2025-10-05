@@ -194,7 +194,10 @@ export default function PostDetail() {
             )}
 
             {post.description && (
-              <p className="text-gray-700 mb-4 leading-relaxed">
+              <p 
+                className="text-gray-700 mb-4 leading-relaxed whitespace-pre-wrap"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
                 {post.description}
               </p>
             )}
