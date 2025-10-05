@@ -4,7 +4,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAPI } from "@/hooks/useAPI";
 import { useSeasonalCampaigns } from "@/hooks/useSeasonalCampaign";
-import { useCallback, useState, useEffect } from "react";
+import {
+  seasonalCampaigns,
+  secondSeasonalCampaigns,
+} from "@/hooks/useSeasonalCampaign";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 import Button from "@/components/Button/Button";
@@ -37,14 +41,30 @@ export default function Settings() {
     loading,
   } = useCurrentUser();
   const { put } = useAPI();
+
+  // 静的データを使用（API側のデータが空の場合のフォールバック）
+  const allStaticCampaigns = useMemo(
+    () => [...seasonalCampaigns, ...secondSeasonalCampaigns],
+    []
+  );
   const {
-    data: campaigns,
+    data: apiCampaigns,
     mutate: mutateCampaigns,
     isLoading: campaignsLoading,
   } = useSeasonalCampaigns();
+
+  // API側のデータが利用可能な場合はそれを使用、そうでなければ静的データを使用
+  const campaigns =
+    apiCampaigns && apiCampaigns.length > 0 ? apiCampaigns : allStaticCampaigns;
+
+  // API側のデータが利用可能かどうか
+  const isApiDataAvailable = apiCampaigns && apiCampaigns.length > 0;
+
+  // 現在のキャンペーンデータ（API側のデータのみ使用）
+  const currentCampaigns = campaigns;
   const [isLoading, setIsLoading] = useState(false);
-  const [formError, setFormError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+
+  const [, setSuccessMessage] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -55,13 +75,15 @@ export default function Settings() {
     "success"
   );
 
-  // ゲストユーザーかどうかを判定
-  const isGuestUser = user?.email === "admin@guest.com";
+  // ゲストユーザーかどうかを判定（Firebase認証とAPI側の両方を考慮）
+  const isGuestUser =
+    user?.email === "admin@guest.com" || userData?.name === "admin@guest.com";
+
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [campaignMessage, setCampaignMessage] = useState("");
-  const [campaignError, setCampaignError] = useState("");
+  const [, setCampaignMessage] = useState("");
+  const [, setCampaignError] = useState("");
   const router = useRouter();
 
   // ユーザー情報を初期化
@@ -80,12 +102,12 @@ export default function Settings() {
 
   const handleSave = useCallback(async () => {
     if (!userId) {
-      setFormError("ユーザー情報が取得できませんでした");
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      ("ユーザー情報が取得できませんでした");
       return;
     }
 
     setIsLoading(true);
-    setFormError("");
     setSuccessMessage("");
 
     try {
@@ -125,16 +147,19 @@ export default function Settings() {
 
   const handlePasswordChange = useCallback(async () => {
     if (newPassword !== confirmPassword) {
-      setFormError("新しいパスワードが一致しません");
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      ("新しいパスワードが一致しません");
       return;
     }
     if (newPassword.length < 6) {
-      setFormError("パスワードは6文字以上で入力してください");
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      ("パスワードは6文字以上で入力してください");
       return;
     }
 
     setIsLoading(true);
-    setFormError("");
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    ("");
     setSuccessMessage("");
 
     try {
@@ -158,7 +183,6 @@ export default function Settings() {
 
   const handleDeleteAccount = useCallback(async () => {
     setIsLoading(true);
-    setFormError("");
     setSuccessMessage("");
 
     try {
@@ -167,7 +191,8 @@ export default function Settings() {
       await logout();
       router.push("/login");
     } catch {
-      setFormError("アカウントの削除に失敗しました");
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      ("アカウントの削除に失敗しました");
       setIsLoading(false);
     }
   }, [logout, router]);
@@ -186,8 +211,15 @@ export default function Settings() {
     campaignId: number,
     currentActive: boolean
   ) => {
+    // API側のデータが利用可能な場合のみ更新可能
+    if (!isApiDataAvailable) {
+      setToastMessage("API側のデータが利用可能になるまで編集はできません");
+      setToastType("info");
+      setShowToast(true);
+      return;
+    }
+
     setIsLoading(true);
-    setCampaignMessage("");
     setCampaignError("");
 
     try {
@@ -214,6 +246,14 @@ export default function Settings() {
     startMonth: number,
     endMonth: number
   ) => {
+    // API側のデータが利用可能な場合のみ更新可能
+    if (!isApiDataAvailable) {
+      setToastMessage("API側のデータが利用可能になるまで編集はできません");
+      setToastType("info");
+      setShowToast(true);
+      return;
+    }
+
     setIsLoading(true);
     setCampaignMessage("");
     setCampaignError("");
@@ -244,6 +284,14 @@ export default function Settings() {
     campaignId: number,
     colorTheme: string
   ) => {
+    // API側のデータが利用可能な場合のみ更新可能
+    if (!isApiDataAvailable) {
+      setToastMessage("API側のデータが利用可能になるまで編集はできません");
+      setToastType("info");
+      setShowToast(true);
+      return;
+    }
+
     setIsLoading(true);
     setCampaignMessage("");
     setCampaignError("");
@@ -605,7 +653,7 @@ export default function Settings() {
                         現在表示中の特集（最大2つまで表示）
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {campaigns
+                        {currentCampaigns
                           ?.filter((c) => c.active)
                           .slice(0, 2)
                           .map((campaign) => (
@@ -650,7 +698,7 @@ export default function Settings() {
                       >
                         全特集一覧
                       </h4>
-                      {campaigns?.map((campaign) => (
+                      {currentCampaigns?.map((campaign) => (
                         <div
                           key={campaign.id}
                           className="border border-gray-200 rounded-lg p-4 bg-gray-50"
@@ -701,7 +749,7 @@ export default function Settings() {
                               >
                                 {campaign.active ? "有効" : "無効"}
                               </span>
-                              {isGuestUser ? (
+                              {isGuestUser && isApiDataAvailable ? (
                                 <Button
                                   size="sm"
                                   onClick={() =>
@@ -732,14 +780,16 @@ export default function Settings() {
                                     fontFamily: "'Noto Sans JP', sans-serif",
                                   }}
                                 >
-                                  変更不可
+                                  {!isApiDataAvailable
+                                    ? "APIデータ待機中"
+                                    : "変更不可"}
                                 </span>
                               )}
                             </div>
                           </div>
 
                           {/* 編集フォーム */}
-                          {isGuestUser ? (
+                          {isGuestUser && isApiDataAvailable ? (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t border-gray-300">
                               {/* 開始月 */}
                               <div>
@@ -846,7 +896,9 @@ export default function Settings() {
                                   fontFamily: "'Noto Sans JP', sans-serif",
                                 }}
                               >
-                                特集設定の変更は管理者のみ可能です
+                                {!isApiDataAvailable
+                                  ? "API側のデータが利用可能になるまで編集はできません"
+                                  : "特集設定の変更は管理者のみ可能です"}
                               </p>
                             </div>
                           )}

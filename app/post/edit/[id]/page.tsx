@@ -8,11 +8,7 @@ import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import Button from "@/components/Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowLeft,
-  faPlus,
-  faTimes,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import Toast from "@/components/Toast/Toast";
 

@@ -1,5 +1,5 @@
 import { useAuth } from "./useAuth";
-import { useUserByFirebaseUID, Profile } from "./useProfile";
+import { useUserByFirebaseUID } from "./useProfile";
 
 /**
  * 現在ログイン中のユーザー情報を取得するフック

@@ -19,7 +19,7 @@ export type SeasonalCampaign = {
 };
 
 // 第1特集（メイン特集）の静的データ
-const seasonalCampaigns: SeasonalCampaign[] = [
+export const seasonalCampaigns: SeasonalCampaign[] = [
   {
     id: 1,
     name: "クリスマス特集",
@@ -80,7 +80,7 @@ const seasonalCampaigns: SeasonalCampaign[] = [
 ];
 
 // 第2特集（サブ特集）の静的データ
-const secondSeasonalCampaigns: SeasonalCampaign[] = [
+export const secondSeasonalCampaigns: SeasonalCampaign[] = [
   {
     id: 5,
     name: "受験応援！あったか毛布特集",
@@ -265,7 +265,7 @@ export const useCurrentSeasonalCampaignAPI = () => {
   const campaign = data || null;
   const colorClasses = useMemo(
     () => (campaign ? getColorClasses(campaign.color_theme) : null),
-    [campaign?.color_theme]
+    [campaign]
   );
 
   return {
@@ -286,7 +286,7 @@ export const useCurrentSecondSeasonalCampaignAPI = () => {
   const campaign = data || null;
   const colorClasses = useMemo(
     () => (campaign ? getColorClasses(campaign.color_theme) : null),
-    [campaign?.color_theme]
+    [campaign]
   );
 
   return {

@@ -148,11 +148,14 @@ export default function Header() {
                 </Link>
 
                 <button
-                  className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                  className="w-full text-left px-4 py-2 text-blue-600 hover:bg-blue-50 transition-colors flex items-center"
                   style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
                   onClick={handleGuestLogin}
                 >
-                  <FontAwesomeIcon icon={faUser} className="mr-2" />
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className="mr-2 text-blue-600"
+                  />
                   ゲストユーザーでログイン
                 </button>
 
