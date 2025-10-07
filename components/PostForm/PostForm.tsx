@@ -25,6 +25,7 @@ export type PostFormProps = {
   error?: string | null;
   submitButtonText?: string;
   showImageUpload?: boolean;
+  currentImageUrl?: string;
 };
 
 export const PostForm: React.FC<PostFormProps> = ({
@@ -34,6 +35,7 @@ export const PostForm: React.FC<PostFormProps> = ({
   error,
   submitButtonText = "投稿する",
   showImageUpload = true,
+  currentImageUrl,
 }) => {
   const [formData, setFormData] = useState<PostFormData>({
     title: "",
@@ -140,6 +142,7 @@ export const PostForm: React.FC<PostFormProps> = ({
             onChange={handleChange}
             onImageChange={handleImageChange}
             previewUrl={previewUrl}
+            currentImageUrl={currentImageUrl}
             showImageUpload={showImageUpload}
           />
 

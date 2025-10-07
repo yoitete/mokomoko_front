@@ -177,6 +177,7 @@ export default function EditPost({
           error={error}
           submitButtonText="投稿を更新"
           showImageUpload={true}
+          currentImageUrl={postData?.images?.[0]}
         />
       </main>
     </div>
