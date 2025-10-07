@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef, use } from "react";
+import React, { useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { usePosts } from "@/hooks/usePosts";
@@ -8,18 +8,9 @@ import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import Button from "@/components/Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import Toast from "@/components/Toast/Toast";
-
-interface Combination {
-  title: string;
-  description: string;
-  price?: number;
-  category: string;
-  tags: string[];
-  image?: File;
-}
+import { PostForm, PostFormData } from "@/components/PostForm/PostForm";
 
 interface PostUpdateData {
   title: string;
@@ -45,23 +36,7 @@ export default function EditPost({
     isUserDataReady,
   } = useCurrentUser();
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
-  const [combination, setCombination] = useState<Combination>({
-    title: "",
-    description: "",
-    price: undefined,
-    category: "",
-    tags: [],
-  });
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const { updatePost, loading, error } = usePosts();
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState<"success" | "error" | "info">(
-    "success"
-  );
 
   // 既存の投稿データを取得
   const {
@@ -70,124 +45,45 @@ export default function EditPost({
     isLoading: postLoading,
   } = useGet<Post>(`/posts/${postId}`);
 
-  // 投稿データが読み込まれたらフォームに設定
+  // 権限チェック：投稿の所有者のみ編集可能
   useEffect(() => {
-    if (postData) {
-      setCombination({
+    if (postData && userId && postData.user_id !== userId) {
+      router.push("/mypage/posts");
+    }
+  }, [postData, userId, router]);
+
+  const handleSubmit = async (formData: PostFormData) => {
+    if (!isUserDataReady || !userId) {
+      throw new Error(
+        "ユーザー情報の取得に失敗しました。ページを再読み込みしてください。"
+      );
+    }
+
+    // 投稿データを準備
+    const postUpdateData: PostUpdateData = {
+      title: formData.title,
+      description: formData.description || "",
+      price: formData.price,
+      season: formData.category,
+      tags: formData.tags,
+      image: formData.image || undefined,
+    };
+
+    // 投稿を更新
+    await updatePost(parseInt(postId), postUpdateData);
+  };
+
+  // 初期データを準備
+  const initialData: Partial<PostFormData> = postData
+    ? {
         title: postData.title || "",
         description: postData.description || "",
         price: postData.price,
         category: postData.season || "",
         tags: postData.tags || [],
-      });
-      setTags(postData.tags || []);
-    }
-  }, [postData]);
-
-  // 権限チェック：投稿の所有者のみ編集可能
-  useEffect(() => {
-    if (postData && userId && postData.user_id !== userId) {
-      setToastMessage("この投稿を編集する権限がありません。");
-      setToastType("error");
-      setShowToast(true);
-      router.push("/mypage/posts");
-    }
-  }, [postData, userId, router]);
-
-  const handleChange = <K extends keyof Combination>(
-    field: K,
-    value: Combination[K]
-  ) => setCombination({ ...combination, [field]: value });
-
-  // タグ追加関数
-  const addTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      const newTags = [...tags, tagInput.trim()];
-      setTags(newTags);
-      handleChange("tags", newTags);
-      setTagInput("");
-    }
-  };
-
-  // タグ削除関数
-  const removeTag = (index: number) => {
-    const newTags = tags.filter((_, i) => i !== index);
-    setTags(newTags);
-    handleChange("tags", newTags);
-  };
-
-  // Enterキーでタグ追加
-  const handleTagKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addTag();
-    }
-  };
-
-  // 画像選択ハンドラー
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleChange("image", file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    }
-  };
-
-  const handleSubmit = async () => {
-    // バリデーション
-    if (!combination.title.trim()) {
-      setToastMessage("タイトルを入力してください");
-      setToastType("error");
-      setShowToast(true);
-      return;
-    }
-
-    if (!combination.category) {
-      setToastMessage("カテゴリーを選択してください");
-      setToastType("error");
-      setShowToast(true);
-      return;
-    }
-
-    if (!isUserDataReady || !userId) {
-      setToastMessage(
-        "ユーザー情報の取得に失敗しました。ページを再読み込みしてください。"
-      );
-      setToastType("error");
-      setShowToast(true);
-      return;
-    }
-
-    try {
-      // 投稿データを準備
-      const postData: PostUpdateData = {
-        title: combination.title,
-        description: combination.description || "",
-        price: combination.price,
-        season: combination.category,
-        tags: combination.tags,
-        image: combination.image,
-      };
-
-      // 投稿を更新
-      await updatePost(parseInt(postId), postData);
-
-      setToastMessage("投稿が更新されました！");
-      setToastType("success");
-      setShowToast(true);
-
-      // 少し遅延してからマイページにリダイレクト
-      setTimeout(() => {
-        router.push("/mypage/posts");
-      }, 1500);
-    } catch (err) {
-      console.error("投稿更新エラー:", err);
-      setToastMessage("投稿の更新中にエラーが発生しました。");
-      setToastType("error");
-      setShowToast(true);
-    }
-  };
+        image: null,
+      }
+    : {};
 
   // ローディング中の表示
   if (authLoading || postLoading) {
@@ -251,205 +147,39 @@ export default function EditPost({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-[#E2D8D8]">
       {/* ヘッダー */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
+      <div className="mt-10">
+        <div className="mb-4">
+          <div className="flex items-center justify-between max-w-4xl mx-auto px-4">
             <button
               onClick={() => router.push("/mypage/posts")}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
               <FontAwesomeIcon icon={faArrowLeft} className="text-gray-600" />
             </button>
-            <h1 className="text-2xl font-bold text-gray-900">投稿を編集</h1>
+            <div
+              className="text-3xl font-bold tracking-wide text-[#5A4A4A]"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
+              投稿編集
+            </div>
+            <div className="w-10"></div> {/* 右側のスペーサー */}
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          {/* タイトル */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              タイトル <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={combination.title}
-              onChange={(e) => handleChange("title", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="毛布のタイトルを入力してください"
-            />
-          </div>
-
-          {/* 説明 */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              説明
-            </label>
-            <textarea
-              value={combination.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="毛布の詳細な説明を入力してください"
-            />
-          </div>
-
-          {/* 価格 */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              価格（円）
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={combination.price || ""}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (
-                  value === "" ||
-                  (parseInt(value) >= 0 && !isNaN(parseInt(value)))
-                ) {
-                  handleChange("price", value ? parseInt(value) : undefined);
-                }
-              }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="価格を入力してください（任意）"
-            />
-          </div>
-
-          {/* カテゴリー */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              カテゴリー <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={combination.category}
-              onChange={(e) => handleChange("category", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">カテゴリーを選択してください</option>
-              <option value="spring">春</option>
-              <option value="summer">夏</option>
-              <option value="autumn">秋</option>
-              <option value="winter">冬</option>
-              <option value="spring-summer">春・夏</option>
-              <option value="autumn-winter">秋・冬</option>
-            </select>
-          </div>
-
-          {/* タグ */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              タグ
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={handleTagKeyPress}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="タグを入力してEnterキーを押してください"
-              />
-              <Button
-                onClick={addTag}
-                size="md"
-                className="px-6"
-                disabled={!tagInput.trim() || tags.includes(tagInput.trim())}
-              >
-                追加
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => removeTag(index)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <FontAwesomeIcon icon={faTimes} />
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* 画像 */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              画像
-            </label>
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {previewUrl && (
-              <div className="mt-4">
-                <img
-                  src={previewUrl}
-                  alt="プレビュー"
-                  className="w-32 h-32 object-cover rounded-lg"
-                />
-              </div>
-            )}
-            {postData?.images?.[0] && !previewUrl && (
-              <div className="mt-4">
-                <p className="text-sm text-gray-600 mb-2">現在の画像:</p>
-                <img
-                  src={postData.images[0]}
-                  alt="現在の画像"
-                  className="w-32 h-32 object-cover rounded-lg"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* エラー表示 */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
-            </div>
-          )}
-
-          {/* ボタン */}
-          <div className="flex gap-4">
-            <Button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
-            >
-              {loading ? "更新中..." : "投稿を更新"}
-            </Button>
-            <Button
-              onClick={() => router.push("/mypage/posts")}
-              variant="outline"
-              className="flex-1"
-            >
-              キャンセル
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* トースト通知 */}
-      <Toast
-        message={toastMessage}
-        type={toastType}
-        isVisible={showToast}
-        onClose={() => setShowToast(false)}
-        duration={5000}
-      />
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        <PostForm
+          initialData={initialData}
+          onSubmit={handleSubmit}
+          loading={loading}
+          error={error}
+          submitButtonText="投稿を更新"
+          showImageUpload={true}
+          currentImageUrl={postData?.images?.[0]}
+        />
+      </main>
     </div>
   );
 }
