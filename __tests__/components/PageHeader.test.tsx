@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 // Mock Next.js Link component
 jest.mock("next/link", () => {
-  return function MockLink({ children, href, ...props }: any) {
+  return function MockLink({ children, href, ...props }: { children: React.ReactNode; href: string; [key: string]: unknown }) {
     return (
       <a href={href} {...props}>
         {children}
@@ -14,7 +14,7 @@ jest.mock("next/link", () => {
 
 // Mock FontAwesome
 jest.mock("@fortawesome/react-fontawesome", () => ({
-  FontAwesomeIcon: ({ icon, className }: any) => (
+  FontAwesomeIcon: ({ icon, className }: { icon: unknown; className?: string }) => (
     <span data-testid="fontawesome-icon" className={className}>
       {icon}
     </span>
