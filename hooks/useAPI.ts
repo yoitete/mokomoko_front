@@ -24,6 +24,9 @@ export const useAPI = () => {
   // トークン付きでAPIリクエストを作成する関数
   const createAuthenticatedRequest = useCallback(async () => {
     try {
+      console.log("createAuthenticatedRequest: token =", token ? "存在" : "なし");
+      console.log("createAuthenticatedRequest: token length =", token?.length || 0);
+      
       const api = axios.create({
         baseURL: API_BASE_URL,
         headers: {

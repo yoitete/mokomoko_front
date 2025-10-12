@@ -19,7 +19,6 @@ import {
   faUser,
   faEnvelope,
   faSave,
-  faArrowLeft,
   faLock,
   faTrash,
   faShieldAlt,
@@ -29,7 +28,7 @@ import {
   faCalendar,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Link from "next/link";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 export default function Settings() {
   const { logout } = useAuth();
@@ -374,20 +373,8 @@ export default function Settings() {
         {/* 設定コンテンツ */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           {/* ヘッダー */}
-          <div className="flex items-center mb-6">
-            <Link href="/mypage" className="mr-4">
-              <FontAwesomeIcon
-                icon={faArrowLeft}
-                className="text-[#7E6565] hover:text-[#6B5555] transition-colors"
-                size="lg"
-              />
-            </Link>
-            <h2
-              className="text-2xl font-semibold text-[#5A4A4A]"
-              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-            >
-              設定
-            </h2>
+          <div className="mb-6">
+            <PageHeader title="設定" backHref="/mypage" />
           </div>
 
           {/* 個人情報セクション */}

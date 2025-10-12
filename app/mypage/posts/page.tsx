@@ -7,8 +7,8 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import Button from "@/components/Button/Button";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faPlus } from "@fortawesome/free-solid-svg-icons";
-import Link from "next/link";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 export default function MyPostsPage() {
   const router = useRouter();
@@ -79,20 +79,8 @@ export default function MyPostsPage() {
     <div className="min-h-screen bg-[#E2D8D8]">
       <div className="mt-10 mx-4 space-y-4">
         {/* ヘッダー */}
-        <div className="flex items-center mb-6">
-          <button onClick={handleGoBack} className="mr-4">
-            <FontAwesomeIcon
-              icon={faArrowLeft}
-              className="text-[#7E6565] hover:text-[#6B5555] transition-colors cursor-pointer"
-              size="lg"
-            />
-          </button>
-          <h2
-            className="text-2xl font-semibold text-[#5A4A4A]"
-            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-          >
-            投稿管理
-          </h2>
+        <div className="mb-6">
+          <PageHeader title="投稿管理" backHref="/mypage" />
         </div>
       </div>
 

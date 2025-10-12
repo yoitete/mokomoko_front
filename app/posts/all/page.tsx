@@ -9,7 +9,8 @@ import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 import Link from "next/link";
 
 interface SearchResponse {
@@ -101,19 +102,8 @@ function AllPostsContent() {
     <div className="min-h-screen bg-[#E2D8D8]">
       <div className="mt-10 mx-4 space-y-4">
         {/* ヘッダー */}
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => router.push("/home")}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} className="text-[#5A4A4A]" />
-          </button>
-          <h1
-            className="text-2xl font-light text-center text-[#5A4A4A]"
-            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-          >
-            投稿一覧
-          </h1>
+        <div className="mb-6">
+          <PageHeader title="投稿一覧" backHref="/home" centerTitle={true} />
         </div>
       </div>
 
