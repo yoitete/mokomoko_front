@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Link from "next/link";
 import { useMyPosts } from "@/hooks/useMyPosts";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import Button from "@/components/Button/Button";
@@ -11,7 +11,6 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 export default function MyPostsPage() {
-  const router = useRouter();
   const { isUnauthenticated, loading } = useCurrentUser();
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 5;
@@ -24,10 +23,6 @@ export default function MyPostsPage() {
     isDeleting,
     error: postsError,
   } = useMyPosts(currentPage, postsPerPage);
-
-  const handleGoBack = useCallback(() => {
-    router.push("/mypage");
-  }, [router]);
 
   // ページ変更時にトップにスクロール
   const handlePageChange = (page: number) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
@@ -24,7 +24,6 @@ interface SearchResponse {
 }
 
 function AllPostsContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { isUnauthenticated, loading: authLoading, userId } = useCurrentUser();
 
