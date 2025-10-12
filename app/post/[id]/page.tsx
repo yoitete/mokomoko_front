@@ -3,13 +3,15 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { Post } from "@/hooks/usePosts";
 import { useGet } from "@/hooks/useSWRAPI";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
+import Button from "@/components/Button/Button";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 export default function PostDetail() {
