@@ -8,9 +8,9 @@ import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import Button from "@/components/Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { PostForm, PostFormData } from "@/components/PostForm/PostForm";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 interface PostUpdateData {
   title: string;
@@ -149,23 +149,9 @@ export default function EditPost({
   return (
     <div className="min-h-screen bg-[#E2D8D8]">
       {/* ヘッダー */}
-      <div className="mt-10">
-        <div className="mb-4">
-          <div className="flex items-center justify-between max-w-4xl mx-auto px-4">
-            <button
-              onClick={() => router.push("/mypage/posts")}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <FontAwesomeIcon icon={faArrowLeft} className="text-gray-600" />
-            </button>
-            <div
-              className="text-3xl font-bold tracking-wide text-[#5A4A4A]"
-              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-            >
-              投稿編集
-            </div>
-            <div className="w-10"></div> {/* 右側のスペーサー */}
-          </div>
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="mb-6">
+          <PageHeader title="投稿編集" backHref="/mypage/posts" />
         </div>
       </div>
 

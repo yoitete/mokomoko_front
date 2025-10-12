@@ -1,5 +1,6 @@
 import { useGet } from "./useSWRAPI";
 import { useAPI } from "./useAPI";
+import { useAuth } from "./useAuth";
 import { Post } from "./usePosts";
 import { mutate } from "swr";
 import { useState } from "react";
@@ -15,6 +16,13 @@ interface MyPostsResponse {
 }
 
 export const useMyPosts = (page: number = 1, perPage: number = 5) => {
+  const { isAuthenticated, token } = useAuth();
+
+  // 認証状態をデバッグ
+  console.log("useMyPosts: isAuthenticated =", isAuthenticated);
+  console.log("useMyPosts: token =", token ? "存在" : "なし");
+
+  // Hooksを先に呼び出す（条件分岐の前）
   const {
     data: response,
     error,
@@ -23,13 +31,19 @@ export const useMyPosts = (page: number = 1, perPage: number = 5) => {
     requireAuth: true,
   });
 
-  const posts = response?.posts || [];
-  const pagination = response?.pagination;
-
   const { delete: deleteAPI } = useAPI();
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // 認証されていない場合は空のデータを返す（Hooksの後）
+  const posts = response?.posts || [];
+  const pagination = response?.pagination;
+
   const handleDeletePost = async (postId: number) => {
+    if (!isAuthenticated) {
+      console.log("useMyPosts: 認証されていないため、削除を実行できません");
+      return { success: false, error: "認証が必要です" };
+    }
+
     setIsDeleting(true);
     try {
       await deleteAPI(`/posts/${postId}`);

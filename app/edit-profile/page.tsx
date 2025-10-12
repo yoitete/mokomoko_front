@@ -18,12 +18,11 @@ import {
   faDog,
   faStar,
   faLeaf,
-  faArrowLeft,
   faSave,
   faPaw,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Link from "next/link";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 export default function EditProfile() {
   const profile = useAtomValue(profileAtom);
@@ -194,26 +193,20 @@ export default function EditProfile() {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          {/* ヘッダー */}
-          <div className="flex items-center mb-6">
-            <Link href="/mypage" className="mr-4">
-              <FontAwesomeIcon
-                icon={faArrowLeft}
-                className="text-[#7E6565] hover:text-[#6B5555] transition-colors cursor-pointer"
-                size="lg"
-              />
-            </Link>
-            <h2
-              className="text-2xl font-semibold text-[#5A4A4A]"
-              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-            >
-              プロフィール編集
-            </h2>
-          </div>
+    <div className="min-h-screen px-4 py-8">
+      {/* ヘッダー */}
+      <div className="max-w-md mx-auto">
+        <div className="mb-6">
+          <PageHeader
+            title="プロフィール編集"
+            backHref="/mypage"
+            centerTitle={true}
+          />
+        </div>
+      </div>
 
+      <div className="max-w-md mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-6">
           {/* プロフィール画像とニックネーム */}
           <div className="flex items-center mb-6">
             <ProfileImage
