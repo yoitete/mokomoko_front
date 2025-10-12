@@ -3,15 +3,16 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { Post } from "@/hooks/usePosts";
 import { useGet } from "@/hooks/useSWRAPI";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
-import Link from "next/link";
 import Button from "@/components/Button/Button";
+import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 export default function PostDetail() {
   const params = useParams();
@@ -111,29 +112,7 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-[#E2D8D8]">
       {/* ヘッダー */}
-      <div className="mt-10">
-        <div className="mb-4">
-          <div className="mt-5 flex items-center justify-between">
-            <button
-              onClick={() => window.history.back()}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <FontAwesomeIcon
-                icon={faArrowLeft}
-                className="text-[#5A4A4A]"
-                size="lg"
-              />
-            </button>
-            <h1
-              className="text-3xl font-bold tracking-wide text-center text-[#5A4A4A]"
-              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-            >
-              投稿詳細
-            </h1>
-            <div className="w-10"></div> {/* 右側のスペーサー */}
-          </div>
-        </div>
-      </div>
+      <PageHeader title="投稿詳細" backHref="/home" centerTitle={true} />
 
       <div className="max-w-4xl mx-auto p-4">
         {/* 投稿内容 */}
