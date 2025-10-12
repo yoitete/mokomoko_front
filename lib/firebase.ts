@@ -2,14 +2,18 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-// 開発環境と本番環境の設定を分岐
+// Firebase設定（開発環境と本番環境で統一）
 const getFirebaseConfig = () => {
-  // 本番環境の設定（環境変数が設定されている場合）
+  // 環境変数が正しく設定されている場合のみ使用
   if (
     process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
-    process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== "dummy-api-key"
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== "dummy-api-key" &&
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID &&
+    process.env.NEXT_PUBLIC_FIREBASE_APP_ID
   ) {
-    console.log("🔧 本番環境のFirebase設定を使用");
+    console.log("🔧 環境変数からFirebase設定を使用");
     return {
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
       authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -21,16 +25,16 @@ const getFirebaseConfig = () => {
     };
   }
 
-  // 開発環境の設定（Firebase Consoleから取得した実際の値を使用）
-  console.log("🔧 開発環境のFirebase設定を使用");
+  // デフォルト設定（開発環境と本番環境で統一）
+  console.log("🔧 デフォルトFirebase設定を使用");
   return {
     apiKey: "AIzaSyDWvJMpHDw8kayI4Lr4gN3sm-3FBSKCHHs",
     authDomain: "mokomoko-2ac26.firebaseapp.com",
     projectId: "mokomoko-2ac26",
     storageBucket: "mokomoko-2ac26.appspot.com",
-    messagingSenderId: "963617085321", // 実際の値に更新
-    appId: "1:963617085321:web:c8f1371dc10af2bf", // 実際の値に更新
-    measurementId: "G-XXXXXXXXXX", // Firebase Consoleから取得した実際の値に置き換えてください（オプション）
+    messagingSenderId: "963617085321",
+    appId: "1:963617085321:web:c8f1371dc10af2bf",
+    measurementId: "G-XXXXXXXXXX",
   };
 };
 
@@ -44,6 +48,12 @@ console.log("  projectId:", firebaseConfig.projectId);
 console.log("  messagingSenderId:", firebaseConfig.messagingSenderId);
 console.log("  appId:", firebaseConfig.appId?.substring(0, 20) + "...");
 console.log("  storageBucket:", firebaseConfig.storageBucket);
+console.log("  Environment:", process.env.NODE_ENV);
+console.log("  Has env vars:", {
+  hasApiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  hasAuthDomain: !!process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  hasProjectId: !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+});
 
 // Firebase設定の型定義
 interface FirebaseConfig {
