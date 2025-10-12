@@ -369,15 +369,15 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-[#E2D8D8] px-4 pb-8 pt-2">
+      {/* ヘッダー */}
+      <div className="max-w-md mx-auto pb-8">
+        <PageHeader title="設定" backHref="/mypage" />
+      </div>
+
+      <div className="max-w-md mx-auto">
         {/* 設定コンテンツ */}
         <div className="bg-white rounded-lg shadow-lg p-6">
-          {/* ヘッダー */}
-          <div className="mb-6">
-            <PageHeader title="設定" backHref="/mypage" />
-          </div>
-
           {/* 個人情報セクション */}
           <div className="space-y-6">
             <div>

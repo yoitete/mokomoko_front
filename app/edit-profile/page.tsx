@@ -193,16 +193,10 @@ export default function EditProfile() {
   ];
 
   return (
-    <div className="min-h-screen px-4 py-8">
+    <div className="min-h-screen bg-[#E2D8D8] px-4 py-8">
       {/* ヘッダー */}
       <div className="max-w-md mx-auto">
-        <div className="mb-6">
-          <PageHeader
-            title="プロフィール編集"
-            backHref="/mypage"
-            centerTitle={true}
-          />
-        </div>
+        <PageHeader title="プロフィール編集" backHref="/mypage" />
       </div>
 
       <div className="max-w-md mx-auto">
