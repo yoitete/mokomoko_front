@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAPI } from "@/hooks/useAPI";
-import { useSeasonalCampaigns } from "@/hooks/useSeasonalCampaign";
+// import { useSeasonalCampaigns } from "@/hooks/useSeasonalCampaign"; // 一時的に無効化
 import {
   seasonalCampaigns,
   secondSeasonalCampaigns,
@@ -47,22 +47,30 @@ export default function Settings() {
     () => [...seasonalCampaigns, ...secondSeasonalCampaigns],
     []
   );
-  const {
-    data: apiCampaigns,
-    mutate: mutateCampaigns,
-    isLoading: campaignsLoading,
-  } = useSeasonalCampaigns();
+  // 一時的にAPI呼び出しを無効化して静的データのみを使用
+  // const {
+  //   data: apiCampaigns,
+  //   mutate: mutateCampaigns,
+  //   isLoading: campaignsLoading,
+  //   error: campaignsError,
+  // } = useSeasonalCampaigns();
 
-  // API側のデータが利用可能な場合はそれを使用、そうでなければ静的データを使用
-  const campaigns =
-    apiCampaigns && apiCampaigns.length > 0 ? apiCampaigns : allStaticCampaigns;
+  // 静的データのみを使用（API呼び出しを一時的に無効化）
+  const campaigns = allStaticCampaigns;
+  const campaignsError = null;
+  const campaignsLoading = false;
+  const isApiDataAvailable = false;
 
-  // API側のデータが利用可能かどうか
-  const isApiDataAvailable = apiCampaigns && apiCampaigns.length > 0;
-
-  // 現在のキャンペーンデータ（API側のデータのみ使用）
+  // 現在のキャンペーンデータ（静的データのみ使用）
   const currentCampaigns = campaigns;
   const [isLoading, setIsLoading] = useState(false);
+
+  // デバッグ用：エラーが発生した場合のログ出力
+  useEffect(() => {
+    if (campaignsError) {
+      console.error("Seasonal campaigns API error:", campaignsError);
+    }
+  }, [campaignsError]);
 
   const [, setSuccessMessage] = useState("");
   const [name, setName] = useState("");
@@ -226,7 +234,7 @@ export default function Settings() {
       await put(`/seasonal_campaigns/${campaignId}`, {
         seasonal_campaign: { active: !currentActive },
       });
-      mutateCampaigns(); // データ再取得
+      // mutateCampaigns(); // データ再取得（一時的に無効化）
       setToastMessage(`特集を${!currentActive ? "有効" : "無効"}にしました`);
       setToastType("success");
       setShowToast(true);
@@ -265,7 +273,7 @@ export default function Settings() {
           end_month: endMonth,
         },
       });
-      mutateCampaigns(); // データ再取得
+      // mutateCampaigns(); // データ再取得（一時的に無効化）
       setToastMessage("特集期間を更新しました");
       setToastType("success");
       setShowToast(true);
@@ -303,7 +311,7 @@ export default function Settings() {
           highlight_color: colorTheme,
         },
       });
-      mutateCampaigns(); // データ再取得
+      // mutateCampaigns(); // データ再取得（一時的に無効化）
       setToastMessage("カラーテーマを更新しました");
       setToastType("success");
       setShowToast(true);

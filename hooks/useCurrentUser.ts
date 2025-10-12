@@ -18,13 +18,13 @@ export const useCurrentUser = () => {
     isLoading: userDataLoading,
   } = useUserByFirebaseUID(user?.uid || null);
 
-  // デバッグログ（必要に応じてコメントアウト）
-  // console.log("useCurrentUser - Firebase User:", user);
-  // console.log("useCurrentUser - Firebase UID:", user?.uid);
-  // console.log("useCurrentUser - API User Data:", userData);
-  // console.log("useCurrentUser - User ID:", userData?.id);
-  // console.log("useCurrentUser - Loading states:", { authLoading, userDataLoading });
-  // console.log("useCurrentUser - Error:", userError);
+  // デバッグログ
+  console.log("useCurrentUser - Firebase User:", user);
+  console.log("useCurrentUser - Firebase UID:", user?.uid);
+  console.log("useCurrentUser - API User Data:", userData);
+  console.log("useCurrentUser - User ID:", userData?.id);
+  console.log("useCurrentUser - Loading states:", { authLoading, userDataLoading });
+  console.log("useCurrentUser - Error:", userError);
 
   return {
     // Firebase認証情報

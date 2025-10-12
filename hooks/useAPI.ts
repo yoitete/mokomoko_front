@@ -24,9 +24,15 @@ export const useAPI = () => {
   // トークン付きでAPIリクエストを作成する関数
   const createAuthenticatedRequest = useCallback(async () => {
     try {
-      console.log("createAuthenticatedRequest: token =", token ? "存在" : "なし");
-      console.log("createAuthenticatedRequest: token length =", token?.length || 0);
-      
+      console.log(
+        "createAuthenticatedRequest: token =",
+        token ? "存在" : "なし"
+      );
+      console.log(
+        "createAuthenticatedRequest: token length =",
+        token?.length || 0
+      );
+
       const api = axios.create({
         baseURL: API_BASE_URL,
         headers: {
@@ -84,22 +90,24 @@ export const useAPI = () => {
           console.log("API 404:", API_BASE_URL + url);
         } else {
           // より詳細なエラー情報を取得
+          const axiosError = error as AxiosError;
           const errorInfo: ErrorInfo = {
             url: API_BASE_URL + url,
             errorType: error?.constructor?.name || "Unknown",
             message: (error as Error)?.message || "No message",
-            code: (error as AxiosError)?.code || "No code",
-            status: (error as AxiosError)?.response?.status || "No status",
-            statusText:
-              (error as AxiosError)?.response?.statusText || "No status text",
-            responseData:
-              (error as AxiosError)?.response?.data || "No response data",
-            isNetworkError: !(error as AxiosError)?.response,
-            isTimeout: (error as AxiosError)?.code === "ECONNABORTED",
-            isConnectionRefused: (error as AxiosError)?.code === "ECONNREFUSED",
+            code: axiosError?.code || "No code",
+            status: axiosError?.response?.status || "No status",
+            statusText: axiosError?.response?.statusText || "No status text",
+            responseData: axiosError?.response?.data || "No response data",
+            isNetworkError: !axiosError?.response,
+            isTimeout: axiosError?.code === "ECONNABORTED",
+            isConnectionRefused: axiosError?.code === "ECONNREFUSED",
           };
 
           console.error("API Error Details:", errorInfo);
+          console.error("Raw Error Object:", error);
+          console.error("Error Type:", typeof error);
+          console.error("Error Constructor:", error?.constructor?.name);
 
           // ネットワークエラーの場合は追加の診断情報を表示
           if (errorInfo.isNetworkError) {
