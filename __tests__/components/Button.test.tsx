@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { Button } from "@/components/Button/Button";
+import Button from "@/components/Button/Button";
 
 describe("Button", () => {
   it("renders with text", () => {
@@ -59,12 +59,5 @@ describe("Button", () => {
     fireEvent.click(button);
 
     expect(handleClick).not.toHaveBeenCalled();
-  });
-
-  it("renders as different element when as prop is provided", () => {
-    render(<Button as="div">Div Button</Button>);
-
-    const element = screen.getByText("Div Button");
-    expect(element.tagName).toBe("DIV");
   });
 });

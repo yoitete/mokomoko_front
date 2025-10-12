@@ -7,7 +7,6 @@ import { usePosts } from "@/hooks/usePosts";
 import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import Button from "@/components/Button/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { PostForm, PostFormData } from "@/components/PostForm/PostForm";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
