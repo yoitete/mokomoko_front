@@ -39,8 +39,24 @@ export const useAuth = (): {
       setError(null);
       try {
         await signInWithEmailAndPassword(auth, email, password);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "ログインに失敗しました");
+      } catch (err: any) {
+        console.error("Firebase認証エラー:", err);
+        
+        // エラーメッセージを日本語に変換
+        let errorMessage = "ログインに失敗しました";
+        if (err.code === "auth/invalid-credential") {
+          errorMessage = "メールアドレスまたはパスワードが正しくありません";
+        } else if (err.code === "auth/user-not-found") {
+          errorMessage = "このメールアドレスのユーザーが見つかりません";
+        } else if (err.code === "auth/wrong-password") {
+          errorMessage = "パスワードが正しくありません";
+        } else if (err.code === "auth/too-many-requests") {
+          errorMessage = "ログイン試行回数が多すぎます。しばらく待ってから再試行してください";
+        } else if (err.code === "auth/network-request-failed") {
+          errorMessage = "ネットワークエラーが発生しました。接続を確認してください";
+        }
+        
+        setError(errorMessage);
         throw err;
       } finally {
         setLoading(false);

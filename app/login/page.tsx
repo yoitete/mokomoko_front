@@ -64,7 +64,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await signIn("admin@guest.com", "guest123");
+      await signIn("admin@guest.com", "33443344");
       // 成功時はuseEffectでリダイレクトされる
     } catch {
       setToastMessage("ゲストログインに失敗しました。");
