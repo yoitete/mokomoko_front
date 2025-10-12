@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/PageHeader/PageHeader";
 
 // Mock Next.js Link component
 jest.mock("next/link", () => {
-  return function MockLink({ children, href, ...props }) {
+  return function MockLink({ children, href, ...props }: any) {
     return (
       <a href={href} {...props}>
         {children}
@@ -14,7 +14,7 @@ jest.mock("next/link", () => {
 
 // Mock FontAwesome
 jest.mock("@fortawesome/react-fontawesome", () => ({
-  FontAwesomeIcon: ({ icon, className }) => (
+  FontAwesomeIcon: ({ icon, className }: any) => (
     <span data-testid="fontawesome-icon" className={className}>
       {icon}
     </span>
@@ -23,57 +23,34 @@ jest.mock("@fortawesome/react-fontawesome", () => ({
 
 describe("PageHeader", () => {
   it("renders with title", () => {
-    render(<PageHeader title="Test Title" />);
+    render(<PageHeader title="Test Title" backHref="/home" />);
 
     expect(screen.getByText("Test Title")).toBeInTheDocument();
   });
 
-  it("renders with back button when showBackButton is true", () => {
-    const mockOnBack = jest.fn();
+  it("renders with back button", () => {
     render(
       <PageHeader
         title="Test Title"
-        showBackButton={true}
-        onBack={mockOnBack}
+        backHref="/home"
       />
     );
 
-    const backButton = screen.getByRole("button");
+    const backButton = screen.getByRole("link");
     expect(backButton).toBeInTheDocument();
     expect(screen.getByTestId("fontawesome-icon")).toBeInTheDocument();
   });
 
-  it("calls onBack when back button is clicked", () => {
-    const mockOnBack = jest.fn();
-    render(
-      <PageHeader
-        title="Test Title"
-        showBackButton={true}
-        onBack={mockOnBack}
-      />
-    );
-
-    const backButton = screen.getByRole("button");
-    backButton.click();
-
-    expect(mockOnBack).toHaveBeenCalledTimes(1);
-  });
-
   it("renders with custom className", () => {
-    render(<PageHeader title="Test Title" className="custom-class" />);
+    render(<PageHeader title="Test Title" backHref="/home" className="custom-class" />);
 
     const header = screen.getByRole("banner");
     expect(header).toHaveClass("custom-class");
   });
 
-  it("renders children when provided", () => {
-    render(
-      <PageHeader title="Test Title">
-        <div data-testid="child-content">Child Content</div>
-      </PageHeader>
-    );
+  it("renders with centerTitle when true", () => {
+    render(<PageHeader title="Test Title" backHref="/home" centerTitle={true} />);
 
-    expect(screen.getByTestId("child-content")).toBeInTheDocument();
-    expect(screen.getByText("Child Content")).toBeInTheDocument();
+    expect(screen.getByText("Test Title")).toBeInTheDocument();
   });
 });
