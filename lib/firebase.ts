@@ -20,19 +20,73 @@ const getFirebaseConfig = () => {
     };
   }
 
-  // 開発環境の設定（実際のFirebase設定に置き換えてください）
+  // 開発環境の設定（Firebase Consoleから取得した実際の値を使用）
   return {
-    apiKey: "実際のAPIキーをここに貼り付けてください",
+    apiKey: "AIzaSyDWvJMpHDw8kayI4Lr4gN3sm-3FBSKCHHs",
     authDomain: "mokomoko-2ac26.firebaseapp.com",
     projectId: "mokomoko-2ac26",
     storageBucket: "mokomoko-2ac26.appspot.com",
-    messagingSenderId: "実際のMessagingSenderIdをここに貼り付けてください",
-    appId: "実際のAppIdをここに貼り付けてください",
-    measurementId: "実際のMeasurementIdをここに貼り付けてください",
+    messagingSenderId: "123456789012", // Firebase Consoleから取得した実際の値に置き換えてください
+    appId: "1:123456789012:web:abcdef1234567890", // Firebase Consoleから取得した実際の値に置き換えてください
+    measurementId: "G-XXXXXXXXXX", // Firebase Consoleから取得した実際の値に置き換えてください（オプション）
   };
 };
 
 const firebaseConfig = getFirebaseConfig();
+
+// デバッグ用：Firebase設定をログ出力
+console.log("🔍 Firebase設定詳細:");
+console.log("  apiKey:", firebaseConfig.apiKey?.substring(0, 10) + "...");
+console.log("  authDomain:", firebaseConfig.authDomain);
+console.log("  projectId:", firebaseConfig.projectId);
+console.log("  messagingSenderId:", firebaseConfig.messagingSenderId);
+console.log("  appId:", firebaseConfig.appId?.substring(0, 20) + "...");
+console.log("  storageBucket:", firebaseConfig.storageBucket);
+
+// Firebase設定の検証
+const validateFirebaseConfig = (config: any) => {
+  const requiredFields = [
+    "apiKey",
+    "authDomain",
+    "projectId",
+    "messagingSenderId",
+    "appId",
+  ];
+
+  // ダミー値や不完全な値をチェック
+  const dummyValues = [
+    "123456789012",
+    "1:123456789012:web:abcdef1234567890",
+    "G-XXXXXXXXXX",
+    "実際の",
+  ];
+
+  const invalidFields = requiredFields.filter(
+    (field) =>
+      !config[field] ||
+      config[field].includes("実際の") ||
+      dummyValues.some((dummy) => config[field].includes(dummy))
+  );
+
+  if (invalidFields.length > 0) {
+    console.error("❌ Firebase設定に無効な値があります:", invalidFields);
+    console.error("🔧 Firebase Consoleから正しい値を取得して設定してください");
+    console.error("📋 必要な設定値:");
+    console.error(
+      "  - messagingSenderId: Firebase Console → プロジェクト設定 → 全般 → MessagingSenderId"
+    );
+    console.error(
+      "  - appId: Firebase Console → プロジェクト設定 → 全般 → AppId"
+    );
+    console.error(
+      "  - measurementId: Firebase Console → プロジェクト設定 → 全般 → MeasurementId (オプション)"
+    );
+  } else {
+    console.log("✅ Firebase設定は正常です");
+  }
+};
+
+validateFirebaseConfig(firebaseConfig);
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

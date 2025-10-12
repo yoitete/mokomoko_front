@@ -64,10 +64,61 @@ export default function Login() {
     setIsLoading(true);
 
     try {
+      console.log("ゲストログイン試行: admin@guest.com");
+      console.log("ゲストユーザー情報:");
+      console.log("  - ID: admin@guest.com");
+      console.log("  - UID: 7AvuE3bjD6ZASXMZKxTfewsWsIO2");
+      console.log("  - パスワード: 33443344");
+
       await signIn("admin@guest.com", "33443344");
+      console.log("ゲストログイン成功");
       // 成功時はuseEffectでリダイレクトされる
-    } catch {
-      setToastMessage("ゲストログインに失敗しました。");
+    } catch (error: unknown) {
+      console.error("ゲストログインエラーの詳細:", error);
+
+      let errorMessage = "ゲストログインに失敗しました。";
+
+      // Firebase認証エラーの型チェック
+      if (error && typeof error === "object" && "code" in error) {
+        const firebaseError = error as { code: string; message: string };
+        console.error("エラーコード:", firebaseError.code);
+        console.error("エラーメッセージ:", firebaseError.message);
+
+        if (firebaseError.code === "auth/invalid-credential") {
+          errorMessage =
+            "ゲストユーザーが存在しないか、パスワードが正しくありません。\n\n" +
+            "ゲストユーザー情報:\n" +
+            "  - ID: admin@guest.com\n" +
+            "  - UID: 7AvuE3bjD6ZASXMZKxTfewsWsIO2\n" +
+            "  - パスワード: 33443344\n\n" +
+            "解決方法:\n" +
+            "1. Firebase Consoleでゲストユーザー（admin@guest.com）を作成\n" +
+            "2. パスワードを「33443344」に設定\n" +
+            "3. または新規アカウント作成から始める";
+        } else if (firebaseError.code === "auth/user-not-found") {
+          errorMessage =
+            "ゲストユーザー（admin@guest.com）が見つかりません。\n\n" +
+            "解決方法:\n" +
+            "1. Firebase Consoleでユーザーを作成\n" +
+            "2. または新規アカウント作成から始める";
+        } else if (firebaseError.code === "auth/wrong-password") {
+          errorMessage =
+            "パスワードが正しくありません。\n\n" +
+            "正しいパスワード: 33443344\n\n" +
+            "解決方法:\n" +
+            "1. Firebase Consoleでパスワードをリセット\n" +
+            "2. または新規アカウント作成から始める";
+        } else if (firebaseError.code === "auth/network-request-failed") {
+          errorMessage =
+            "ネットワークエラーが発生しました。\n\n" +
+            "解決方法:\n" +
+            "1. インターネット接続を確認\n" +
+            "2. Firebase設定を確認\n" +
+            "3. しばらく待ってから再試行";
+        }
+      }
+
+      setToastMessage(errorMessage);
       setToastType("error");
       setShowToast(true);
     } finally {

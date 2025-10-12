@@ -37,7 +37,7 @@ export default function Header() {
 
   const handleGuestLogin = async () => {
     try {
-      await signIn("admin@guest.com", "33443344");
+      await signIn("admin@guest.com", "123456");
       setShowMenu(false);
     } catch (error) {
       console.error("ゲストログインに失敗しました:", error);
