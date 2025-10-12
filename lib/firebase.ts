@@ -43,9 +43,20 @@ console.log("  messagingSenderId:", firebaseConfig.messagingSenderId);
 console.log("  appId:", firebaseConfig.appId?.substring(0, 20) + "...");
 console.log("  storageBucket:", firebaseConfig.storageBucket);
 
+// Firebase設定の型定義
+interface FirebaseConfig {
+  apiKey?: string;
+  authDomain?: string;
+  projectId?: string;
+  storageBucket?: string;
+  messagingSenderId?: string;
+  appId?: string;
+  measurementId?: string;
+}
+
 // Firebase設定の検証
-const validateFirebaseConfig = (config: any) => {
-  const requiredFields = [
+const validateFirebaseConfig = (config: FirebaseConfig) => {
+  const requiredFields: (keyof FirebaseConfig)[] = [
     "apiKey",
     "authDomain",
     "projectId",
@@ -61,12 +72,14 @@ const validateFirebaseConfig = (config: any) => {
     "実際の",
   ];
 
-  const invalidFields = requiredFields.filter(
-    (field) =>
-      !config[field] ||
-      config[field].includes("実際の") ||
-      dummyValues.some((dummy) => config[field].includes(dummy))
-  );
+  const invalidFields = requiredFields.filter((field) => {
+    const value = config[field];
+    return (
+      !value ||
+      value.includes("実際の") ||
+      dummyValues.some((dummy) => value.includes(dummy))
+    );
+  });
 
   if (invalidFields.length > 0) {
     console.error("❌ Firebase設定に無効な値があります:", invalidFields);
