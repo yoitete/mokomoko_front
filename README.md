@@ -10,7 +10,7 @@
 
 #### ポートフォリオは以下からアクセスできます↓
 
-https://moko-moko.link
+https://moko-moko.link/home
 
 （ **9:00 〜 21:00** の間のみ稼働しています）
 
