@@ -1,36 +1,382 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ◆ はじめに
 
-## Getting Started
+はじめまして！yoiteteと申します。
 
-First, run the development server:
+リポジトリをご覧いただきありがとうございます。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+こちらはポートフォリオの**フロントエンド**側のリポジトリです。
+（バックエンドのリポジトリは[こちら](https://github.com/yoitete/mokomoko_api)です。)
+
+
+#### ポートフォリオは以下からアクセスできます↓
+
+https://moko-moko.link
+
+（ **9:00 〜 21:00** の間のみ稼働しています）
+
+## 1.ポートフォリオの紹介
+### (1) 概要
+  - "MokoMoko"は、自分のお気に入りの毛布を投稿し、ほかのユーザーと共有できるサービスです。
+  - 理想の毛布を検索や人気ランキングから探すことができます。
+___
+### (2) 使用イメージ
+- 「投稿ページ」
+  - お気に入りの毛布を写真付きで紹介し、素材や肌触りを投稿できる機能です。
+- 「検索ページ」
+  - 検索・ランキング機能：人気の毛布や、タグ（`#クリスマスプレゼント` `#ふわふわ` など）から理想の毛布を探せます。
+  - 並べ替え機能（投稿日順・人気順）を使って、自分の好みに合わせた整理も可能です。
+- 「お気に入りページ」
+  - 自分が気に入った投稿をお気に入りに保存することでいつでもすぐに見直せる機能です。
+  - 保存した毛布の投稿は一覧で見られ、カテゴリーや季節に合わせていつでも見返すことができます
+  
+
+
+### (3) サービス開発の背景
+- 私はふわふわした肌触りのものが好きで、特に毛布の触り心地は睡眠の質にも影響すると感じています。
+  しかし、毛布を購入する際に「実際の触り心地」や「素材ごとの違い」などを比較できる情報は少なく、
+  感覚的な部分を事前に知ることが難しいと感じていました。
+
+- そこで、布団ではなく毛布に特化し、ユーザー同士が写真や感想を投稿・共有できるサービスがあれば、
+  実際に買いに行く前に理想の毛布をピックアップできるのではないかと考えました。
+
+- "MokoMoko もこもこで見つける小さな幸せ"は、毛布の“もこもこ”を通して、日常の中に小さな幸せを見つけてもらえるような体験を提供したいという想いで開発を始めました。
+___
+### （４） 使用技術
+
+1. **フロントエンド**
+  - React_[ver.19.0.0]
+  - Next.js_[ver.15.5.3]
+  - TypeScript_[ver.5.x]
+  - TailwindCSS（スタイリング）
+  - SWR（データフェッチング）
+  - Axios（HTTP通信）
+     
+2. **バックエンド**
+  - Ruby on Rails_[ver.8.0.2]（APIモード）
+  - MySQL
+  - Rubocop（コード整形）
+    　
+     
+4. **開発環境**
+  - Docker / Docker Compose
+    　
+     
+5. **インフラ**
+  - AWS（ECS Fargate、RDS、S3、VPC Endpoint）
+  - GitHub Actions（CI/CD）
+  - AWS CloudWatch（監視）
+    　
+     
+6. **セキュリティ**
+  - Firebase Authentication（ユーザー認証）
+
+___
+### (5) 主な実装機能
+- **投稿検索**
+    - 複数キーワード検索
+    - タグ検索
+    　
+     
+- **新着投稿**
+    - 画像登録
+    - カテゴリー選択
+    - 価格入力欄
+    - 説明入力欄
+    - タグ追加(制限なし)
+    　
+     
+- **詳細情報**
+    - 他のユーザが投稿しているものを表示
+    - 画像クリックまたは投稿説明の続きはこちらをクリックで投稿詳細情報表示
+    - 投稿日表示
+    　
+     
+- **自分の投稿一覧**　
+    - 自分が作成した投稿を一覧表示。
+    - 自分が作成した投稿は、内容の編集と削除が可能。
+
+
+- **マイページ
+    - アイコン・ニックネーム変更可能。  
+
+  
+- **お気に入り登録**
+    - 1レシピに対し、1ユーザーは1つまで登録可能。
+    - お気に入り総数を表示。
+    - 画像クリックで詳細情報表示
+    　
+     
+- **人気ランキング**
+    - お気に入り総数の上位10件を表示し、順位をナンバリング。
+    - 上位3件については王冠を表示。
+    - それ以降は全て表示から一覧表示
+    　
+     
+- 　**新着一覧**
+    - 作成日の新しい６件を表示。
+    - それ以降は全て表示からページネーションで5件表示
+    　
+     
+- 　**ユーザー認証（FireBase）**
+    - メールアドレスとパスワードはデータベースではなくFireBase上に保存しセキュリティを強固にする。
+    - メール認証（新規登録・ログイン）
+    - ゲストログイン機能
+    - ゲストユーザーのみイベント投稿管理機能使用可能(設定より表示)
+    
+-   **設定
+    - 設定より登録ユーザー名・アドレスの設定変更が可能。
+    - イベント投稿表示の変更が可能。(ゲストユーザーのみ)
+___
+### (6) 構成図など
+#### 1. インフラ構成図
+
+<img width="1298" height="820" alt="スクリーンショット 2025-10-11 0 06 20" src="https://github.com/user-attachments/assets/23ec6ea9-a610-43a4-ae2c-ab7a92dcea0b" />
+
+
+#### 2. ER図
+# ER Diagram
+
+```mermaid
+erDiagram
+    users {
+        int id PK
+        string firebase_uid
+        string name
+        string nickname
+        text bio
+        string profile_image
+        string selected_icon
+        datetime created_at
+        datetime updated_at
+    }
+    
+    posts {
+        int id PK
+        int user_id FK
+        string title
+        int price
+        string description
+        string season
+        text tags
+        int favorites_count
+        datetime created_at
+        datetime updated_at
+    }
+    
+    tags {
+        int id PK
+        int post_id FK
+        string name
+        datetime created_at
+        datetime updated_at
+    }
+    
+    favorites {
+        int id PK
+        int user_id FK
+        int post_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    
+    seasonal_campaigns {
+        int id PK
+        string name
+        text description
+        text subtitle
+        string color_theme
+        int start_month
+        int end_month
+        string link_path
+        string button_text
+        text highlight_text
+        string highlight_color
+        boolean active
+        string campaign_type
+        datetime created_at
+        datetime updated_at
+    }
+    
+    users ||--o{ posts : "creates"
+    users ||--o{ favorites : "likes"
+    posts ||--o{ tags : "has"
+    posts ||--o{ favorites : "receives"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### 3.当初のデザイン案（figma）
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+<img width="928" height="594" alt="スクリーンショット 2025-10-11 23 29 59" src="https://github.com/user-attachments/assets/2ff406f8-b5aa-4e61-902a-6f44fa7db440" />
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+___
+### (7) 特にこだわった点
+- ユーザーが直感的に操作できるよう、操作説明がなくても迷わず使えるUI/UXを目指し、何度も修正と検証を重ねた。
+- また、UI全体から「癒し」を感じられる空間を演出するため、色合いやフォントの統一感を持たせた。
+- さらに、ゲストユーザーのみがイベント投稿・管理機能を利用できるようにすることで、利用目的に応じた柔軟なアクセス制御を実現した。
+___
+## 2. 技術の選定
+技術選定で意識したことと、主な技術の選定理由は以下の通りです。
+### （１） 意識したこと
 
-## Learn More
+- **モダンな技術を採用する。**
+    - Web業界は次々と新しい技術が登場するため、常にキャッチアップが欠かせない。
+      そのため、基盤となるモダンな技術を学ぶことが、新しい技術に柔軟に順応する力の習得につながると考えている。
+      
+    - また、モダンな技術は今後さらに開発現場での採用が進むと予想される。
+      より実践に近い技術を学ぶことで、早い段階から現場で活かせる力の獲得を目指している。
+    　
+     
+- **情報が多く学びやすい技術を採用する。**
+    - プログラミング初学者はエラーなどにつまずくことが多い。
+      情報が豊富な技術を選ぶことで、自己解決が容易になり、学習や開発のハードルを下げられると判断した。
+      
+    - さらに、多くの開発者に利用されている技術であれば、周辺ツールやライブラリも充実しており、開発効率の向上も期待できる。
+___
+### （２） 主な技術の選定理由
+1. **フロントエンド**
 
-To learn more about Next.js, take a look at the following resources:
+### **React / Next.js**
+- **使用用途**: フロントエンドのライブラリおよびフレームワークとして使用。SPAで運用
+- **比較対象**: Vue.js / Nuxt.js
+- **採用理由**: 
+  - Reactはコンポーネントベースの開発が可能で再利用性が高い
+  - コンポーネントの親子関係が明確で、Vue.jsと比較しても大規模なアプリケーションでも管理がしやすい
+  - Next.jsはファイルベースルーティングが可能で効率的に開発可能な他、SSRでの運用等も可能となる
+  - 今回はユーザーにストレスフリーでスムーズな操作性を目的としたため、差分レンダリングであるSPAで運用している
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### **TypeScript**
+- **使用用途**: フロントエンドの開発言語
+- **比較対象**: JavaScript
+- **採用理由**:
+  - 既存のJavaScriptコードをそのまま利用することができる上で、静的型付けが可能
+  - 変数や関数の型を事前に指定することで、バグの早期発見やコードの可読性や安全性が向上する
+  - 大規模なアプリケーション開発において、型安全性により保守性が向上する
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### **TailwindCSS**
+- **使用用途**: CSSフレームワークとして使用
+- **比較対象**: Bootstrap、Material-UI
+- **採用理由**: 
+  - 事前に定義された多くのクラスを使用することで、開発効率が向上する
+  - カスタマイズ性と柔軟性が高いため、あらゆるデザインに対応できる
+  - ユーティリティファーストのアプローチにより、一貫したデザインシステムを構築できる
+  - バンドルサイズの最適化により、不要なCSSが含まれない
 
-## Deploy on Vercel
+### **SWR**
+- **使用用途**: データフェッチングライブラリ
+- **比較対象**: React Query、Apollo Client
+- **採用理由**:
+  - シンプルなAPIでキャッシュ機能を提供
+  - リアルタイムデータ同期やエラーハンドリングが容易
+  - 軽量で学習コストが低い
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### **Axios**
+- **使用用途**: HTTPクライアントライブラリ
+- **比較対象**: Fetch API、jQuery.ajax
+- **採用理由**:
+  - リクエスト/レスポンスのインターセプト機能
+  - 自動的なJSONデータ変換
+  - ブラウザ互換性が高い
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### **Firebase**
+- **使用用途**: 認証サービス
+- **比較対象**: Auth0、AWS Cognito
+- **採用理由**:
+  - 簡単に認証機能を実装できる
+  - Google認証など、SNS認証の統合が容易
+  - 無料プランで十分な機能を提供
+
+## 2. バックエンド
+
+### **Ruby / Ruby on Rails**
+- **使用用途**: バックエンドの開発言語とフレームワークとして使用（APIモードで運用）
+- **比較対象**: Go、Python/Django、PHP/Laravel、Node.js/Express
+- **採用理由**: 
+  - MVCモデルに基づいており、データベースの操作も容易で、効率的に開発が可能
+  - Convention over Configurationの思想により、開発速度が向上する
+  - 豊富なGemライブラリにより、機能拡張が容易
+  - Active Recordにより、データベース操作が直感的
+  - インターネット教材が豊富なことから情報も習得しやすい
+
+### **MySQL**
+- **使用用途**: リレーショナルデータベース
+- **比較対象**: PostgreSQL、SQLite
+- **採用理由**:
+  - Railsとの親和性が高い
+  - 安定性とパフォーマンスのバランスが良い
+  - AWS RDSでの運用が容易
+
+## 3. コンテナ・開発環境
+
+### **Docker / Docker Compose**
+- **使用用途**: バックエンドの開発環境および本番環境の構築
+- **比較対象**: VirtualBox、直接インストール
+- **採用理由**: 
+  - Dockerは他の端末でも同じ開発環境を容易に再現することが可能
+  - VirtualBoxと比較して、コンテナ化技術によりOS等の環境差異による問題や手間を減らすことが可能
+  - より軽量で素早く起動することができる
+  - Docker ComposeはバックエンドのRailsと開発環境でのデータベース（MySQL）など、複数コンテナの一括管理が可能
+
+## 4. インフラ
+
+※ 以下の理由から、主にAWS（Amazon Web Services）サービスを採用した。
+- GCPと比較してインターネット上で実装に関する情報が豊富
+- RenderやHerokuでは読み込み速度が遅い
+- AWSは幅広いサービスを提供しており、他のサービスとの親和性が高く、一元的な管理が可能
+
+### **ECS Fargate**
+- **使用用途**: バックエンドのサーバー（バックエンドのコンテナ(Docker)をデプロイ・管理）
+- **比較対象**: EC2、AWS Lambda
+- **採用理由**: 
+  - ECR上に保持したコンテナ(Docker)をそのままデプロイ可能
+  - EC2と比較して、サーバーに必要なリソース(処理能力やメモリなど)をAWSが自動的に調整してくれるため、手動でのサーバー管理の必要が無い
+  - サーバーレスコンテナとして、スケーリングが自動化されている
+  - 運用コストを抑えながら、高い可用性を提供
+
+### **AWS RDS**
+- **使用用途**: マネージドデータベースサービス
+- **比較対象**: EC2上でのMySQL自運用
+- **採用理由**:
+  - 自動バックアップとポイントインタイム復旧
+  - 自動スケーリングとパフォーマンス最適化
+  - セキュリティパッチの自動適用
+  - 高可用性のMulti-AZ配置
+
+### **AWS S3**
+- **使用用途**: ファイルストレージ（Active Storage用）
+- **比較対象**: ローカルストレージ、Google Cloud Storage
+- **採用理由**:
+  - 高い耐久性と可用性
+  - Rails Active Storageとの統合が容易
+  - CDNとの連携による高速配信
+  - コスト効率が良い
+
+### **GitHub Actions**
+- **使用用途**: バックエンドのCI/CDパイプライン
+- **比較対象**: CircleCI、Jenkins
+- **採用理由**: 
+  - バックエンドのプッシュからデプロイまでを自動化できる
+  - GitHub Actionsのみ制限無しで無料利用が可能（パブリックレポジトリの場合）
+  - GitHubリポジトリと直接統合されていて、管理しやすい
+  - ECS Fargateへの自動デプロイが容易
+
+### **AWS VPC Endpoint**
+- **使用用途**: プライベートネットワーク経由でのAWSサービスアクセス
+- **採用理由**:
+  - インターネットを経由せずにAWSサービスにアクセス可能
+  - セキュリティの向上
+  - データ転送コストの削減
+  - ネットワークレイテンシの削減
+
+## 5. 運用・監視
+
+### **AWS CloudWatch**
+- **使用用途**: ログ収集・監視
+- **採用理由**:
+  - AWSサービスとの統合が容易
+  - アラート設定による障害の早期発見
+  - コスト効率の良い監視ソリューション
+
+
+ここまでお読みいただきありがとうございます。
+少しでも興味を持っていただけたら幸いです。
+
+  
