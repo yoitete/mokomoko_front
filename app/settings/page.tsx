@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAPI } from "@/hooks/useAPI";
-// import { useSeasonalCampaigns } from "@/hooks/useSeasonalCampaign"; // 一時的に無効化
+import { useSeasonalCampaigns } from "@/hooks/useSeasonalCampaign";
 import {
   seasonalCampaigns,
   secondSeasonalCampaigns,
@@ -47,19 +47,18 @@ export default function Settings() {
     () => [...seasonalCampaigns, ...secondSeasonalCampaigns],
     []
   );
-  // 一時的にAPI呼び出しを無効化して静的データのみを使用
-  // const {
-  //   data: apiCampaigns,
-  //   mutate: mutateCampaigns,
-  //   isLoading: campaignsLoading,
-  //   error: campaignsError,
-  // } = useSeasonalCampaigns();
 
-  // 静的データのみを使用（API呼び出しを一時的に無効化）
-  const campaigns = allStaticCampaigns;
-  const campaignsError = null;
-  const campaignsLoading = false;
-  const isApiDataAvailable = false;
+  // API呼び出しを有効化
+  const {
+    data: apiCampaigns,
+    mutate: mutateCampaigns,
+    isLoading: campaignsLoading,
+    error: campaignsError,
+  } = useSeasonalCampaigns();
+
+  // APIデータが利用可能な場合はAPIデータを使用、そうでなければ静的データを使用
+  const campaigns =
+    apiCampaigns && apiCampaigns.length > 0 ? apiCampaigns : allStaticCampaigns;
 
   // 現在のキャンペーンデータ（静的データのみ使用）
   const currentCampaigns = campaigns;
@@ -219,14 +218,6 @@ export default function Settings() {
     campaignId: number,
     currentActive: boolean
   ) => {
-    // API側のデータが利用可能な場合のみ更新可能
-    if (!isApiDataAvailable) {
-      setToastMessage("API側のデータが利用可能になるまで編集はできません");
-      setToastType("info");
-      setShowToast(true);
-      return;
-    }
-
     setIsLoading(true);
     setCampaignError("");
 
@@ -234,7 +225,7 @@ export default function Settings() {
       await put(`/seasonal_campaigns/${campaignId}`, {
         seasonal_campaign: { active: !currentActive },
       });
-      // mutateCampaigns(); // データ再取得（一時的に無効化）
+      mutateCampaigns(); // データ再取得
       setToastMessage(`特集を${!currentActive ? "有効" : "無効"}にしました`);
       setToastType("success");
       setShowToast(true);
@@ -254,14 +245,6 @@ export default function Settings() {
     startMonth: number,
     endMonth: number
   ) => {
-    // API側のデータが利用可能な場合のみ更新可能
-    if (!isApiDataAvailable) {
-      setToastMessage("API側のデータが利用可能になるまで編集はできません");
-      setToastType("info");
-      setShowToast(true);
-      return;
-    }
-
     setIsLoading(true);
     setCampaignMessage("");
     setCampaignError("");
@@ -273,7 +256,7 @@ export default function Settings() {
           end_month: endMonth,
         },
       });
-      // mutateCampaigns(); // データ再取得（一時的に無効化）
+      mutateCampaigns(); // データ再取得
       setToastMessage("特集期間を更新しました");
       setToastType("success");
       setShowToast(true);
@@ -292,14 +275,6 @@ export default function Settings() {
     campaignId: number,
     colorTheme: string
   ) => {
-    // API側のデータが利用可能な場合のみ更新可能
-    if (!isApiDataAvailable) {
-      setToastMessage("API側のデータが利用可能になるまで編集はできません");
-      setToastType("info");
-      setShowToast(true);
-      return;
-    }
-
     setIsLoading(true);
     setCampaignMessage("");
     setCampaignError("");
@@ -311,7 +286,7 @@ export default function Settings() {
           highlight_color: colorTheme,
         },
       });
-      // mutateCampaigns(); // データ再取得（一時的に無効化）
+      mutateCampaigns(); // データ再取得
       setToastMessage("カラーテーマを更新しました");
       setToastType("success");
       setShowToast(true);
@@ -745,7 +720,7 @@ export default function Settings() {
                               >
                                 {campaign.active ? "有効" : "無効"}
                               </span>
-                              {isGuestUser && isApiDataAvailable ? (
+                              {isGuestUser && (
                                 <Button
                                   size="sm"
                                   onClick={() =>
@@ -769,23 +744,12 @@ export default function Settings() {
                                   />
                                   {campaign.active ? "無効化" : "有効化"}
                                 </Button>
-                              ) : (
-                                <span
-                                  className="px-3 py-1 text-xs text-gray-500 bg-gray-100 rounded"
-                                  style={{
-                                    fontFamily: "'Noto Sans JP', sans-serif",
-                                  }}
-                                >
-                                  {!isApiDataAvailable
-                                    ? "APIデータ待機中"
-                                    : "変更不可"}
-                                </span>
                               )}
                             </div>
                           </div>
 
                           {/* 編集フォーム */}
-                          {isGuestUser && isApiDataAvailable ? (
+                          {isGuestUser && (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t border-gray-300">
                               {/* 開始月 */}
                               <div>
@@ -883,19 +847,6 @@ export default function Settings() {
                                   <option value="yellow">黄</option>
                                 </select>
                               </div>
-                            </div>
-                          ) : (
-                            <div className="mt-3 pt-3 border-t border-gray-300">
-                              <p
-                                className="text-sm text-gray-500 text-center py-2"
-                                style={{
-                                  fontFamily: "'Noto Sans JP', sans-serif",
-                                }}
-                              >
-                                {!isApiDataAvailable
-                                  ? "API側のデータが利用可能になるまで編集はできません"
-                                  : "特集設定の変更は管理者のみ可能です"}
-                              </p>
                             </div>
                           )}
 
