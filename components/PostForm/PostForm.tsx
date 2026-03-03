@@ -13,7 +13,6 @@ export type PostFormData = {
   title: string;
   description: string;
   price?: number;
-  category: string;
   tags: string[];
   image?: File | null;
 };
@@ -41,7 +40,6 @@ export const PostForm: React.FC<PostFormProps> = ({
     title: "",
     description: "",
     price: undefined,
-    category: "",
     tags: [],
     image: null,
     ...initialData,
@@ -71,13 +69,6 @@ export const PostForm: React.FC<PostFormProps> = ({
   const validateForm = (): boolean => {
     if (!formData.title.trim()) {
       setToastMessage("タイトルを入力してください");
-      setToastType("error");
-      setShowToast(true);
-      return false;
-    }
-
-    if (!formData.category) {
-      setToastMessage("カテゴリーを選択してください");
       setToastType("error");
       setShowToast(true);
       return false;

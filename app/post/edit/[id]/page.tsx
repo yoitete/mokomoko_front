@@ -15,7 +15,6 @@ interface PostUpdateData {
   title: string;
   description: string;
   price?: number;
-  season: string;
   tags: string[];
   image?: File;
 }
@@ -63,7 +62,6 @@ export default function EditPost({
       title: formData.title,
       description: formData.description || "",
       price: formData.price,
-      season: formData.category,
       tags: formData.tags,
       image: formData.image || undefined,
     };
@@ -78,7 +76,6 @@ export default function EditPost({
         title: postData.title || "",
         description: postData.description || "",
         price: postData.price,
-        category: postData.season || "",
         tags: postData.tags || [],
         image: null,
       }

@@ -10,7 +10,6 @@ export type Post = {
   title: string;
   price?: number;
   description?: string;
-  season: string;
   tags?: string[];
   favorites_count?: number;
   created_at?: string;
@@ -24,7 +23,6 @@ export type CreatePostData = {
   title: string;
   price?: number;
   description?: string;
-  season: string;
   tags?: string[];
 };
 
@@ -34,7 +32,6 @@ export type CreatePostWithImageData = {
   title: string;
   price?: number;
   description?: string;
-  season: string;
   tags?: string[];
   image?: File;
 };
@@ -83,7 +80,6 @@ export const usePosts = () => {
         formData.append("post[user_id]", postDataInput.user_id.toString());
         formData.append("post[title]", postDataInput.title);
         formData.append("post[description]", postDataInput.description || "");
-        formData.append("post[season]", postDataInput.season);
 
         if (postDataInput.price !== undefined) {
           formData.append("post[price]", postDataInput.price.toString());

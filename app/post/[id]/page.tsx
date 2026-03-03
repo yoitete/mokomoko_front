@@ -185,32 +185,6 @@ export default function PostDetail() {
               </p>
             )}
 
-            {/* カテゴリー */}
-            <div className="mb-4">
-              <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                {post.season === "new-arrivals" && "新着情報"}
-                {post.season === "spring-summer" && "春・夏"}
-                {post.season === "autumn-winter" && "秋・冬"}
-                {post.season === "christmas" && "クリスマス"}
-                {post.season === "exam-support" && "受験応援"}
-                {post.season === "mothers-day" && "母の日"}
-                {post.season === "new-life-support" && "新生活応援"}
-                {post.season === "fathers-day" && "父の日"}
-                {post.season === "halloween" && "ハロウィン"}
-                {![
-                  "new-arrivals",
-                  "spring-summer",
-                  "autumn-winter",
-                  "christmas",
-                  "exam-support",
-                  "mothers-day",
-                  "new-life-support",
-                  "fathers-day",
-                  "halloween",
-                ].includes(post.season) && post.season}
-              </span>
-            </div>
-
             {/* タグ */}
             {post.tags && post.tags.length > 0 && (
               <div className="mb-6">
