@@ -7,7 +7,6 @@ import { Post } from "@/hooks/usePosts";
 import { useGet } from "@/hooks/useSWRAPI";
 import { useFavorites } from "@/hooks/useFavorites";
 import { PostList } from "@/components/PostList/PostList";
-import { SectionHeader } from "@/components/SectionHeader/SectionHeader";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -46,12 +45,12 @@ export default function Home() {
   const colorClasses = useMemo(
     () =>
       currentCampaign ? getColorClasses(currentCampaign.color_theme) : null,
-    [currentCampaign]
+    [currentCampaign],
   );
 
   const secondColorClasses = useMemo(
     () => (secondCampaign ? getColorClasses(secondCampaign.color_theme) : null),
-    [secondCampaign]
+    [secondCampaign],
   );
 
   // 一時的にログを出す（ユーザーIDを確認）
@@ -76,26 +75,21 @@ export default function Home() {
     console.log("postsResponse:", postsResponse);
     console.log(
       "Posts with images:",
-      posts.filter((post) => post.images && post.images.length > 0)
+      posts.filter((post) => post.images && post.images.length > 0),
     );
     console.log(
       "Posts without images:",
-      posts.filter((post) => !post.images || post.images.length === 0)
+      posts.filter((post) => !post.images || post.images.length === 0),
     );
   }, [posts, isLoading, error, postsResponse]);
 
   // 新着投稿を取得（API側で既にソート済み）
   const newPosts = (posts || []).slice(0, 6);
 
-  // 春・夏の人気投稿を取得（API版）
-  const { data: springSummerPosts, isLoading: springSummerLoading } = useGet<
-    Post[]
-  >("/posts/popular?season=spring-summer&with_images=true&limit=4");
-
-  // 秋・冬の人気投稿を取得（API版）
-  const { data: autumnWinterPosts, isLoading: autumnWinterLoading } = useGet<
-    Post[]
-  >("/posts/popular?season=autumn-winter&with_images=true&limit=4");
+  // 人気投稿を取得（API版・季節区分なし）
+  const { data: popularPosts, isLoading: popularLoading } = useGet<Post[]>(
+    "/posts/popular?with_images=true&limit=8",
+  );
 
   // 画像がある投稿のみをフィルタリング
 
@@ -126,23 +120,29 @@ export default function Home() {
 
   return (
     <div>
-      <div className="mt-10">
-        <div className="mb-4">
-          <SectionHeader title="投稿新着一覧" />
-        </div>
-        <div className="relative">
-          <SectionHeader subtitle="New" noBorder={true} />
-          <div className="absolute top-2 right-0">
-            <Link href="/posts/all?sort=newest">
-              <Button
-                variant="outline"
-                size="sm"
-                className="mr-4 text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-600"
-              >
-                全て表示
-              </Button>
-            </Link>
-          </div>
+      <section className="mt-8">
+        <h2
+          className="text-center text-3xl font-bold tracking-wide bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
+          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+        >
+          投稿新着一覧
+        </h2>
+        <div className="flex items-center justify-between px-4 mt-2 mb-3">
+          <p
+            className="text-sm font-semibold text-[#7E6565] tracking-widest"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
+            NEW ARRIVALS
+          </p>
+          <Link href="/posts/all?sort=newest">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
+            >
+              全て表示
+            </Button>
+          </Link>
         </div>
         <PostList
           posts={newPosts}
@@ -152,65 +152,44 @@ export default function Home() {
           toggleFavorite={toggleFavorite}
           currentUserId={userId || undefined}
         />
-      </div>
+      </section>
 
-      <div className="mt-10"></div>
-      <div className="mb-4">
-        <SectionHeader
-          title="投稿人気ランキング"
-          gradientFrom="from-blue-900"
-          gradientTo="to-slate-800"
+      <section className="mt-10">
+        <h2
+          className="text-center text-3xl font-bold tracking-wide bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
+          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+        >
+          投稿人気ランキング
+        </h2>
+        <div className="flex items-center justify-between px-4 mt-2 mb-3">
+          <p
+            className="text-sm font-semibold text-[#7E6565] tracking-widest"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
+            POPULAR
+          </p>
+          <Link href="/posts/all?sort=popular">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
+            >
+              全て表示
+            </Button>
+          </Link>
+        </div>
+        <PostList
+          posts={popularPosts || []}
+          showRanking={true}
+          isAuthenticated={isAuthenticated}
+          isFavorite={isFavorite}
+          toggleFavorite={toggleFavorite}
+          isLoading={popularLoading}
+          emptyMessage="人気の投稿がありません"
+          currentUserId={userId || undefined}
         />
-      </div>
-      <div className="relative">
-        <SectionHeader subtitle="春・夏" borderColor="border-orange-500" />
-        <div className="absolute -top-1 right-0">
-          <Link href="/posts/all?sort=popular&season=spring-summer">
-            <Button
-              variant="outline"
-              size="sm"
-              className="mr-4 text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-600"
-            >
-              全て表示
-            </Button>
-          </Link>
-        </div>
-      </div>
-      <PostList
-        posts={springSummerPosts || []}
-        showRanking={true}
-        isAuthenticated={isAuthenticated}
-        isFavorite={isFavorite}
-        toggleFavorite={toggleFavorite}
-        isLoading={springSummerLoading}
-        emptyMessage="人気の投稿がありません"
-        currentUserId={userId || undefined}
-      />
+      </section>
 
-      <div className="relative">
-        <SectionHeader subtitle="秋・冬" borderColor="border-orange-500" />
-        <div className="absolute -top-1 right-0">
-          <Link href="/posts/all?sort=popular&season=autumn-winter">
-            <Button
-              variant="outline"
-              size="sm"
-              className="mr-4 text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-600"
-            >
-              全て表示
-            </Button>
-          </Link>
-        </div>
-      </div>
-      <PostList
-        posts={autumnWinterPosts || []}
-        showRanking={true}
-        isAuthenticated={isAuthenticated}
-        isFavorite={isFavorite}
-        toggleFavorite={toggleFavorite}
-        isLoading={autumnWinterLoading}
-        emptyMessage="人気の投稿がありません"
-        currentUserId={userId || undefined}
-      />
       {/* 特集セクション：特集が存在する場合のみ表示 */}
       {(currentCampaign || secondCampaign) && (
         <>

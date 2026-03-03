@@ -33,66 +33,63 @@ export const PostCard = ({
   }
 
   return (
-    <div className="inline-block mr-4 w-40 overflow-hidden bg-white">
+    <div className="inline-block mr-3 w-44 snap-start shrink-0 group">
       <Link href={`/post/${post.id}`} className="block">
-        {/* タイトルボックス（上部） */}
-        <div className="p-2 bg-white">
-          {showRanking ? (
-            <div className="flex items-center gap-2">
-              {/* 順位表示 */}
-              <div className="flex-shrink-0">
-                <RankingDisplay index={index} />
+        <div className="bg-white rounded-2xl overflow-hidden shadow-sm transition-all duration-200 group-hover:shadow-lg group-hover:-translate-y-0.5">
+          <div className="relative w-full h-[140px] overflow-hidden">
+            <Image
+              src={imageUrl}
+              alt={post.title}
+              fill
+              unoptimized={true}
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            {!isOwnPost && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!isAuthenticated) return;
+                  toggleFavorite(post.id!);
+                }}
+                className={`absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 ${
+                  isAuthenticated
+                    ? "hover:bg-white hover:scale-110 cursor-pointer"
+                    : "cursor-not-allowed opacity-60"
+                }`}
+                title={
+                  !isAuthenticated ? "ログインが必要です" : "お気に入りに追加"
+                }
+              >
+                <FontAwesomeIcon
+                  icon={faHeart}
+                  className={`text-sm ${
+                    !isAuthenticated
+                      ? "text-gray-300"
+                      : isFavorite(post.id!)
+                        ? "text-red-500"
+                        : "text-gray-400 group-hover:text-red-300"
+                  }`}
+                />
+              </button>
+            )}
+          </div>
+          <div className="px-3 py-2.5">
+            {showRanking ? (
+              <div className="flex items-center gap-2">
+                <div className="flex-shrink-0">
+                  <RankingDisplay index={index} />
+                </div>
+                <h3 className="text-sm font-semibold text-[#5A4A4A] line-clamp-2 leading-snug flex-1">
+                  {post.title}
+                </h3>
               </div>
-              <h3 className="text-sm font-medium text-gray-800 line-clamp-2 leading-tight flex-1">
+            ) : (
+              <h3 className="text-sm font-semibold text-[#5A4A4A] line-clamp-2 leading-snug">
                 {post.title}
               </h3>
-            </div>
-          ) : (
-            <h3 className="text-sm font-medium text-gray-800 line-clamp-2 leading-tight">
-              {post.title}
-            </h3>
-          )}
-        </div>
-        <div className="relative w-full h-[118px] overflow-hidden">
-          <Image
-            src={imageUrl}
-            alt={post.title}
-            fill
-            unoptimized={true}
-            className="cursor-pointer object-cover"
-          />
-          {/* お気に入りボタン（自分の投稿でない場合のみ表示） */}
-          {!isOwnPost && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!isAuthenticated) {
-                  return;
-                }
-                toggleFavorite(post.id!);
-              }}
-              className={`absolute bottom-2 right-2 p-1 rounded-full bg-white/80 transition-colors ${
-                isAuthenticated
-                  ? "hover:bg-white cursor-pointer"
-                  : "cursor-not-allowed opacity-60"
-              }`}
-              title={
-                !isAuthenticated ? "ログインが必要です" : "お気に入りに追加"
-              }
-            >
-              <FontAwesomeIcon
-                icon={faHeart}
-                className={`text-lg ${
-                  !isAuthenticated
-                    ? "text-gray-300 hover:text-gray-400"
-                    : isFavorite(post.id!)
-                    ? "text-red-500"
-                    : "text-gray-400 hover:text-red-500"
-                }`}
-              />
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </Link>
     </div>
