@@ -7,7 +7,6 @@ import { Post } from "@/hooks/usePosts";
 import { useGet } from "@/hooks/useSWRAPI";
 import { useFavorites } from "@/hooks/useFavorites";
 import { PostList } from "@/components/PostList/PostList";
-import { SectionHeader } from "@/components/SectionHeader/SectionHeader";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -121,22 +120,29 @@ export default function Home() {
 
   return (
     <div>
-      <div className="mt-6">
-        <SectionHeader title="投稿新着一覧" />
-
-        <div className="relative">
-          <SectionHeader subtitle="New" noBorder={true} />
-          <div className="absolute top-2 right-0">
-            <Link href="/posts/all?sort=newest">
-              <Button
-                variant="outline"
-                size="sm"
-                className="mr-4 text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
-              >
-                全て表示
-              </Button>
-            </Link>
-          </div>
+      <section className="mt-8">
+        <h2
+          className="text-center text-3xl font-bold tracking-wide bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
+          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+        >
+          投稿新着一覧
+        </h2>
+        <div className="flex items-center justify-between px-4 mt-2 mb-3">
+          <p
+            className="text-sm font-semibold text-[#7E6565] tracking-widest"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
+            NEW ARRIVALS
+          </p>
+          <Link href="/posts/all?sort=newest">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
+            >
+              全て表示
+            </Button>
+          </Link>
         </div>
         <PostList
           posts={newPosts}
@@ -146,20 +152,27 @@ export default function Home() {
           toggleFavorite={toggleFavorite}
           currentUserId={userId || undefined}
         />
-      </div>
+      </section>
 
-      <div className="mt-6">
-        <SectionHeader
-          title="投稿人気ランキング"
-          gradientFrom="from-red-700"
-          gradientTo="to-red-900"
-        />
-        <div className="flex justify-end mb-1">
+      <section className="mt-10">
+        <h2
+          className="text-center text-3xl font-bold tracking-wide bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
+          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+        >
+          投稿人気ランキング
+        </h2>
+        <div className="flex items-center justify-between px-4 mt-2 mb-3">
+          <p
+            className="text-sm font-semibold text-[#7E6565] tracking-widest"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
+            POPULAR
+          </p>
           <Link href="/posts/all?sort=popular">
             <Button
               variant="outline"
               size="sm"
-              className="mr-4 text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
+              className="text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
             >
               全て表示
             </Button>
@@ -175,7 +188,7 @@ export default function Home() {
           emptyMessage="人気の投稿がありません"
           currentUserId={userId || undefined}
         />
-      </div>
+      </section>
 
       {/* 特集セクション：特集が存在する場合のみ表示 */}
       {(currentCampaign || secondCampaign) && (
