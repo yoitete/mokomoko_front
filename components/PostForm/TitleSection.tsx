@@ -4,7 +4,6 @@ export type PostFormData = {
   title: string;
   description: string;
   price?: number;
-  category: string;
   tags: string[];
   image?: File | null;
 };

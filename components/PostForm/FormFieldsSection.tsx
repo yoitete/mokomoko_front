@@ -4,7 +4,6 @@ export type PostFormData = {
   title: string;
   description: string;
   price?: number;
-  category: string;
   tags: string[];
   image?: File | null;
 };
@@ -32,33 +31,6 @@ export const FormFieldsSection: React.FC<PostFormSectionProps> = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* カテゴリー */}
-      <div className="space-y-2">
-        <label
-          className="block text-lg font-semibold text-gray-800"
-          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-        >
-          カテゴリー <span className="text-red-500">*</span>
-        </label>
-        <select
-          className="w-full px-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-lg h-14"
-          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-          value={data.category ?? ""}
-          onChange={(e) => onChange("category", e.target.value)}
-        >
-          <option value="">カテゴリーを選択してください</option>
-          <option value="spring-summer">春・夏</option>
-          <option value="autumn-winter">秋・冬</option>
-          <option value="christmas">クリスマス</option>
-          <option value="exam-support">受験応援</option>
-          <option value="mothers-day">母の日</option>
-          <option value="new-life-support">新生活応援</option>
-          <option value="fathers-day">父の日</option>
-          <option value="halloween">ハロウィン</option>
-          <option value="new-arrivals">新着情報</option>
-        </select>
-      </div>
-
       {/* 価格 */}
       <div className="space-y-2">
         <label

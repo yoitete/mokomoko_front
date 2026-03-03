@@ -30,7 +30,6 @@ export default function Post() {
       title: formData.title,
       description: formData.description || "",
       price: formData.price,
-      season: formData.category,
       tags: formData.tags,
       image: formData.image || undefined,
     };
