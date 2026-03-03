@@ -21,7 +21,7 @@ export const SectionHeader = ({
     <>
       {title && (
         <div
-          className={`mt-5 text-center text-3xl font-bold tracking-wide bg-gradient-to-r ${gradientFrom} ${gradientTo} bg-clip-text text-transparent`}
+          className={`text-center text-3xl font-bold tracking-wide bg-gradient-to-r ${gradientFrom} ${gradientTo} bg-clip-text text-transparent`}
           style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
         >
           {title}
@@ -29,7 +29,7 @@ export const SectionHeader = ({
       )}
       {subtitle && (
         <div
-          className={`mt-5 ml-4 text-left font-bold ${
+          className={`ml-4 text-left font-bold ${
             noBorder
               ? "py-2 text-orange-600 text-2xl"
               : `text-[#5A4A4A] border-l-4 ${borderColor} pl-3`

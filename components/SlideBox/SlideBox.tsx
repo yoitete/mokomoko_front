@@ -1,15 +1,16 @@
 export const SlideBox = ({ children }: { children?: React.ReactNode }) => (
   <div
     className="
-    bg-white
-    mt-5 ml-2
-    p-4
-    w-full
-    rounded-l-lg
-    shadow
-    overflow-x-auto
-    whitespace-nowrap
-  "
+      px-4 py-4
+      w-full
+      bg-[#D8CDCD]
+      rounded-l-2xl
+      overflow-x-auto
+      whitespace-nowrap
+      snap-x snap-mandatory
+      scrollbar-hide
+    "
+    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
   >
     {children}
   </div>

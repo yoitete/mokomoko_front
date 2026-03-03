@@ -11,3 +11,7 @@ body {
   background-color: #ece6e6;
   font-family: 'Noto Sans JP', sans-serif;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
