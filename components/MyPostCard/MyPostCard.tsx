@@ -28,17 +28,17 @@ export const MyPostCard = ({ post, onDelete, isDeleting }: MyPostCardProps) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {/* 画像部分 */}
         {imageUrl ? (
-          <div className="relative w-full h-48">
+          <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
             <Image
               src={imageUrl}
               alt={post.title}
               fill
               unoptimized={true}
-              className="object-cover"
+              className="object-cover rounded-t-lg"
             />
           </div>
         ) : (
-          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+          <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg">
             <span className="text-gray-400">画像なし</span>
           </div>
         )}

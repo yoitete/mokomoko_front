@@ -36,13 +36,13 @@ export const PostCard = ({
     <div className="inline-block mr-3 w-44 snap-start shrink-0 group">
       <Link href={`/post/${post.id}`} className="block">
         <div className="bg-white rounded-2xl overflow-hidden shadow-sm transition-all duration-200 group-hover:shadow-lg group-hover:-translate-y-0.5">
-          <div className="relative w-full h-[140px] overflow-hidden">
+          <div className="relative w-full h-[140px] overflow-hidden rounded-t-2xl">
             <Image
               src={imageUrl}
               alt={post.title}
               fill
               unoptimized={true}
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 group-hover:scale-105 rounded-t-2xl"
             />
             {!isOwnPost && (
               <button

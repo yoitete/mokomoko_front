@@ -154,11 +154,11 @@ function AllPostsContent() {
               {/* 左：画像 */}
               <div className="md:w-1/3 w-full">
                 {post.images?.[0] ? (
-                  <div className="w-full h-[118px] overflow-hidden relative">
+                  <div className="w-full h-[118px] overflow-hidden relative rounded-lg">
                     <img
                       src={post.images[0]}
                       alt={post.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover rounded-lg"
                     />
                     {/* お気に入りボタン（自分の投稿以外） */}
                     {post.user_id !== userId && post.id && (
@@ -219,6 +219,17 @@ function AllPostsContent() {
                     ))}
                   </div>
                 )}
+                <p className="text-xs text-gray-500 mt-2">
+                  {post.created_at &&
+                    new Date(post.created_at).toLocaleString("ja-JP", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  {post.user_name && ` ・ ${post.user_name}`}
+                </p>
                 <Link
                   href={`/post/${post.id}`}
                   className="text-blue-500 text-sm mt-2 inline-block"

@@ -15,6 +15,7 @@ export type Post = {
   created_at?: string;
   updated_at?: string;
   images?: string[];
+  user_name?: string;
 };
 
 // 投稿作成用の型定義

@@ -122,15 +122,15 @@ export default function MyPostsPage() {
               <div className="md:w-1/3 w-full">
                 <Link href={`/post/${post.id}`}>
                   {post.images?.[0] ? (
-                    <div className="w-full h-[118px] overflow-hidden relative cursor-pointer hover:opacity-80 transition-opacity">
+                    <div className="w-full h-[118px] overflow-hidden relative cursor-pointer hover:opacity-80 transition-opacity rounded-lg">
                       <img
                         src={post.images[0]}
                         alt={post.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     </div>
                   ) : (
-                    <div className="h-[118px] bg-gray-200 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity">
+                    <div className="h-[118px] bg-gray-200 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity rounded-lg">
                       No Image
                     </div>
                   )}
@@ -153,9 +153,14 @@ export default function MyPostsPage() {
                 <div className="flex items-center justify-between text-sm text-gray-500 mt-2">
                   <div className="flex items-center gap-4">
                     <span>
-                      {new Date(post.created_at || "").toLocaleDateString(
-                        "ja-JP"
-                      )}
+                      {post.created_at &&
+                        new Date(post.created_at).toLocaleString("ja-JP", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                     </span>
                     <span>♥ {post.favorites_count || 0}</span>
                   </div>
