@@ -89,6 +89,11 @@ export const PostCard = ({
                 {post.title}
               </h3>
             )}
+            {post.user_name && (
+              <p className="text-xs text-[#7E6565] mt-1 truncate">
+                {post.user_name}
+              </p>
+            )}
           </div>
         </div>
       </Link>

@@ -225,54 +225,49 @@ export default function FavoritePage() {
       </div>
 
       {currentPosts.map((post) => (
-        <SimpleBox
-          key={post.id}
-          className="flex flex-col md:flex-row items-start p-4"
-        >
-          {/* 左：画像 */}
-          <div className="md:w-1/3 w-full">
-            {post.images?.[0] ? (
-              <div className="w-full h-[118px] overflow-hidden relative rounded-lg">
-                <Image
-                  src={post.images[0]}
-                  alt={post.title}
-                  fill
-                  className="object-cover rounded-lg"
-                  unoptimized={true}
-                />
-              </div>
-            ) : (
-              <div className="h-[118px] bg-gray-200 flex items-center justify-center rounded-lg">
-                No Image
-              </div>
-            )}
-          </div>
+        <Link key={post.id} href={`/post/${post.id}`} className="block">
+          <SimpleBox
+            className="flex flex-col md:flex-row items-start p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+          >
+            {/* 左：画像 */}
+            <div className="md:w-1/3 w-full">
+              {post.images?.[0] ? (
+                <div className="w-full h-[118px] overflow-hidden relative rounded-lg">
+                  <Image
+                    src={post.images[0]}
+                    alt={post.title}
+                    fill
+                    className="object-cover rounded-lg"
+                    unoptimized={true}
+                  />
+                </div>
+              ) : (
+                <div className="h-[118px] bg-gray-200 flex items-center justify-center rounded-lg">
+                  No Image
+                </div>
+              )}
+            </div>
 
-          {/* 右：タイトル＋本文サマリー */}
-          <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
-            <p className="text-lg font-semibold">{post.title}</p>
-            <p className="text-sm text-gray-600 line-clamp-3 mt-1 whitespace-pre-wrap">
-              {post.description}
-            </p>
-            <p className="text-xs text-gray-500 mt-2">
-              {post.created_at &&
-                new Date(post.created_at).toLocaleString("ja-JP", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              {post.user_name && ` ・ ${post.user_name}`}
-            </p>
-            <Link
-              href={`/post/${post.id}`}
-              className="text-blue-500 text-sm mt-2 inline-block"
-            >
-              続きを読む
-            </Link>
-          </div>
-        </SimpleBox>
+            {/* 右：タイトル＋本文サマリー */}
+            <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
+              <p className="text-lg font-semibold">{post.title}</p>
+              <p className="text-sm text-gray-600 line-clamp-3 mt-1 whitespace-pre-wrap">
+                {post.description}
+              </p>
+              <p className="text-xs text-gray-500 mt-2">
+                {post.created_at &&
+                  new Date(post.created_at).toLocaleString("ja-JP", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                {post.user_name && ` ・ ${post.user_name}`}
+              </p>
+            </div>
+          </SimpleBox>
+        </Link>
       ))}
 
       {/* ページネーション */}

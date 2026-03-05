@@ -251,114 +251,109 @@ export default function Search() {
           </p>
         ) : (
           posts.map((post) => (
-            <SimpleBox
-              key={post.id}
-              className="flex flex-col md:flex-row items-start p-4 !rounded-2xl !shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
-            >
-              <Link href={`/post/${post.id}`} className="md:w-1/3 w-full block">
-                {post.images?.[0] ? (
-                  <div className="w-full h-[140px] overflow-hidden relative rounded-2xl">
-                    <Image
-                      src={post.images[0]}
-                      alt={post.title}
-                      fill
-                      className="object-cover rounded-2xl"
-                      unoptimized={true}
-                    />
-                    {post.user_id !== userId && post.id && (
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (post.id) {
-                            toggleFavorite(post.id);
-                          }
-                        }}
-                        className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
-                        title="お気に入りに追加"
-                      >
-                        <FontAwesomeIcon
-                          icon={faHeart}
-                          className={`text-sm ${
-                            post.id && isFavorite(post.id)
-                              ? "text-red-500"
-                              : "text-gray-400 hover:text-red-300"
-                          }`}
-                        />
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="h-[140px] bg-gray-200 flex items-center justify-center rounded-2xl text-sm text-gray-400 relative">
-                    No Image
-                    {post.user_id !== userId && post.id && (
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (post.id) {
-                            toggleFavorite(post.id);
-                          }
-                        }}
-                        className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
-                        title="お気に入りに追加"
-                      >
-                        <FontAwesomeIcon
-                          icon={faHeart}
-                          className={`text-sm ${
-                            post.id && isFavorite(post.id)
-                              ? "text-red-500"
-                              : "text-gray-400 hover:text-red-300"
-                          }`}
-                        />
-                      </button>
-                    )}
-                  </div>
-                )}
-              </Link>
-              <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
-                <p className="text-lg font-semibold text-[#5A4A4A]">
-                  {post.title}
-                </p>
-                {post.price != null && (
-                  <p className="text-sm font-bold text-red-600 mt-1">
-                    ¥{post.price.toLocaleString()}
+            <Link key={post.id} href={`/post/${post.id}`} className="block">
+              <SimpleBox
+                className="flex flex-col md:flex-row items-start p-4 !rounded-2xl !shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <div className="md:w-1/3 w-full">
+                  {post.images?.[0] ? (
+                    <div className="w-full h-[140px] overflow-hidden relative rounded-2xl">
+                      <Image
+                        src={post.images[0]}
+                        alt={post.title}
+                        fill
+                        className="object-cover rounded-2xl"
+                        unoptimized={true}
+                      />
+                      {post.user_id !== userId && post.id && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (post.id) {
+                              toggleFavorite(post.id);
+                            }
+                          }}
+                          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
+                          title="お気に入りに追加"
+                        >
+                          <FontAwesomeIcon
+                            icon={faHeart}
+                            className={`text-sm ${
+                              post.id && isFavorite(post.id)
+                                ? "text-red-500"
+                                : "text-gray-400 hover:text-red-300"
+                            }`}
+                          />
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="h-[140px] bg-gray-200 flex items-center justify-center rounded-2xl text-sm text-gray-400 relative">
+                      No Image
+                      {post.user_id !== userId && post.id && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (post.id) {
+                              toggleFavorite(post.id);
+                            }
+                          }}
+                          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
+                          title="お気に入りに追加"
+                        >
+                          <FontAwesomeIcon
+                            icon={faHeart}
+                            className={`text-sm ${
+                              post.id && isFavorite(post.id)
+                                ? "text-red-500"
+                                : "text-gray-400 hover:text-red-300"
+                            }`}
+                          />
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
+                  <p className="text-lg font-semibold text-[#5A4A4A]">
+                    {post.title}
                   </p>
-                )}
-                <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
-                  {post.description}
-                </p>
-                <p className="text-xs text-[#5A4A4A] mt-2">
-                  {post.created_at &&
-                    new Date(post.created_at).toLocaleString("ja-JP", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  {post.user_name && ` ・ ${post.user_name}`}
-                </p>
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {post.tags.slice(0, 5).map((tag, index) => (
-                      <span
-                        key={index}
-                        className="bg-[#F5F0F0] text-[#7E6565] px-2 py-1 rounded-full text-xs"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <Link
-                  href={`/post/${post.id}`}
-                  className="text-sm mt-2 inline-block font-semibold text-[#7E6565] hover:text-[#5A4A4A]"
-                >
-                  続きを読む →
-                </Link>
-              </div>
-            </SimpleBox>
+                  {post.price != null && (
+                    <p className="text-sm font-bold text-red-600 mt-1">
+                      ¥{post.price.toLocaleString()}
+                    </p>
+                  )}
+                  <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
+                    {post.description}
+                  </p>
+                  <p className="text-xs text-[#5A4A4A] mt-2">
+                    {post.created_at &&
+                      new Date(post.created_at).toLocaleString("ja-JP", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    {post.user_name && ` ・ ${post.user_name}`}
+                  </p>
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {post.tags.slice(0, 5).map((tag, index) => (
+                        <span
+                          key={index}
+                          className="bg-[#F5F0F0] text-[#7E6565] px-2 py-1 rounded-full text-xs"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </SimpleBox>
+            </Link>
           ))
         )}
       </div>
