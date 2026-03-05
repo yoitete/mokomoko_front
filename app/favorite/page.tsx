@@ -200,7 +200,7 @@ export default function FavoritePage() {
 
   if (favoritePosts.length === 0) {
     return (
-      <p className="text-center mt-10 text-gray-600">
+      <p className="text-center mt-10 text-[#7E6565]">
         お気に入りはまだありません
       </p>
     );
@@ -250,11 +250,16 @@ export default function FavoritePage() {
 
             {/* 右：タイトル＋本文サマリー */}
             <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
-              <p className="text-lg font-semibold">{post.title}</p>
-              <p className="text-sm text-gray-600 line-clamp-3 mt-1 whitespace-pre-wrap">
+              <p className="text-lg font-semibold text-[#5A4A4A]">{post.title}</p>
+              {post.price != null && (
+                <p className="text-sm font-bold text-red-600 mt-1">
+                  ¥{post.price.toLocaleString()}
+                </p>
+              )}
+              <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
                 {post.description}
               </p>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-[#7E6565] mt-2">
                 {post.created_at &&
                   new Date(post.created_at).toLocaleString("ja-JP", {
                     year: "numeric",

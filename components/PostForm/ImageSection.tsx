@@ -1,25 +1,7 @@
 import React, { useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
-
-export type PostFormData = {
-  title: string;
-  description: string;
-  price?: number;
-  tags: string[];
-  image?: File | null;
-};
-
-export type PostFormSectionProps = {
-  data: PostFormData;
-  onChange: <K extends keyof PostFormData>(
-    field: K,
-    value: PostFormData[K]
-  ) => void;
-  onImageChange?: (file: File | null) => void;
-  previewUrl?: string | null;
-  showImageUpload?: boolean;
-};
+import { PostFormSectionProps } from "./types";
 
 interface ImageSectionProps extends PostFormSectionProps {
   currentImageUrl?: string;
@@ -45,16 +27,16 @@ export const ImageSection: React.FC<ImageSectionProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <label
-        className="block text-lg font-semibold text-gray-800"
+        className="block text-sm font-semibold text-[#5A4A4A]"
         style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
       >
         投稿画像 <span className="text-red-500">*</span>
       </label>
       <div className="flex justify-center">
         <div
-          className="w-64 h-64 border-2 border-dashed border-gray-300 rounded-xl overflow-hidden hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 cursor-pointer group"
+          className="w-48 h-48 border-2 border-dashed border-[#C4B5B5] rounded-2xl overflow-hidden hover:border-[#7E6565] hover:bg-[#F5F0F0] transition-all duration-200 cursor-pointer group"
           onClick={() => {
             inputRef.current?.click();
           }}
@@ -82,15 +64,15 @@ export const ImageSection: React.FC<ImageSectionProps> = ({
               </div>
             </div>
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center group-hover:bg-blue-50 transition-colors duration-200">
+            <div className="w-full h-full flex flex-col items-center justify-center group-hover:bg-[#F5F0F0] transition-colors duration-200">
               <FontAwesomeIcon
                 icon={faUpload}
-                className="text-gray-400 text-4xl mb-3 group-hover:text-blue-500 transition-colors duration-200"
+                className="text-[#C4B5B5] text-3xl mb-2 group-hover:text-[#7E6565] transition-colors duration-200"
               />
-              <span className="text-sm text-gray-500 group-hover:text-blue-600 transition-colors duration-200">
+              <span className="text-xs text-gray-400 group-hover:text-[#7E6565] transition-colors duration-200">
                 画像をクリックして選択
               </span>
-              <span className="text-xs text-gray-400 mt-1">
+              <span className="text-xs text-gray-300 mt-1">
                 JPG, PNG, GIF対応
               </span>
             </div>

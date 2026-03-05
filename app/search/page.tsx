@@ -244,7 +244,7 @@ export default function Search() {
       {/* 投稿一覧 */}
       <div className="mx-4 space-y-4">
         {posts.length === 0 ? (
-          <p className="text-center mt-10 text-gray-600">
+          <p className="text-center mt-10 text-[#7E6565]">
             {searchQuery
               ? "検索結果が見つかりませんでした"
               : "投稿がありません"}

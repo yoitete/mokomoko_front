@@ -26,7 +26,7 @@ export default function Post() {
   const handleSubmit = async (formData: PostFormData) => {
     if (!isUserDataReady || !userId) {
       throw new Error(
-        "ユーザー情報の取得に失敗しました。ページを再読み込みしてください。"
+        "ユーザー情報の取得に失敗しました。ページを再読み込みしてください。",
       );
     }
 
@@ -37,6 +37,10 @@ export default function Post() {
       price: formData.price,
       tags: formData.tags,
       image: formData.image || undefined,
+      material: formData.material,
+      sleeping_position: formData.sleeping_position,
+      height: formData.height,
+      order_type: formData.order_type,
     };
 
     await createPostWithImage(postData);
@@ -93,18 +97,16 @@ export default function Post() {
   return (
     <div className="min-h-screen bg-[#E2D8D8]">
       {/* ヘッダー */}
-      <div className="mt-10">
-        <div className="mb-4">
-          <div
-            className="mt-5 text-center text-3xl font-bold tracking-wide text-[#5A4A4A]"
-            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-          >
-            新規投稿
-          </div>
-        </div>
-      </div>
+      <section className="mt-8">
+        <h2
+          className="text-center text-3xl font-bold tracking-wide bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
+          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+        >
+          新規投稿
+        </h2>
+      </section>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-4 py-6">
         <PostForm
           onSubmit={handleSubmit}
           onSuccess={handleSuccess}

@@ -166,23 +166,83 @@ export default function PostDetail() {
 
           {/* 投稿情報 */}
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl font-bold text-[#5A4A4A] mb-2">
               {post.title}
             </h2>
 
             {post.price && (
-              <p className="text-xl font-semibold text-red-600 mb-4">
+              <p className="text-base font-bold text-red-600 mb-4">
                 ¥{post.price.toLocaleString()}
               </p>
             )}
 
             {post.description && (
               <p
-                className="text-gray-700 mb-4 leading-relaxed whitespace-pre-wrap"
+                className="text-black mb-4 leading-relaxed whitespace-pre-wrap"
                 style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
               >
                 {post.description}
               </p>
+            )}
+
+            {/* 枕の特徴 */}
+            {(post.material || post.sleeping_position || post.height || post.order_type) && (
+              <div className="mb-6">
+                <h3
+                  className="text-sm font-medium text-gray-500 mb-3"
+                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                >
+                  枕の特徴
+                </h3>
+                <div className="space-y-3">
+                  {post.material && (
+                    <div>
+                      <p className="text-xs text-[#7E6565] mb-1">素材</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {post.material.split(",").map((item, i) => (
+                          <span key={i} className="bg-[#F5F0F0] text-[#5A4A4A] text-xs px-2.5 py-1 rounded-full">
+                            {item.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {post.sleeping_position && (
+                    <div>
+                      <p className="text-xs text-[#7E6565] mb-1">寝姿勢</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {post.sleeping_position.split(",").map((item, i) => (
+                          <span key={i} className="bg-[#F5F0F0] text-[#5A4A4A] text-xs px-2.5 py-1 rounded-full">
+                            {item.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {post.height && (
+                    <div>
+                      <p className="text-xs text-[#7E6565] mb-1">高さ</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {post.height.split(",").map((item, i) => (
+                          <span key={i} className="bg-[#F5F0F0] text-[#5A4A4A] text-xs px-2.5 py-1 rounded-full">
+                            {item.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {post.order_type && (
+                    <div>
+                      <p className="text-xs text-[#7E6565] mb-1">オーダーメイド</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        <span className="bg-[#F5F0F0] text-[#5A4A4A] text-xs px-2.5 py-1 rounded-full">
+                          {post.order_type}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
 
             {/* タグ */}

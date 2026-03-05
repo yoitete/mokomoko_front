@@ -2,25 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/components/Button/Button";
-
-export type PostFormData = {
-  title: string;
-  description: string;
-  price?: number;
-  tags: string[];
-  image?: File | null;
-};
-
-export type PostFormSectionProps = {
-  data: PostFormData;
-  onChange: <K extends keyof PostFormData>(
-    field: K,
-    value: PostFormData[K]
-  ) => void;
-  onImageChange?: (file: File | null) => void;
-  previewUrl?: string | null;
-  showImageUpload?: boolean;
-};
+import { PostFormSectionProps } from "./types";
 
 export const TagsSection: React.FC<PostFormSectionProps> = ({
   data,
@@ -51,16 +33,16 @@ export const TagsSection: React.FC<PostFormSectionProps> = ({
   return (
     <div className="space-y-4">
       <label
-        className="block text-lg font-semibold text-gray-800"
+        className="block text-sm font-semibold text-[#5A4A4A]"
         style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
       >
         タグ
       </label>
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         <input
           type="text"
-          placeholder="タグを入力してEnterキーで追加"
-          className="flex-1 px-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-lg"
+          placeholder="低反発 羽毛 ポリエステル"
+          className="flex-1 px-3 py-2.5 border border-[#C4B5B5] rounded-xl focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-sm"
           style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
           value={tagInput}
           onChange={(e) => setTagInput(e.target.value)}
@@ -68,8 +50,8 @@ export const TagsSection: React.FC<PostFormSectionProps> = ({
         />
         <Button
           onClick={addTag}
-          size="md"
-          className="px-6"
+          size="sm"
+          className="px-4"
           disabled={!tagInput.trim() || data.tags.includes(tagInput.trim())}
         >
           追加
@@ -82,12 +64,12 @@ export const TagsSection: React.FC<PostFormSectionProps> = ({
           {data.tags.map((tag, index) => (
             <span
               key={index}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-800 text-sm rounded-full hover:bg-blue-200 transition-colors duration-200"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F5F0F0] text-[#7E6565] text-xs rounded-full hover:bg-[#E2D8D8] transition-colors duration-200"
             >
               #{tag}
               <button
                 onClick={() => removeTag(index)}
-                className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                className="text-[#7E6565] hover:text-[#5A4A4A] transition-colors duration-200"
               >
                 <FontAwesomeIcon icon={faTimes} size="xs" />
               </button>

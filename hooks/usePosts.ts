@@ -16,6 +16,10 @@ export type Post = {
   updated_at?: string;
   images?: string[];
   user_name?: string;
+  material?: string;
+  sleeping_position?: string;
+  height?: string;
+  order_type?: string;
 };
 
 // 投稿作成用の型定義
@@ -25,6 +29,10 @@ export type CreatePostData = {
   price?: number;
   description?: string;
   tags?: string[];
+  material?: string[];
+  sleeping_position?: string[];
+  height?: string[];
+  order_type?: string;
 };
 
 // 画像付き投稿作成用の型定義
@@ -35,6 +43,10 @@ export type CreatePostWithImageData = {
   description?: string;
   tags?: string[];
   image?: File;
+  material?: string[];
+  sleeping_position?: string[];
+  height?: string[];
+  order_type?: string;
 };
 
 export const usePosts = () => {
@@ -90,6 +102,19 @@ export const usePosts = () => {
           postDataInput.tags.forEach((tag) => {
             formData.append("post[tags][]", tag);
           });
+        }
+
+        if (postDataInput.material && postDataInput.material.length > 0) {
+          formData.append("post[material]", postDataInput.material.join(","));
+        }
+        if (postDataInput.sleeping_position && postDataInput.sleeping_position.length > 0) {
+          formData.append("post[sleeping_position]", postDataInput.sleeping_position.join(","));
+        }
+        if (postDataInput.height && postDataInput.height.length > 0) {
+          formData.append("post[height]", postDataInput.height.join(","));
+        }
+        if (postDataInput.order_type) {
+          formData.append("post[order_type]", postDataInput.order_type);
         }
 
         if (postDataInput.image) {
@@ -156,6 +181,19 @@ export const usePosts = () => {
           postDataInput.tags.forEach((tag) => {
             formData.append("post[tags][]", tag);
           });
+        }
+
+        if (postDataInput.material && postDataInput.material.length > 0) {
+          formData.append("post[material]", postDataInput.material.join(","));
+        }
+        if (postDataInput.sleeping_position && postDataInput.sleeping_position.length > 0) {
+          formData.append("post[sleeping_position]", postDataInput.sleeping_position.join(","));
+        }
+        if (postDataInput.height && postDataInput.height.length > 0) {
+          formData.append("post[height]", postDataInput.height.join(","));
+        }
+        if (postDataInput.order_type) {
+          formData.append("post[order_type]", postDataInput.order_type);
         }
 
         if (postDataInput.image) {

@@ -60,6 +60,10 @@ export default function EditPost({
       price: formData.price,
       tags: formData.tags,
       image: formData.image || undefined,
+      material: formData.material,
+      sleeping_position: formData.sleeping_position,
+      height: formData.height,
+      order_type: formData.order_type,
     };
 
     await updatePostWithImage(parseInt(postId), postUpdateData);
@@ -81,6 +85,10 @@ export default function EditPost({
         price: postData.price,
         tags: postData.tags || [],
         image: null,
+        material: postData.material ? postData.material.split(",").map((s) => s.trim()) : [],
+        sleeping_position: postData.sleeping_position ? postData.sleeping_position.split(",").map((s) => s.trim()) : [],
+        height: postData.height ? postData.height.split(",").map((s) => s.trim()) : [],
+        order_type: postData.order_type,
       }
     : {};
 
