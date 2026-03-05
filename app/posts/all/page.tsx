@@ -147,97 +147,82 @@ function AllPostsContent() {
           </p>
         ) : (
           posts.map((post, index) => (
-            <SimpleBox
-              key={post.id || index}
-              className="flex flex-col md:flex-row items-start p-4"
-            >
-              {/* 左：画像 */}
-              <div className="md:w-1/3 w-full">
-                {post.images?.[0] ? (
-                  <div className="w-full h-[118px] overflow-hidden relative rounded-lg">
-                    <img
-                      src={post.images[0]}
-                      alt={post.title}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                    {/* お気に入りボタン（自分の投稿以外） */}
-                    {post.user_id !== userId && post.id && (
-                      <button
-                        onClick={() => {
-                          console.log(
-                            "お気に入りボタンクリック - post.id:",
-                            post.id
-                          );
-                          console.log(
-                            "お気に入りボタンクリック - userId:",
-                            userId
-                          );
-                          console.log(
-                            "お気に入りボタンクリック - isFavorite:",
-                            post.id ? isFavorite(post.id) : false
-                          );
-                          if (post.id) {
-                            toggleFavorite(post.id);
-                          }
-                        }}
-                        className="absolute bottom-2 right-2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 transition-all duration-200 shadow-md hover:shadow-lg"
-                        style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faHeart}
-                          className={`text-lg ${
-                            post.id && isFavorite(post.id)
-                              ? "text-red-500"
-                              : "text-gray-400 hover:text-red-400"
-                          } transition-colors duration-200`}
-                        />
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="h-[118px] bg-gray-200 flex items-center justify-center">
-                    No Image
-                  </div>
-                )}
-              </div>
+            <Link key={post.id || index} href={`/post/${post.id}`} className="block">
+              <SimpleBox
+                className="flex flex-col md:flex-row items-start p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+              >
+                {/* 左：画像 */}
+                <div className="md:w-1/3 w-full">
+                  {post.images?.[0] ? (
+                    <div className="w-full h-[118px] overflow-hidden relative rounded-lg">
+                      <img
+                        src={post.images[0]}
+                        alt={post.title}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      {/* お気に入りボタン（自分の投稿以外） */}
+                      {post.user_id !== userId && post.id && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (post.id) {
+                              toggleFavorite(post.id);
+                            }
+                          }}
+                          className="absolute bottom-2 right-2 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full p-2 transition-all duration-200 shadow-md hover:shadow-lg"
+                          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                        >
+                          <FontAwesomeIcon
+                            icon={faHeart}
+                            className={`text-lg ${
+                              post.id && isFavorite(post.id)
+                                ? "text-red-500"
+                                : "text-gray-400 hover:text-red-400"
+                            } transition-colors duration-200`}
+                          />
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="h-[118px] bg-gray-200 flex items-center justify-center">
+                      No Image
+                    </div>
+                  )}
+                </div>
 
-              {/* 右：タイトル＋本文サマリー */}
-              <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
-                <p className="text-lg font-semibold text-black">{post.title}</p>
-                <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
-                  {post.description}
-                </p>
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {post.tags.slice(0, 5).map((tag, index) => (
-                      <span
-                        key={index}
-                        className="bg-gray-100 text-black px-2 py-1 rounded-full text-xs"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <p className="text-xs text-gray-500 mt-2">
-                  {post.created_at &&
-                    new Date(post.created_at).toLocaleString("ja-JP", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  {post.user_name && ` ・ ${post.user_name}`}
-                </p>
-                <Link
-                  href={`/post/${post.id}`}
-                  className="text-blue-500 text-sm mt-2 inline-block"
-                >
-                  続きを読む
-                </Link>
-              </div>
-            </SimpleBox>
+                {/* 右：タイトル＋本文サマリー */}
+                <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
+                  <p className="text-lg font-semibold text-black">{post.title}</p>
+                  <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
+                    {post.description}
+                  </p>
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {post.tags.slice(0, 5).map((tag, index) => (
+                        <span
+                          key={index}
+                          className="bg-gray-100 text-black px-2 py-1 rounded-full text-xs"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500 mt-2">
+                    {post.created_at &&
+                      new Date(post.created_at).toLocaleString("ja-JP", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    {post.user_name && ` ・ ${post.user_name}`}
+                  </p>
+                </div>
+              </SimpleBox>
+            </Link>
           ))
         )}
       </div>
