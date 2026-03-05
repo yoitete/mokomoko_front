@@ -31,7 +31,7 @@ function AllPostsContent() {
   const { toggleFavorite, isFavorite } = useFavorites(userId);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 5;
+  const postsPerPage = 10;
 
   // 検索パラメータを構築
   const buildSearchParams = useCallback(() => {

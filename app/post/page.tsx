@@ -1,13 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Button from "@/components/Button/Button";
 import { usePosts, CreatePostWithImageData } from "@/hooks/usePosts";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import Link from "next/link";
 import { PostForm, PostFormData } from "@/components/PostForm/PostForm";
+import Toast from "@/components/Toast/Toast";
 
 export default function Post() {
+  const router = useRouter();
   const {
     isUnauthenticated,
     loading: authLoading,
@@ -17,6 +20,9 @@ export default function Post() {
 
   const { createPostWithImage, loading, error } = usePosts();
 
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
   const handleSubmit = async (formData: PostFormData) => {
     if (!isUserDataReady || !userId) {
       throw new Error(
@@ -24,7 +30,6 @@ export default function Post() {
       );
     }
 
-    // 投稿データを準備
     const postData: CreatePostWithImageData = {
       user_id: userId,
       title: formData.title,
@@ -34,8 +39,15 @@ export default function Post() {
       image: formData.image || undefined,
     };
 
-    // 投稿を作成
     await createPostWithImage(postData);
+  };
+
+  const handleSuccess = () => {
+    setToastMessage("投稿しました");
+    setShowToast(true);
+    setTimeout(() => {
+      router.push("/home");
+    }, 1500);
   };
 
   // ローディング中の表示
@@ -95,12 +107,20 @@ export default function Post() {
       <main className="max-w-4xl mx-auto px-4 py-8">
         <PostForm
           onSubmit={handleSubmit}
+          onSuccess={handleSuccess}
           loading={loading}
           error={error}
           submitButtonText="投稿する"
           showImageUpload={true}
         />
       </main>
+
+      <Toast
+        message={toastMessage}
+        type="success"
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }

@@ -20,6 +20,7 @@ export type PostFormData = {
 export type PostFormProps = {
   initialData?: Partial<PostFormData>;
   onSubmit: (data: PostFormData) => Promise<void>;
+  onSuccess?: () => void;
   loading?: boolean;
   error?: string | null;
   submitButtonText?: string;
@@ -30,6 +31,7 @@ export type PostFormProps = {
 export const PostForm: React.FC<PostFormProps> = ({
   initialData = {},
   onSubmit,
+  onSuccess,
   loading = false,
   error,
   submitButtonText = "投稿する",
@@ -112,6 +114,7 @@ export const PostForm: React.FC<PostFormProps> = ({
 
     try {
       await onSubmit(formData);
+      onSuccess?.();
     } catch (err) {
       console.error("投稿エラー:", err);
       setToastMessage("投稿中にエラーが発生しました。");

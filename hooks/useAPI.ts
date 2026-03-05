@@ -148,6 +148,21 @@ export const useAPI = () => {
     [createAuthenticatedRequest, token]
   );
 
+  // 画像アップロード用のPUTメソッド
+  const putFormData = useCallback(
+    async <T = unknown>(url: string, formData: FormData) => {
+      const api = await createAuthenticatedRequest();
+      const response = await api.put<T>(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+      return response.data;
+    },
+    [createAuthenticatedRequest, token]
+  );
+
   const put = useCallback(
     async <T = unknown>(url: string, data?: unknown) => {
       const api = await createAuthenticatedRequest();
@@ -166,5 +181,5 @@ export const useAPI = () => {
     [createAuthenticatedRequest]
   );
 
-  return { get, post, postFormData, put, delete: del };
+  return { get, post, postFormData, putFormData, put, delete: del };
 };

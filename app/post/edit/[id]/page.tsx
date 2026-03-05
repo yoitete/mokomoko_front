@@ -1,23 +1,16 @@
 "use client";
 
-import React, { useEffect, use } from "react";
+import React, { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { usePosts } from "@/hooks/usePosts";
+import { usePosts, CreatePostWithImageData } from "@/hooks/usePosts";
 import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import Button from "@/components/Button/Button";
 import Link from "next/link";
 import { PostForm, PostFormData } from "@/components/PostForm/PostForm";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
-
-interface PostUpdateData {
-  title: string;
-  description: string;
-  price?: number;
-  tags: string[];
-  image?: File;
-}
+import Toast from "@/components/Toast/Toast";
 
 export default function EditPost({
   params,
@@ -34,7 +27,10 @@ export default function EditPost({
     isUserDataReady,
   } = useCurrentUser();
 
-  const { updatePost, loading, error } = usePosts();
+  const { updatePostWithImage, loading, error } = usePosts();
+
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   // 既存の投稿データを取得
   const {
@@ -57,8 +53,8 @@ export default function EditPost({
       );
     }
 
-    // 投稿データを準備
-    const postUpdateData: PostUpdateData = {
+    const postUpdateData: CreatePostWithImageData = {
+      user_id: userId,
       title: formData.title,
       description: formData.description || "",
       price: formData.price,
@@ -66,8 +62,15 @@ export default function EditPost({
       image: formData.image || undefined,
     };
 
-    // 投稿を更新
-    await updatePost(parseInt(postId), postUpdateData);
+    await updatePostWithImage(parseInt(postId), postUpdateData);
+  };
+
+  const handleSuccess = () => {
+    setToastMessage("投稿を更新しました");
+    setShowToast(true);
+    setTimeout(() => {
+      router.push("/mypage/posts");
+    }, 1500);
   };
 
   // 初期データを準備
@@ -155,6 +158,7 @@ export default function EditPost({
         <PostForm
           initialData={initialData}
           onSubmit={handleSubmit}
+          onSuccess={handleSuccess}
           loading={loading}
           error={error}
           submitButtonText="投稿を更新"
@@ -162,6 +166,13 @@ export default function EditPost({
           currentImageUrl={postData?.images?.[0]}
         />
       </main>
+
+      <Toast
+        message={toastMessage}
+        type="success"
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }

@@ -6,10 +6,11 @@ import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import Button from "@/components/Button/Button";
-import { faList, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { useAuth } from "@/hooks/useAuth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface SearchResponse {
   posts: Post[];
@@ -22,7 +23,8 @@ interface SearchResponse {
 }
 
 export default function Search() {
-  const { isUnauthenticated, loading } = useAuth();
+  const { isUnauthenticated, loading, userId } = useCurrentUser();
+  const { toggleFavorite, isFavorite } = useFavorites(userId);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
@@ -49,7 +51,7 @@ export default function Search() {
     }
     params.append("with_images", "true");
     params.append("page", currentPage.toString());
-    params.append("per_page", "6");
+    params.append("per_page", "10");
     return params.toString();
   }, [debouncedSearchQuery, selectedSort, currentPage]);
 
@@ -165,13 +167,6 @@ export default function Search() {
         >
           検索
         </h2>
-        <p
-          className="text-center text-sm font-semibold text-[#7E6565] tracking-widest mt-1"
-          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-        >
-          SEARCH
-        </p>
-
         {/* 検索バー */}
         <div className="px-4 mt-4">
           <div className="relative">
@@ -205,9 +200,7 @@ export default function Search() {
               style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
             >
               <FontAwesomeIcon icon={faList} className="text-xs" />
-              <span>
-                {selectedSort === "newest" ? "新着順" : "人気順"}
-              </span>
+              <span>{selectedSort === "newest" ? "新着順" : "人気順"}</span>
             </button>
 
             {isDropdownOpen && (
@@ -262,7 +255,7 @@ export default function Search() {
               key={post.id}
               className="flex flex-col md:flex-row items-start p-4 !rounded-2xl !shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
             >
-              <div className="md:w-1/3 w-full">
+              <Link href={`/post/${post.id}`} className="md:w-1/3 w-full block">
                 {post.images?.[0] ? (
                   <div className="w-full h-[140px] overflow-hidden relative rounded-2xl">
                     <Image
@@ -272,19 +265,70 @@ export default function Search() {
                       className="object-cover rounded-2xl"
                       unoptimized={true}
                     />
+                    {post.user_id !== userId && post.id && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (post.id) {
+                            toggleFavorite(post.id);
+                          }
+                        }}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
+                        title="お気に入りに追加"
+                      >
+                        <FontAwesomeIcon
+                          icon={faHeart}
+                          className={`text-sm ${
+                            post.id && isFavorite(post.id)
+                              ? "text-red-500"
+                              : "text-gray-400 hover:text-red-300"
+                          }`}
+                        />
+                      </button>
+                    )}
                   </div>
                 ) : (
-                  <div className="h-[140px] bg-gray-200 flex items-center justify-center rounded-2xl text-sm text-gray-400">
+                  <div className="h-[140px] bg-gray-200 flex items-center justify-center rounded-2xl text-sm text-gray-400 relative">
                     No Image
+                    {post.user_id !== userId && post.id && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (post.id) {
+                            toggleFavorite(post.id);
+                          }
+                        }}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
+                        title="お気に入りに追加"
+                      >
+                        <FontAwesomeIcon
+                          icon={faHeart}
+                          className={`text-sm ${
+                            post.id && isFavorite(post.id)
+                              ? "text-red-500"
+                              : "text-gray-400 hover:text-red-300"
+                          }`}
+                        />
+                      </button>
+                    )}
                   </div>
                 )}
-              </div>
+              </Link>
               <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
-                <p className="text-lg font-semibold text-[#5A4A4A]">{post.title}</p>
-                <p className="text-sm text-gray-600 line-clamp-3 mt-1 whitespace-pre-wrap">
+                <p className="text-lg font-semibold text-[#5A4A4A]">
+                  {post.title}
+                </p>
+                {post.price != null && (
+                  <p className="text-sm font-bold text-red-600 mt-1">
+                    ¥{post.price.toLocaleString()}
+                  </p>
+                )}
+                <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
                   {post.description}
                 </p>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-[#5A4A4A] mt-2">
                   {post.created_at &&
                     new Date(post.created_at).toLocaleString("ja-JP", {
                       year: "numeric",
@@ -320,7 +364,7 @@ export default function Search() {
       </div>
 
       {/* ページネーション */}
-      {pagination && pagination.total_pages > 1 && (
+      {pagination && (
         <div className="flex justify-center items-center space-x-4 mt-8 mb-6">
           <Button
             onClick={() => handlePageChange(currentPage - 1)}

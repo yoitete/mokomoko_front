@@ -13,7 +13,7 @@ import { PageHeader } from "@/components/PageHeader/PageHeader";
 export default function MyPostsPage() {
   const { isUnauthenticated, loading } = useCurrentUser();
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 5;
+  const postsPerPage = 10;
 
   const {
     posts,
