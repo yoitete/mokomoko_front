@@ -1,23 +1,5 @@
 import React from "react";
-
-export type PostFormData = {
-  title: string;
-  description: string;
-  price?: number;
-  tags: string[];
-  image?: File | null;
-};
-
-export type PostFormSectionProps = {
-  data: PostFormData;
-  onChange: <K extends keyof PostFormData>(
-    field: K,
-    value: PostFormData[K]
-  ) => void;
-  onImageChange?: (file: File | null) => void;
-  previewUrl?: string | null;
-  showImageUpload?: boolean;
-};
+import { PostFormSectionProps } from "./types";
 
 export const FormFieldsSection: React.FC<PostFormSectionProps> = ({
   data,
@@ -34,13 +16,13 @@ export const FormFieldsSection: React.FC<PostFormSectionProps> = ({
       {/* 価格 */}
       <div className="space-y-2">
         <label
-          className="block text-lg font-semibold text-gray-800"
+          className="block text-sm font-semibold text-[#5A4A4A]"
           style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
         >
           価格（円） <span className="text-red-500">*</span>
         </label>
         <div className="relative">
-          <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">
+          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
             ¥
           </span>
           <input
@@ -48,8 +30,8 @@ export const FormFieldsSection: React.FC<PostFormSectionProps> = ({
             min="1"
             max="1000000"
             inputMode="numeric"
-            placeholder="価格を入力してください（1円〜100万円）"
-            className="w-full pl-8 pr-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-lg h-14"
+            placeholder="価格を入力"
+            className="w-full pl-7 pr-3 py-2.5 border border-[#C4B5B5] rounded-xl focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-sm"
             style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
             value={data.price ?? ""}
             onChange={(e) => handlePriceChange(e.target.value)}

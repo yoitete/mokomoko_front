@@ -1,23 +1,5 @@
 import React from "react";
-
-export type PostFormData = {
-  title: string;
-  description: string;
-  price?: number;
-  tags: string[];
-  image?: File | null;
-};
-
-export type PostFormSectionProps = {
-  data: PostFormData;
-  onChange: <K extends keyof PostFormData>(
-    field: K,
-    value: PostFormData[K]
-  ) => void;
-  onImageChange?: (file: File | null) => void;
-  previewUrl?: string | null;
-  showImageUpload?: boolean;
-};
+import { PostFormSectionProps } from "./types";
 
 export const TitleSection: React.FC<PostFormSectionProps> = ({
   data,
@@ -26,7 +8,7 @@ export const TitleSection: React.FC<PostFormSectionProps> = ({
   return (
     <div className="space-y-2">
       <label
-        className="block text-lg font-semibold text-gray-800"
+        className="block text-sm font-semibold text-[#5A4A4A]"
         style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
       >
         タイトル <span className="text-red-500">*</span>
@@ -34,16 +16,14 @@ export const TitleSection: React.FC<PostFormSectionProps> = ({
       <input
         type="text"
         maxLength={20}
-        placeholder="魅力的なタイトルを入力してください"
-        className="w-full px-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-lg"
+        placeholder="羽毛枕"
+        className="w-full px-3 py-2.5 border border-[#C4B5B5] rounded-xl focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 text-sm"
         style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
         value={data.title}
         onChange={(e) => onChange("title", e.target.value)}
       />
       <div className="flex justify-end items-center">
-        <p className="text-sm font-medium text-gray-600">
-          {data.title.length}/20文字
-        </p>
+        <p className="text-xs text-gray-400">{data.title.length}/20文字</p>
       </div>
     </div>
   );

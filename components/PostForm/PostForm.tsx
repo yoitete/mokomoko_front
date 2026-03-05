@@ -6,16 +6,12 @@ import Toast from "@/components/Toast/Toast";
 import { TitleSection } from "./TitleSection";
 import { DescriptionSection } from "./DescriptionSection";
 import { FormFieldsSection } from "./FormFieldsSection";
+import { SelectionFieldsSection } from "./SelectionFieldsSection";
 import { TagsSection } from "./TagsSection";
 import { ImageSection } from "./ImageSection";
+import { PostFormData } from "./types";
 
-export type PostFormData = {
-  title: string;
-  description: string;
-  price?: number;
-  tags: string[];
-  image?: File | null;
-};
+export type { PostFormData } from "./types";
 
 export type PostFormProps = {
   initialData?: Partial<PostFormData>;
@@ -44,6 +40,10 @@ export const PostForm: React.FC<PostFormProps> = ({
     price: undefined,
     tags: [],
     image: null,
+    material: [],
+    sleeping_position: [],
+    height: [],
+    order_type: undefined,
     ...initialData,
   });
 
@@ -125,8 +125,8 @@ export const PostForm: React.FC<PostFormProps> = ({
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="p-8 space-y-8">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="p-5 space-y-5">
           {/* タイトルセクション */}
           <TitleSection data={formData} onChange={handleChange} />
 
@@ -140,7 +140,10 @@ export const PostForm: React.FC<PostFormProps> = ({
             showImageUpload={showImageUpload}
           />
 
-          {/* フォームセクション */}
+          {/* 素材・寝姿勢・高さ選択セクション */}
+          <SelectionFieldsSection data={formData} onChange={handleChange} />
+
+          {/* 価格セクション */}
           <FormFieldsSection data={formData} onChange={handleChange} />
 
           {/* タグ入力セクション */}
@@ -151,25 +154,25 @@ export const PostForm: React.FC<PostFormProps> = ({
 
           {/* エラー表示 */}
           {error && (
-            <div className="bg-red-50 border-2 border-red-200 text-red-700 px-6 py-4 rounded-lg">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
               <div className="flex items-center">
-                <FontAwesomeIcon icon={faTimes} className="mr-2" />
+                <FontAwesomeIcon icon={faTimes} className="mr-2 text-xs" />
                 {error}
               </div>
             </div>
           )}
 
           {/* 投稿ボタン */}
-          <div className="flex justify-center pt-6">
+          <div className="flex justify-center pt-4">
             <Button
               onClick={handleSubmit}
-              size="lg"
-              className="min-w-[240px] py-4 text-lg font-semibold cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200"
+              size="md"
+              className="min-w-[200px] py-3 text-sm font-semibold cursor-pointer shadow-sm hover:shadow-md transition-all duration-200"
               disabled={loading}
             >
               {loading ? (
                 <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   {submitButtonText.replace("する", "中...")}
                 </div>
               ) : (

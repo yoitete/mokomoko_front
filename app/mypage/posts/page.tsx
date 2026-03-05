@@ -107,7 +107,7 @@ export default function MyPostsPage() {
                 className="text-gray-300 text-4xl mb-4"
               />
             </div>
-            <p className="text-gray-500 mb-4 text-lg">まだ投稿がありません</p>
+            <p className="text-[#7E6565] mb-4 text-sm">まだ投稿がありません</p>
             <p className="text-gray-400 text-sm mb-6">
               投稿ページから最初の投稿を作成しましょう
             </p>
@@ -139,16 +139,15 @@ export default function MyPostsPage() {
 
               {/* 右：タイトル＋本文サマリー */}
               <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
-                <p className="text-lg font-semibold text-black">{post.title}</p>
-                <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
-                  {post.description}
-                </p>
-
+                <p className="text-lg font-semibold text-[#5A4A4A]">{post.title}</p>
                 {post.price && (
-                  <p className="text-xl font-bold text-red-600 mb-2">
+                  <p className="text-sm font-bold text-red-600 mt-1">
                     ¥{post.price.toLocaleString()}
                   </p>
                 )}
+                <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
+                  {post.description}
+                </p>
 
                 <div className="flex items-center justify-between text-sm text-gray-500 mt-2">
                   <div className="flex items-center gap-4">
