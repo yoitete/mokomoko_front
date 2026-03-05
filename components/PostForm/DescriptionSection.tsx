@@ -32,7 +32,7 @@ export const DescriptionSection: React.FC<PostFormSectionProps> = ({
         説明 <span className="text-red-500">*</span>
       </label>
       <textarea
-        placeholder="ふわふわの触りごごちでとてもこれ一枚でも暖かい毛布です...（必須）"
+        placeholder="低反発タイプの枕を購入しました。頭と首にフィットしてくれる感じがあり、朝起きたときの首の疲れが軽減された気がします。高さもちょうど良く、仰向けでも横向きでも寝やすいです。（必須）"
         className="w-full px-4 py-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] transition-all duration-200 resize-none text-lg"
         style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
         rows={5}

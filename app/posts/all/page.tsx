@@ -193,7 +193,7 @@ function AllPostsContent() {
 
                 {/* 右：タイトル＋本文サマリー */}
                 <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
-                  <p className="text-lg font-semibold text-black">{post.title}</p>
+                  <p className="text-lg font-semibold text-[#5A4A4A]">{post.title}</p>
                   <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
                     {post.description}
                   </p>
@@ -202,14 +202,14 @@ function AllPostsContent() {
                       {post.tags.slice(0, 5).map((tag, index) => (
                         <span
                           key={index}
-                          className="bg-gray-100 text-black px-2 py-1 rounded-full text-xs"
+                          className="bg-[#F5F0F0] text-[#7E6565] px-2 py-1 rounded-full text-xs"
                         >
                           #{tag}
                         </span>
                       ))}
                     </div>
                   )}
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-[#5A4A4A] mt-2">
                     {post.created_at &&
                       new Date(post.created_at).toLocaleString("ja-JP", {
                         year: "numeric",
