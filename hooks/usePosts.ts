@@ -15,6 +15,7 @@ export type Post = {
   created_at?: string;
   updated_at?: string;
   images?: string[];
+  user_name?: string;
 };
 
 // 投稿作成用の型定義
@@ -41,7 +42,7 @@ export const usePosts = () => {
   const postData = usePost<Post>();
   const putData = usePut<Post>();
   const deleteData = useDelete();
-  const { postFormData } = useAPI();
+  const { postFormData, putFormData } = useAPI();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +137,49 @@ export const usePosts = () => {
     [putData]
   );
 
+  // 投稿を更新（画像付き）
+  const updatePostWithImage = useCallback(
+    async (id: number, postDataInput: CreatePostWithImageData) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const formData = new FormData();
+        formData.append("post[title]", postDataInput.title);
+        formData.append("post[description]", postDataInput.description || "");
+
+        if (postDataInput.price !== undefined) {
+          formData.append("post[price]", postDataInput.price.toString());
+        }
+
+        if (postDataInput.tags && postDataInput.tags.length > 0) {
+          postDataInput.tags.forEach((tag) => {
+            formData.append("post[tags][]", tag);
+          });
+        }
+
+        if (postDataInput.image) {
+          formData.append("post[images][]", postDataInput.image);
+        }
+
+        const data = await putFormData<Post>(`/posts/${id}`, formData);
+
+        // キャッシュを更新
+        mutate("/posts");
+        mutate(`/posts/${id}`);
+        return data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "投稿の更新に失敗しました";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [putFormData]
+  );
+
   // 投稿を削除
   const deletePost = useCallback(
     async (id: number) => {
@@ -164,6 +208,7 @@ export const usePosts = () => {
     createPost,
     createPostWithImage,
     updatePost,
+    updatePostWithImage,
     deletePost,
   };
 };

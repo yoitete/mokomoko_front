@@ -119,13 +119,13 @@ export default function PostDetail() {
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* 画像 */}
           {post.images && post.images.length > 0 && (
-            <div className="relative">
+            <div className="relative rounded-t-lg overflow-hidden">
               <Image
                 src={post.images[0]}
                 alt={post.title}
                 width={800}
                 height={400}
-                className="w-full h-64 object-cover"
+                className="w-full h-64 object-cover rounded-t-lg"
                 unoptimized={true}
               />
               {/* お気に入りボタン（画像の右下にオーバーレイ） */}
@@ -202,10 +202,25 @@ export default function PostDetail() {
               </div>
             )}
 
-            {/* 投稿日時 */}
-            <div className="mt-4 text-sm text-gray-500">
-              投稿日:{" "}
-              {new Date(post.created_at || "").toLocaleDateString("ja-JP")}
+            {/* 投稿日時・投稿者 */}
+            <div className="mt-4 pt-4 border-t border-gray-100 space-y-1 text-sm text-[#7E6565]">
+              {post.created_at && (
+                <p style={{ fontFamily: "'Noto Sans JP', sans-serif" }}>
+                  投稿日時:{" "}
+                  {new Date(post.created_at).toLocaleString("ja-JP", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              )}
+              {post.user_name && (
+                <p style={{ fontFamily: "'Noto Sans JP', sans-serif" }}>
+                  投稿者: {post.user_name}
+                </p>
+              )}
             </div>
           </div>
         </div>

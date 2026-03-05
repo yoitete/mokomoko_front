@@ -7,7 +7,7 @@ export const SimpleBox = ({
 }) => (
   <div
     className={`
-      bg-white
+      bg-[#D8CDCD]
       mt-5
       p-4
       rounded-lg

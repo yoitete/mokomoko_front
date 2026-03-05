@@ -15,7 +15,7 @@ interface MyPostsResponse {
   };
 }
 
-export const useMyPosts = (page: number = 1, perPage: number = 5) => {
+export const useMyPosts = (page: number = 1, perPage: number = 10) => {
   const { isAuthenticated, token } = useAuth();
 
   // 認証状態をデバッグ

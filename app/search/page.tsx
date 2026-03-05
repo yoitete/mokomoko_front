@@ -6,10 +6,11 @@ import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import Button from "@/components/Button/Button";
-import { faList, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { useAuth } from "@/hooks/useAuth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface SearchResponse {
   posts: Post[];
@@ -22,26 +23,24 @@ interface SearchResponse {
 }
 
 export default function Search() {
-  const { isUnauthenticated, loading } = useAuth();
+  const { isUnauthenticated, loading, userId } = useCurrentUser();
+  const { toggleFavorite, isFavorite } = useFavorites(userId);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState<"newest" | "popular">(
-    "newest"
+    "newest",
   );
 
-  // デバウンス機能：2000ms後に検索クエリを更新
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
     }, 2000);
-
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // 検索パラメータを構築
   const buildSearchParams = useCallback(() => {
     const params = new URLSearchParams();
     if (debouncedSearchQuery.trim()) {
@@ -52,11 +51,10 @@ export default function Search() {
     }
     params.append("with_images", "true");
     params.append("page", currentPage.toString());
-    params.append("per_page", "6");
+    params.append("per_page", "10");
     return params.toString();
   }, [debouncedSearchQuery, selectedSort, currentPage]);
 
-  // APIから検索結果を取得
   const {
     data: searchData,
     error,
@@ -66,12 +64,10 @@ export default function Search() {
   const posts = searchData?.posts || [];
   const pagination = searchData?.pagination;
 
-  // 検索クエリが変更されたときにページを1にリセット
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearchQuery, selectedSort]);
 
-  // ドロップダウンメニューの外側クリックで閉じる
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (isDropdownOpen) {
@@ -81,20 +77,15 @@ export default function Search() {
         }
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isDropdownOpen]);
 
-  // ページ変更時にトップにスクロール
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // ローディング中の表示
   if (loading) {
     return (
       <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
@@ -106,7 +97,6 @@ export default function Search() {
     );
   }
 
-  // ログイン前の表示
   if (isUnauthenticated) {
     return (
       <div className="min-h-screen bg-[#E2D8D8] flex items-center justify-center">
@@ -156,102 +146,103 @@ export default function Search() {
     );
   }
 
+  const totalCount = pagination?.total_count ?? 0;
+  const currentPageNum = pagination?.current_page ?? 1;
+  const perPage = pagination?.per_page ?? 6;
+  const startNum = (currentPageNum - 1) * perPage + 1;
+  const endNum = Math.min(currentPageNum * perPage, totalCount);
+  const pageInfoText =
+    posts.length === 0
+      ? searchQuery
+        ? `"${searchQuery}" の検索結果: 0件`
+        : "0件"
+      : `${totalCount}件中 ${startNum}-${endNum}件を表示`;
+
   return (
-    <div className="mt-5 mb-5">
-      <div
-        className="mt-5 ml-7 text-left font-semibold text-2xl"
-        style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-      >
-        検索
-      </div>
-
-      {/* 検索バー */}
-      <div className="ml-6 mt-3 flex items-center gap-2">
-        <div className="relative flex-1 max-w-md">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-3 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] pr-10 bg-white"
-            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-            placeholder="タグ、タイトル、説明で検索..."
-          />
-          <FontAwesomeIcon
-            icon={faSearch}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-          />
-        </div>
-      </div>
-
-      {/* 絞り込み */}
-      <div className="mr-6 mt-2 flex justify-end">
-        <div className="relative dropdown-container">
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm text-black"
-            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-          >
-            <FontAwesomeIcon icon={faList} size="lg" className="text-black" />
-            <span>
-              絞り込み：{selectedSort === "newest" ? "新着順" : "人気順"}
-            </span>
-          </button>
-
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-              <div className="py-1">
-                <button
-                  onClick={() => {
-                    setSelectedSort("newest");
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    selectedSort === "newest" ? "bg-blue-50 text-blue-600" : ""
-                  }`}
-                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-                >
-                  新着順
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedSort("popular");
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                    selectedSort === "popular" ? "bg-blue-50 text-blue-600" : ""
-                  }`}
-                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-                >
-                  人気順
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 検索結果 */}
-      <div className="mt-4 ml-6">
-        <p
-          className="text-sm text-gray-600"
-          style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+    <div>
+      <section className="mt-8">
+        <h2
+          className="text-center text-3xl font-bold tracking-wide bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
+          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
         >
-          {searchQuery
-            ? `"${searchQuery}" の検索結果: ${pagination?.total_count || 0}件`
-            : `全投稿: ${pagination?.total_count || 0}件`}
-        </p>
-        {pagination && pagination.total_pages > 1 && (
+          検索
+        </h2>
+        {/* 検索バー */}
+        <div className="px-4 mt-4">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full p-3 pl-10 border border-[#C4B5B5] rounded-lg focus:border-[#7E6565] focus:ring-[#7E6565] bg-white"
+              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              placeholder="タグ、タイトル、説明で検索..."
+            />
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7E6565]"
+            />
+          </div>
+        </div>
+
+        {/* 絞り込み・件数 */}
+        <div className="flex items-center justify-between px-4 mt-3 mb-3">
           <p
-            className="text-sm text-gray-500 mt-1"
+            className="text-sm text-gray-500"
             style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
           >
-            {pagination.current_page} / {pagination.total_pages} ページ
+            {pageInfoText}
           </p>
-        )}
-      </div>
+          <div className="relative dropdown-container">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 px-3 py-1.5 border border-[#C4B5B5] rounded-lg hover:bg-[#7E6565] hover:text-white text-sm text-[#5A4A4A] transition-colors"
+              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
+              <FontAwesomeIcon icon={faList} className="text-xs" />
+              <span>{selectedSort === "newest" ? "新着順" : "人気順"}</span>
+            </button>
+
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-36 bg-white border border-[#C4B5B5] rounded-lg shadow-lg z-10">
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      setSelectedSort("newest");
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                      selectedSort === "newest"
+                        ? "text-[#7E6565] font-semibold"
+                        : "text-gray-700"
+                    }`}
+                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                  >
+                    新着順
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedSort("popular");
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                      selectedSort === "popular"
+                        ? "text-[#7E6565] font-semibold"
+                        : "text-gray-700"
+                    }`}
+                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                  >
+                    人気順
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* 投稿一覧 */}
-      <div className="mt-10 mx-4 space-y-4">
+      <div className="mx-4 space-y-4">
         {posts.length === 0 ? (
           <p className="text-center mt-10 text-gray-600">
             {searchQuery
@@ -262,39 +253,98 @@ export default function Search() {
           posts.map((post) => (
             <SimpleBox
               key={post.id}
-              className="flex flex-col md:flex-row items-start p-4"
+              className="flex flex-col md:flex-row items-start p-4 !rounded-2xl !shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
             >
-              {/* 左：画像 */}
-              <div className="md:w-1/3 w-full">
+              <Link href={`/post/${post.id}`} className="md:w-1/3 w-full block">
                 {post.images?.[0] ? (
-                  <div className="w-full h-[118px] overflow-hidden relative">
+                  <div className="w-full h-[140px] overflow-hidden relative rounded-2xl">
                     <Image
                       src={post.images[0]}
                       alt={post.title}
                       fill
-                      className="object-cover"
+                      className="object-cover rounded-2xl"
                       unoptimized={true}
                     />
+                    {post.user_id !== userId && post.id && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (post.id) {
+                            toggleFavorite(post.id);
+                          }
+                        }}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
+                        title="お気に入りに追加"
+                      >
+                        <FontAwesomeIcon
+                          icon={faHeart}
+                          className={`text-sm ${
+                            post.id && isFavorite(post.id)
+                              ? "text-red-500"
+                              : "text-gray-400 hover:text-red-300"
+                          }`}
+                        />
+                      </button>
+                    )}
                   </div>
                 ) : (
-                  <div className="h-[118px] bg-gray-200 flex items-center justify-center">
+                  <div className="h-[140px] bg-gray-200 flex items-center justify-center rounded-2xl text-sm text-gray-400 relative">
                     No Image
+                    {post.user_id !== userId && post.id && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (post.id) {
+                            toggleFavorite(post.id);
+                          }
+                        }}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
+                        title="お気に入りに追加"
+                      >
+                        <FontAwesomeIcon
+                          icon={faHeart}
+                          className={`text-sm ${
+                            post.id && isFavorite(post.id)
+                              ? "text-red-500"
+                              : "text-gray-400 hover:text-red-300"
+                          }`}
+                        />
+                      </button>
+                    )}
                   </div>
                 )}
-              </div>
-
-              {/* 右：タイトル＋本文サマリー */}
+              </Link>
               <div className="md:w-2/3 w-full md:ml-4 mt-2 md:mt-0">
-                <p className="text-lg font-semibold">{post.title}</p>
-                <p className="text-sm text-gray-600 line-clamp-3 mt-1 whitespace-pre-wrap">
+                <p className="text-lg font-semibold text-[#5A4A4A]">
+                  {post.title}
+                </p>
+                {post.price != null && (
+                  <p className="text-sm font-bold text-red-600 mt-1">
+                    ¥{post.price.toLocaleString()}
+                  </p>
+                )}
+                <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
                   {post.description}
+                </p>
+                <p className="text-xs text-[#5A4A4A] mt-2">
+                  {post.created_at &&
+                    new Date(post.created_at).toLocaleString("ja-JP", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  {post.user_name && ` ・ ${post.user_name}`}
                 </p>
                 {post.tags && post.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {post.tags.slice(0, 5).map((tag, index) => (
                       <span
                         key={index}
-                        className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs"
+                        className="bg-[#F5F0F0] text-[#7E6565] px-2 py-1 rounded-full text-xs"
                       >
                         #{tag}
                       </span>
@@ -303,9 +353,9 @@ export default function Search() {
                 )}
                 <Link
                   href={`/post/${post.id}`}
-                  className="text-blue-500 text-sm mt-2 inline-block"
+                  className="text-sm mt-2 inline-block font-semibold text-[#7E6565] hover:text-[#5A4A4A]"
                 >
-                  続きを読む
+                  続きを読む →
                 </Link>
               </div>
             </SimpleBox>
@@ -314,33 +364,29 @@ export default function Search() {
       </div>
 
       {/* ページネーション */}
-      {pagination && pagination.total_pages > 1 && (
-        <div className="flex justify-center items-center space-x-4 mt-8 mb-3">
+      {pagination && (
+        <div className="flex justify-center items-center space-x-4 mt-8 mb-6">
           <Button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             variant="outline"
             size="md"
-            className="min-w-[100px]"
+            className="min-w-[100px] text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
           >
             前へ
           </Button>
-
-          <div className="flex items-center space-x-2">
-            <span
-              className="text-sm text-gray-900 font-semibold"
-              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-            >
-              {pagination.current_page} / {pagination.total_pages}
-            </span>
-          </div>
-
+          <span
+            className="text-sm text-[#7E6565] font-semibold"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
+            {pagination.current_page} / {pagination.total_pages}
+          </span>
           <Button
             onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === pagination.total_pages}
+            disabled={currentPage === (pagination?.total_pages ?? 1)}
             variant="outline"
             size="md"
-            className="min-w-[100px]"
+            className="min-w-[100px] text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
           >
             次へ
           </Button>
