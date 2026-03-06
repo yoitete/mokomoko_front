@@ -137,30 +137,30 @@ export const useAPI = () => {
   const postFormData = useCallback(
     async <T = unknown>(url: string, formData: FormData) => {
       const api = await createAuthenticatedRequest();
-      // Content-Typeを手動設定せず、axiosにFormDataを自動検出させる（boundary付与のため）
       const response = await api.post<T>(url, formData, {
         headers: {
-          "Content-Type": undefined,
+          "Content-Type": "multipart/form-data",
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
       });
       return response.data;
     },
-    [createAuthenticatedRequest]
+    [createAuthenticatedRequest, token]
   );
 
   // 画像アップロード用のPUTメソッド
   const putFormData = useCallback(
     async <T = unknown>(url: string, formData: FormData) => {
       const api = await createAuthenticatedRequest();
-      // Content-Typeを手動設定せず、axiosにFormDataを自動検出させる（boundary付与のため）
       const response = await api.put<T>(url, formData, {
         headers: {
-          "Content-Type": undefined,
+          "Content-Type": "multipart/form-data",
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
       });
       return response.data;
     },
-    [createAuthenticatedRequest]
+    [createAuthenticatedRequest, token]
   );
 
   const put = useCallback(

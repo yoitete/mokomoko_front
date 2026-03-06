@@ -58,7 +58,7 @@ export const PostForm: React.FC<PostFormProps> = ({
     field: K,
     value: PostFormData[K]
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData({ ...formData, [field]: value });
   };
 
   const handleImageChange = (file: File | null) => {
@@ -115,22 +115,9 @@ export const PostForm: React.FC<PostFormProps> = ({
     try {
       await onSubmit(formData);
       onSuccess?.();
-    } catch (err: unknown) {
+    } catch (err) {
       console.error("投稿エラー:", err);
-      // エラー詳細を取得
-      const axiosErr = err as { response?: { status?: number; data?: unknown }; message?: string; code?: string };
-      const status = axiosErr?.response?.status;
-      const detail = axiosErr?.response?.data;
-      const code = axiosErr?.code;
-      console.error("投稿エラー詳細:", { status, detail, code, message: axiosErr?.message });
-
-      let message = "投稿中にエラーが発生しました。";
-      if (status) {
-        message += ` (${status})`;
-      } else if (code === "ERR_NETWORK") {
-        message = "ネットワークエラー: APIサーバーに接続できません。";
-      }
-      setToastMessage(message);
+      setToastMessage("投稿中にエラーが発生しました。");
       setToastType("error");
       setShowToast(true);
     }
