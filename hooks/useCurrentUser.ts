@@ -1,13 +1,18 @@
+import { useEffect, useRef, useCallback } from "react";
 import { useAuth } from "./useAuth";
 import { useUserByFirebaseUID } from "./useProfile";
+import { useAPI } from "./useAPI";
+import { mutate } from "swr";
 
 /**
  * 現在ログイン中のユーザー情報を取得するフック
  * Firebase認証とAPI側のユーザーデータを組み合わせて提供
+ * APIにユーザーが存在しない場合は自動作成する
  */
 export const useCurrentUser = () => {
   const {
     user,
+    token,
     loading: authLoading,
     isAuthenticated,
     isUnauthenticated,
@@ -17,14 +22,43 @@ export const useCurrentUser = () => {
     error: userError,
     isLoading: userDataLoading,
   } = useUserByFirebaseUID(user?.uid || null);
+  const { post } = useAPI();
+  const isCreatingRef = useRef(false);
 
-  // デバッグログ
-  console.log("useCurrentUser - Firebase User:", user);
-  console.log("useCurrentUser - Firebase UID:", user?.uid);
-  console.log("useCurrentUser - API User Data:", userData);
-  console.log("useCurrentUser - User ID:", userData?.id);
-  console.log("useCurrentUser - Loading states:", { authLoading, userDataLoading });
-  console.log("useCurrentUser - Error:", userError);
+  // APIにユーザーが存在しない場合（404）、自動作成する
+  const autoCreateUser = useCallback(async () => {
+    if (isCreatingRef.current) return;
+    if (!user?.uid || !token) return;
+
+    isCreatingRef.current = true;
+    try {
+      console.log("useCurrentUser: APIユーザー自動作成開始", user.uid);
+      await post("/users", {
+        name: user.displayName || "",
+        token: token,
+      });
+      // 作成成功 → SWRキャッシュを再検証
+      await mutate(`/users/by_firebase_uid/${user.uid}`);
+      console.log("useCurrentUser: APIユーザー自動作成成功");
+    } catch (err) {
+      console.error("useCurrentUser: APIユーザー自動作成失敗:", err);
+    } finally {
+      isCreatingRef.current = false;
+    }
+  }, [user?.uid, user?.displayName, token, post]);
+
+  useEffect(() => {
+    // Firebaseユーザーが存在し、トークンがあり、APIユーザーが404の場合
+    const is404 =
+      userError &&
+      typeof userError === "object" &&
+      "response" in userError &&
+      (userError as { response?: { status?: number } }).response?.status === 404;
+
+    if (user?.uid && token && is404 && !isCreatingRef.current) {
+      autoCreateUser();
+    }
+  }, [user?.uid, token, userError, autoCreateUser]);
 
   return {
     // Firebase認証情報
