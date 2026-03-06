@@ -119,15 +119,21 @@ export const PostForm: React.FC<PostFormProps> = ({
       console.error("投稿エラー:", err);
       const axiosErr = err as { response?: { status?: number; data?: unknown }; message?: string; code?: string };
       const status = axiosErr?.response?.status;
-      const detail = axiosErr?.response?.data;
       const code = axiosErr?.code;
-      console.error("投稿エラー詳細:", { status, detail, code, message: axiosErr?.message });
+      const errMsg = axiosErr?.message || "";
+      console.error("投稿エラー詳細:", { status, code, errMsg, response: axiosErr?.response?.data });
 
-      let message = "投稿中にエラーが発生しました。";
-      if (status) {
-        message += ` (${status})`;
+      let message = "投稿エラー: ";
+      if (status === 401) {
+        message += "認証エラー(401) - 再ログインしてください";
+      } else if (status === 500) {
+        message += "サーバーエラー(500)";
+      } else if (status) {
+        message += `エラー(${status})`;
       } else if (code === "ERR_NETWORK") {
-        message = "ネットワークエラー: APIサーバーに接続できません。";
+        message += "ネットワークエラー - APIに接続できません";
+      } else {
+        message += errMsg || "不明なエラー";
       }
       setToastMessage(message);
       setToastType("error");
