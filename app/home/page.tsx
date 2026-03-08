@@ -8,6 +8,7 @@ import { PostList } from "@/components/PostList/PostList";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import PillowDiagnosis from "@/components/PillowDiagnosis/PillowDiagnosis";
 
 export default function Home() {
   const { userId, isAuthenticated } = useCurrentUser();
@@ -149,6 +150,29 @@ export default function Home() {
           toggleFavorite={toggleFavorite}
           isLoading={popularLoading}
           emptyMessage="人気の投稿がありません"
+          currentUserId={userId || undefined}
+        />
+      </section>
+
+      <section className="mt-10 mb-8">
+        <h2
+          className="text-center text-3xl font-bold tracking-wide bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
+          style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+        >
+          まくら診断
+        </h2>
+        <div className="flex items-center justify-between px-4 mt-2 mb-3">
+          <p
+            className="text-sm font-semibold text-[#7E6565] tracking-widest"
+            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          >
+            PILLOW MATCHING
+          </p>
+        </div>
+        <PillowDiagnosis
+          isAuthenticated={isAuthenticated}
+          isFavorite={isFavorite}
+          toggleFavorite={toggleFavorite}
           currentUserId={userId || undefined}
         />
       </section>
