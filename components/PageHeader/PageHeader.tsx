@@ -33,7 +33,7 @@ export const PageHeader = ({
                 />
               </button>
               <h1
-                className="text-3xl font-bold tracking-wide text-center text-[#5A4A4A]"
+                className="text-3xl font-bold tracking-wide text-center bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
                 style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
               >
                 {title}
@@ -59,7 +59,7 @@ export const PageHeader = ({
               />
             </Link>
             <h2
-              className="text-3xl font-bold tracking-wide text-center text-[#5A4A4A]"
+              className="text-3xl font-bold tracking-wide text-center bg-gradient-to-r from-red-700 to-red-900 bg-clip-text text-transparent"
               style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
             >
               {title}
