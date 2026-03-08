@@ -5,7 +5,6 @@ import {
   faSignOutAlt,
   faUser,
   faSignInAlt,
-  faCog,
   faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -109,17 +108,6 @@ export default function Header() {
                   </button>
                 </Link>
 
-                <Link href="/settings">
-                  <button
-                    className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
-                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-                    onClick={() => setShowMenu(false)}
-                  >
-                    <FontAwesomeIcon icon={faCog} className="mr-2" />
-                    設定
-                  </button>
-                </Link>
-
                 <button
                   className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
                   style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
@@ -165,17 +153,6 @@ export default function Header() {
                   />
                   ゲストユーザーでログイン
                 </button>
-
-                <Link href="/settings">
-                  <button
-                    className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
-                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-                    onClick={() => setShowMenu(false)}
-                  >
-                    <FontAwesomeIcon icon={faCog} className="mr-2" />
-                    設定
-                  </button>
-                </Link>
 
                 <button
                   className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
