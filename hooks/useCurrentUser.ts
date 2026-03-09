@@ -25,16 +25,20 @@ export const useCurrentUser = () => {
   const { post } = useAPI();
   const isCreatingRef = useRef(false);
 
+  // tokenをrefで保持し、useCallbackの依存配列から除外してループを防止
+  const tokenRef = useRef(token);
+  tokenRef.current = token;
+
   // APIにユーザーが存在しない場合（404）、自動作成する
   const autoCreateUser = useCallback(async () => {
     if (isCreatingRef.current) return;
-    if (!user?.uid || !token) return;
+    if (!user?.uid || !tokenRef.current) return;
 
     isCreatingRef.current = true;
     try {
       await post("/users", {
         name: user.displayName || "",
-        token: token,
+        token: tokenRef.current,
       });
       await mutate(`/users/by_firebase_uid/${user.uid}`);
     } catch (err) {
@@ -42,7 +46,7 @@ export const useCurrentUser = () => {
     } finally {
       isCreatingRef.current = false;
     }
-  }, [user?.uid, user?.displayName, token, post]);
+  }, [user?.uid, user?.displayName, post]);
 
   useEffect(() => {
     // Firebaseユーザーが存在し、トークンがあり、APIユーザーが404の場合
@@ -52,10 +56,10 @@ export const useCurrentUser = () => {
       "response" in userError &&
       (userError as { response?: { status?: number } }).response?.status === 404;
 
-    if (user?.uid && token && is404 && !isCreatingRef.current) {
+    if (user?.uid && tokenRef.current && is404 && !isCreatingRef.current) {
       autoCreateUser();
     }
-  }, [user?.uid, token, userError, autoCreateUser]);
+  }, [user?.uid, userError, autoCreateUser]);
 
   return {
     // Firebase認証情報

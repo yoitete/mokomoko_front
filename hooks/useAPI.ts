@@ -30,11 +30,13 @@ export const useAPI = () => {
     api.interceptors.response.use(
       (response) => response,
       async (error) => {
-        if (error.response?.status === 401 && tokenRef.current) {
+        // 再試行済みフラグで無限ループを防止
+        if (error.response?.status === 401 && tokenRef.current && !error.config?._isRetryAttempt) {
           try {
             const newToken = await refreshTokenRef.current();
             const config = error.config;
             config.headers.Authorization = `Bearer ${newToken}`;
+            config._isRetryAttempt = true;
             return axios(config);
           } catch {
             return Promise.reject(error);

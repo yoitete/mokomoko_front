@@ -1,20 +1,18 @@
 import { useCallback, useMemo } from "react";
 import { useGet, usePost, useDelete } from "./useSWRAPI";
 import { mutate } from "swr";
-import { authTokenAtom } from "@/lib/authAtoms";
-import { useAtomValue } from "jotai";
 
 export const useFavorites = (userId: number | null = null) => {
-  const token = useAtomValue(authTokenAtom);
-  // SWRを使用してお気に入り一覧を取得
+  // SWRを使用してお気に入り一覧を取得（requireAuthで認証状態を管理）
   const {
     data: favoritesData,
     error,
     isLoading,
   } = useGet<{ post_id: number }[]>(
-    token && userId ? `/favorites?user_id=${userId}` : null,
+    userId ? `/favorites?user_id=${userId}` : null,
     {
-      revalidateOnFocus: false, // お気に入りは頻繁に変更されないため
+      requireAuth: true,
+      revalidateOnFocus: false,
     }
   );
 
