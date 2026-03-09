@@ -65,10 +65,18 @@ export default function Mypage() {
   // アカウント管理
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // アコーディオン開閉
-  const [openSection, setOpenSection] = useState<string | null>(null);
+  // アコーディオン開閉（複数セクション同時に開ける）
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set());
   const toggleSection = (section: string) => {
-    setOpenSection((prev) => (prev === section ? null : section));
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(section)) {
+        next.delete(section);
+      } else {
+        next.add(section);
+      }
+      return next;
+    });
   };
 
   // UI状態
@@ -251,7 +259,11 @@ export default function Mypage() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setOpenSection(null);
+      setOpenSections((prev) => {
+        const next = new Set(prev);
+        next.delete("security");
+        return next;
+      });
     } catch {
       setToastMessage("パスワードの変更に失敗しました");
       setToastType("error");
@@ -526,11 +538,11 @@ export default function Mypage() {
             <FontAwesomeIcon
               icon={faChevronDown}
               className={`text-[#7E6565] text-sm transition-transform duration-200 ${
-                openSection === "personal" ? "rotate-180" : ""
+                openSections.has("personal") ? "rotate-180" : ""
               }`}
             />
           </button>
-          {openSection === "personal" && (
+          {openSections.has("personal") && (
             <div className="space-y-4 mt-4">
               <div>
                 <label
@@ -593,11 +605,11 @@ export default function Mypage() {
             <FontAwesomeIcon
               icon={faChevronDown}
               className={`text-[#7E6565] text-sm transition-transform duration-200 ${
-                openSection === "security" ? "rotate-180" : ""
+                openSections.has("security") ? "rotate-180" : ""
               }`}
             />
           </button>
-          {openSection === "security" && (
+          {openSections.has("security") && (
             <div className="mt-4 space-y-4 p-4 bg-gray-50 rounded-lg">
               <div>
                 <label
@@ -677,11 +689,11 @@ export default function Mypage() {
             <FontAwesomeIcon
               icon={faChevronDown}
               className={`text-[#7E6565] text-sm transition-transform duration-200 ${
-                openSection === "account" ? "rotate-180" : ""
+                openSections.has("account") ? "rotate-180" : ""
               }`}
             />
           </button>
-          {openSection === "account" && (
+          {openSections.has("account") && (
             <div className="mt-4">
               {showDeleteConfirm ? (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
