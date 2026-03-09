@@ -114,3 +114,83 @@ export function recordToAnswers(record: DiagnosisRecord): DiagnosisAnswers {
 }
 
 export const SESSION_KEY = "pillow_diagnosis_answers";
+
+// スコアリング用の型
+export type ScoredPost<T> = {
+  post: T;
+  score: number;
+  maxScore: number;
+};
+
+// 投稿のスコアリング関数（おすすめ順ソートに使用）
+export function scorePosts<
+  T extends {
+    sleeping_position?: string;
+    height?: string;
+    material?: string;
+    order_type?: string;
+    price?: number;
+    favorites_count?: number;
+  },
+>(posts: T[], answers: DiagnosisAnswers): ScoredPost<T>[] {
+  return posts
+    .map((post) => {
+      let score = 0;
+      let maxScore = 0;
+
+      if (answers.sleeping_position) {
+        maxScore += 3;
+        const vals = (post.sleeping_position || "")
+          .split(",")
+          .map((s) => s.trim());
+        if (vals.includes(answers.sleeping_position)) score += 3;
+      }
+
+      if (answers.height) {
+        maxScore += 3;
+        const vals = (post.height || "").split(",").map((s) => s.trim());
+        if (vals.includes(answers.height)) score += 3;
+      }
+
+      if (answers.material_preference) {
+        maxScore += 2;
+        const targets = MATERIAL_MAP[answers.material_preference] || [];
+        const vals = (post.material || "").split(",").map((s) => s.trim());
+        if (targets.some((t) => vals.includes(t))) score += 2;
+      }
+
+      if (answers.order_interest) {
+        maxScore += 1;
+        const orderType = (post.order_type || "").trim();
+        if (answers.order_interest === "yes") {
+          if (
+            orderType === "フルオーダーメイド" ||
+            orderType === "セミオーダーメイド"
+          )
+            score += 1;
+        } else if (answers.order_interest === "no") {
+          if (
+            orderType !== "フルオーダーメイド" &&
+            orderType !== "セミオーダーメイド"
+          )
+            score += 1;
+        } else {
+          score += 1;
+        }
+      }
+
+      if (answers.price_range && post.price != null) {
+        maxScore += 2;
+        const range = PRICE_RANGES[answers.price_range];
+        if (range && post.price >= range.min && post.price <= range.max)
+          score += 2;
+      }
+
+      return { post, score, maxScore };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return (b.post.favorites_count || 0) - (a.post.favorites_count || 0);
+    });
+}

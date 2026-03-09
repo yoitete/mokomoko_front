@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
@@ -11,6 +11,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
+import {
+  DiagnosisAnswers,
+  SESSION_KEY,
+  scorePosts,
+} from "@/components/PillowDiagnosis/types";
+
+type SortType = "newest" | "popular" | "recommended";
+
+const SORT_LABELS: Record<SortType, string> = {
+  newest: "新着順",
+  popular: "人気順",
+  recommended: "おすすめ順",
+};
 
 interface SearchResponse {
   posts: Post[];
@@ -30,9 +43,24 @@ export default function Search() {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState<"newest" | "popular">(
-    "newest",
-  );
+  const [selectedSort, setSelectedSort] = useState<SortType>("newest");
+  const [diagnosisAnswers, setDiagnosisAnswers] =
+    useState<DiagnosisAnswers | null>(null);
+
+  const isRecommended = selectedSort === "recommended";
+  const perPage = 10;
+
+  // sessionStorageから診断結果を読み込み
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(SESSION_KEY);
+      if (stored) {
+        setDiagnosisAnswers(JSON.parse(stored));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -41,19 +69,23 @@ export default function Search() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // サーバーサイド用パラメータ（新着順・人気順）
   const buildSearchParams = useCallback(() => {
     const params = new URLSearchParams();
     if (debouncedSearchQuery.trim()) {
       params.append("search", debouncedSearchQuery.trim());
     }
-    if (selectedSort) {
+    if (!isRecommended) {
       params.append("sort", selectedSort);
+      params.append("page", currentPage.toString());
+      params.append("per_page", perPage.toString());
+    } else {
+      // おすすめ順: 全件取得してクライアントでソート
+      params.append("per_page", "100");
     }
     params.append("with_images", "true");
-    params.append("page", currentPage.toString());
-    params.append("per_page", "10");
     return params.toString();
-  }, [debouncedSearchQuery, selectedSort, currentPage]);
+  }, [debouncedSearchQuery, selectedSort, currentPage, isRecommended]);
 
   const {
     data: searchData,
@@ -61,8 +93,54 @@ export default function Search() {
     isLoading,
   } = useGet<SearchResponse>(`/posts?${buildSearchParams()}`);
 
-  const posts = searchData?.posts || [];
-  const pagination = searchData?.pagination;
+  // おすすめ順: クライアントサイドでスコアリング＆ページネーション
+  const recommendedResults = useMemo(() => {
+    if (!isRecommended || !diagnosisAnswers || !searchData?.posts) return null;
+    return scorePosts(searchData.posts, diagnosisAnswers);
+  }, [isRecommended, diagnosisAnswers, searchData?.posts]);
+
+  // 診断なしの場合は人気順（お気に入り数順）にフォールバック
+  const fallbackPopularPosts = useMemo(() => {
+    if (!isRecommended || recommendedResults || !searchData?.posts) return null;
+    return [...searchData.posts].sort(
+      (a, b) => (b.favorites_count || 0) - (a.favorites_count || 0)
+    );
+  }, [isRecommended, recommendedResults, searchData?.posts]);
+
+  const displayPosts = useMemo(() => {
+    if (isRecommended && recommendedResults) {
+      const start = (currentPage - 1) * perPage;
+      return recommendedResults.slice(start, start + perPage).map((r) => r.post);
+    }
+    if (isRecommended && fallbackPopularPosts) {
+      const start = (currentPage - 1) * perPage;
+      return fallbackPopularPosts.slice(start, start + perPage);
+    }
+    return searchData?.posts || [];
+  }, [isRecommended, recommendedResults, fallbackPopularPosts, searchData?.posts, currentPage]);
+
+  // ページネーション情報
+  const paginationInfo = useMemo(() => {
+    if (isRecommended && recommendedResults) {
+      const totalCount = recommendedResults.length;
+      const totalPages = Math.max(1, Math.ceil(totalCount / perPage));
+      return { currentPage, totalPages, totalCount };
+    }
+    if (isRecommended && fallbackPopularPosts) {
+      const totalCount = fallbackPopularPosts.length;
+      const totalPages = Math.max(1, Math.ceil(totalCount / perPage));
+      return { currentPage, totalPages, totalCount };
+    }
+    if (searchData?.pagination) {
+      const p = searchData.pagination;
+      return {
+        currentPage: p.current_page,
+        totalPages: p.total_pages,
+        totalCount: p.total_count,
+      };
+    }
+    return null;
+  }, [isRecommended, recommendedResults, fallbackPopularPosts, searchData?.pagination, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -146,17 +224,18 @@ export default function Search() {
     );
   }
 
-  const totalCount = pagination?.total_count ?? 0;
-  const currentPageNum = pagination?.current_page ?? 1;
-  const perPage = pagination?.per_page ?? 6;
-  const startNum = (currentPageNum - 1) * perPage + 1;
-  const endNum = Math.min(currentPageNum * perPage, totalCount);
-  const pageInfoText =
-    posts.length === 0
-      ? searchQuery
+  // 件数テキスト
+  const pageInfoText = (() => {
+    if (!paginationInfo || displayPosts.length === 0) {
+      return searchQuery
         ? `"${searchQuery}" の検索結果: 0件`
-        : "0件"
-      : `${totalCount}件中 ${startNum}-${endNum}件を表示`;
+        : "0件";
+    }
+    const { totalCount, currentPage: cp } = paginationInfo;
+    const startNum = (cp - 1) * perPage + 1;
+    const endNum = Math.min(cp * perPage, totalCount);
+    return `${totalCount}件中 ${startNum}-${endNum}件を表示`;
+  })();
 
   return (
     <div>
@@ -200,40 +279,29 @@ export default function Search() {
               style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
             >
               <FontAwesomeIcon icon={faList} className="text-xs" />
-              <span>{selectedSort === "newest" ? "新着順" : "人気順"}</span>
+              <span>{SORT_LABELS[selectedSort]}</span>
             </button>
 
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-36 bg-white border border-[#C4B5B5] rounded-lg shadow-lg z-10">
                 <div className="py-1">
-                  <button
-                    onClick={() => {
-                      setSelectedSort("newest");
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                      selectedSort === "newest"
-                        ? "text-[#7E6565] font-semibold"
-                        : "text-gray-700"
-                    }`}
-                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-                  >
-                    新着順
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedSort("popular");
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                      selectedSort === "popular"
-                        ? "text-[#7E6565] font-semibold"
-                        : "text-gray-700"
-                    }`}
-                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-                  >
-                    人気順
-                  </button>
+                  {(Object.keys(SORT_LABELS) as SortType[]).map((sort) => (
+                    <button
+                      key={sort}
+                      onClick={() => {
+                        setSelectedSort(sort);
+                        setIsDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                        selectedSort === sort
+                          ? "text-[#7E6565] font-semibold"
+                          : "text-gray-700"
+                      }`}
+                      style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                    >
+                      {SORT_LABELS[sort]}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
@@ -243,14 +311,16 @@ export default function Search() {
 
       {/* 投稿一覧 */}
       <div className="mx-4 space-y-4">
-        {posts.length === 0 ? (
+        {displayPosts.length === 0 ? (
           <p className="text-center mt-10 text-[#7E6565]">
-            {searchQuery
-              ? "検索結果が見つかりませんでした"
-              : "投稿がありません"}
+            {isRecommended && diagnosisAnswers
+              ? "おすすめの投稿が見つかりませんでした"
+              : searchQuery
+                ? "検索結果が見つかりませんでした"
+                : "投稿がありません"}
           </p>
         ) : (
-          posts.map((post) => (
+          displayPosts.map((post) => (
             <Link key={post.id} href={`/post/${post.id}`} className="block">
               <SimpleBox
                 className="flex flex-col md:flex-row items-start p-4 !rounded-2xl !shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
@@ -359,29 +429,33 @@ export default function Search() {
       </div>
 
       {/* ページネーション */}
-      {pagination && (
-        <div className="flex justify-center items-center space-x-4 mt-8 mb-6">
+      {paginationInfo && paginationInfo.totalPages >= 1 && (
+        <div className="flex justify-center items-center space-x-4 mt-8 mb-3">
           <Button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             variant="outline"
             size="md"
-            className="min-w-[100px] text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
+            className="min-w-[100px]"
           >
             前へ
           </Button>
-          <span
-            className="text-sm text-[#7E6565] font-semibold"
-            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-          >
-            {pagination.current_page} / {pagination.total_pages}
-          </span>
+
+          <div className="flex items-center space-x-2">
+            <span
+              className="text-sm text-gray-900 font-semibold"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
+              {paginationInfo.currentPage} / {paginationInfo.totalPages}
+            </span>
+          </div>
+
           <Button
             onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === (pagination?.total_pages ?? 1)}
+            disabled={currentPage === paginationInfo.totalPages}
             variant="outline"
             size="md"
-            className="min-w-[100px] text-[#5A4A4A] border-[#C4B5B5] hover:bg-[#7E6565] hover:text-white"
+            className="min-w-[100px]"
           >
             次へ
           </Button>
