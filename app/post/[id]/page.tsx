@@ -10,8 +10,10 @@ import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useViewingHistory } from "@/hooks/useViewingHistory";
 import Button from "@/components/Button/Button";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
+import { useEffect } from "react";
 
 export default function PostDetail() {
   const params = useParams();
@@ -28,6 +30,14 @@ export default function PostDetail() {
 
   // お気に入り機能（ログインユーザーのIDを使用）
   const { toggleFavorite, isFavorite } = useFavorites(userId);
+
+  // 閲覧履歴に追加
+  const { addToHistory } = useViewingHistory();
+  useEffect(() => {
+    if (post?.id) {
+      addToHistory(post);
+    }
+  }, [post?.id, addToHistory, post]);
 
   // 自分の投稿かどうかを判定
   const isOwnPost = post && userId && post.user_id === userId;

@@ -5,6 +5,9 @@ import {
   faSignOutAlt,
   faUser,
   faSignInAlt,
+  faHeart,
+  faBed,
+  faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "@/hooks/useAuth";
@@ -93,6 +96,39 @@ export default function Header() {
                   >
                     <FontAwesomeIcon icon={faUser} className="mr-2" />
                     マイページ
+                  </button>
+                </Link>
+
+                <Link href="/favorite">
+                  <button
+                    className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                    onClick={() => setShowMenu(false)}
+                  >
+                    <FontAwesomeIcon icon={faHeart} className="mr-2" />
+                    お気に入り
+                  </button>
+                </Link>
+
+                <Link href="/history">
+                  <button
+                    className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                    onClick={() => setShowMenu(false)}
+                  >
+                    <FontAwesomeIcon icon={faClock} className="mr-2" />
+                    閲覧履歴
+                  </button>
+                </Link>
+
+                <Link href="/diagnosis/history">
+                  <button
+                    className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                    onClick={() => setShowMenu(false)}
+                  >
+                    <FontAwesomeIcon icon={faBed} className="mr-2" />
+                    枕診断
                   </button>
                 </Link>
 
