@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, Suspense } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";

@@ -17,12 +17,6 @@ export default function Header() {
   const { name, nickname, userData } = useCurrentUser();
   const [showMenu, setShowMenu] = useState(false);
 
-  // デバッグログ（プロフィール編集後の反映確認用）
-  console.log("Header - name:", name);
-  console.log("Header - nickname:", nickname);
-  console.log("Header - userData:", userData);
-  console.log("Header - user?.email:", user?.email);
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -35,17 +29,10 @@ export default function Header() {
 
   const handleGuestLogin = async () => {
     try {
-      console.log("🔧 ヘッダーからゲストログイン試行");
-      console.log("🔧 ゲストユーザー情報:");
-      console.log("  - Email: admin@guest.com");
-      console.log("  - UID: 7AvuE3bjD6ZASXMZKxTfewsWsIO2");
-      console.log("  - Password: 33443344");
-      
       await signIn("admin@guest.com", "33443344");
-      console.log("✅ ヘッダーからゲストログイン成功");
       setShowMenu(false);
     } catch (error) {
-      console.error("❌ ヘッダーからゲストログインに失敗しました:", error);
+      console.error("ゲストログインに失敗しました:", error);
     }
   };
 

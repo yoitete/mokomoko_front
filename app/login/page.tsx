@@ -64,70 +64,17 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      console.log("🔧 ゲストログイン試行開始");
-      console.log("🔧 Firebase設定確認中...");
-
-      // Firebase設定を確認
-      const firebaseConfig = {
-        apiKey:
-          process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
-          "AIzaSyDWvJMpHDw8kayI4Lr4gN3sm-3FBSKCHHs",
-        authDomain:
-          process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
-          "mokomoko-2ac26.firebaseapp.com",
-        projectId:
-          process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "mokomoko-2ac26",
-      };
-
-      console.log("🔧 Firebase設定:", {
-        apiKey: firebaseConfig.apiKey?.substring(0, 10) + "...",
-        authDomain: firebaseConfig.authDomain,
-        projectId: firebaseConfig.projectId,
-      });
-
-      console.log("🔧 ゲストユーザー情報:");
-      console.log("  - Email: admin@guest.com");
-      console.log("  - UID: 7AvuE3bjD6ZASXMZKxTfewsWsIO2");
-      console.log("  - Password: 33443344");
-
       await signIn("admin@guest.com", "33443344");
-      console.log("✅ ゲストログイン成功");
-      // 成功時はuseEffectでリダイレクトされる
     } catch (error: unknown) {
-      console.error("❌ ゲストログインエラーの詳細:", error);
-
       let errorMessage = "ゲストログインに失敗しました。";
 
-      // Firebase認証エラーの型チェック
       if (error && typeof error === "object" && "code" in error) {
-        const firebaseError = error as { code: string; message: string };
-        console.error("❌ エラーコード:", firebaseError.code);
-        console.error("❌ エラーメッセージ:", firebaseError.message);
+        const firebaseError = error as { code: string };
 
         if (firebaseError.code === "auth/invalid-credential") {
-          errorMessage =
-            "認証情報が無効です。\n\n" +
-            "手動でログインしてください：\n" +
-            "メール: admin@guest.com\n" +
-            "パスワード: 33443344";
-        } else if (firebaseError.code === "auth/user-not-found") {
-          errorMessage =
-            "ユーザーが見つかりません。\n\n" +
-            "手動でログインしてください：\n" +
-            "メール: admin@guest.com\n" +
-            "パスワード: 33443344";
-        } else if (firebaseError.code === "auth/wrong-password") {
-          errorMessage =
-            "パスワードが正しくありません。\n\n" +
-            "手動でログインしてください：\n" +
-            "メール: admin@guest.com\n" +
-            "パスワード: 33443344";
+          errorMessage = "認証情報が無効です。";
         } else if (firebaseError.code === "auth/network-request-failed") {
-          errorMessage =
-            "ネットワークエラーが発生しました。\n\n" +
-            "手動でログインしてください：\n" +
-            "メール: admin@guest.com\n" +
-            "パスワード: 33443344";
+          errorMessage = "ネットワークエラーが発生しました。";
         }
       }
 

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,10 +24,7 @@ export default function PostDetail() {
     data: post,
     error,
     isLoading,
-  } = useGet<Post>(params.id ? `/posts/${params.id}` : null, {
-    revalidateOnFocus: true, // 詳細ページでは頻繁な再検証は不要
-    dedupingInterval: 0, // 詳細ページは長めのキャッシュ
-  });
+  } = useGet<Post>(params.id ? `/posts/${params.id}` : null);
 
   // お気に入り機能（ログインユーザーのIDを使用）
   const { toggleFavorite, isFavorite } = useFavorites(userId);
@@ -132,12 +128,6 @@ export default function PostDetail() {
               {isAuthenticated && !isOwnPost && post?.id && (
                 <button
                   onClick={() => {
-                    console.log("お気に入りボタンクリック - post.id:", post.id);
-                    console.log("お気に入りボタンクリック - userId:", userId);
-                    console.log(
-                      "お気に入りボタンクリック - isFavorite:",
-                      post.id ? isFavorite(post.id) : false
-                    );
                     if (post.id) {
                       toggleFavorite(post.id);
                     }

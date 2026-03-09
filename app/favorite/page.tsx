@@ -16,11 +16,6 @@ export default function FavoritePage() {
   const { isUnauthenticated, loading, userId, firebaseUID, error } =
     useCurrentUser();
 
-  // デバッグログ（必要に応じてコメントアウト）
-  // console.log("FavoritePage - User ID:", userId);
-  // console.log("FavoritePage - Firebase UID:", firebaseUID);
-  // console.log("FavoritePage - Error:", error);
-
   // SWRを使用してデータを取得（全件取得）
   const {
     data: postsResponse,

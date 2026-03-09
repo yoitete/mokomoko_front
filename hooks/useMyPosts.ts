@@ -16,11 +16,7 @@ interface MyPostsResponse {
 }
 
 export const useMyPosts = (page: number = 1, perPage: number = 10) => {
-  const { isAuthenticated, token } = useAuth();
-
-  // 認証状態をデバッグ
-  console.log("useMyPosts: isAuthenticated =", isAuthenticated);
-  console.log("useMyPosts: token =", token ? "存在" : "なし");
+  const { isAuthenticated } = useAuth();
 
   // Hooksを先に呼び出す（条件分岐の前）
   const {
@@ -40,7 +36,6 @@ export const useMyPosts = (page: number = 1, perPage: number = 10) => {
 
   const handleDeletePost = async (postId: number) => {
     if (!isAuthenticated) {
-      console.log("useMyPosts: 認証されていないため、削除を実行できません");
       return { success: false, error: "認証が必要です" };
     }
 
