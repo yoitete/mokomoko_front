@@ -263,7 +263,15 @@ export default function DiagnosisResultPage() {
                       unoptimized
                       className="object-cover"
                     />
-                    <div className="absolute top-1.5 left-1.5 bg-[#7E6565] text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    <div
+                      className={`absolute top-1.5 left-1.5 text-white text-xs font-bold px-2 py-0.5 rounded-full ${
+                        matchPercentage >= 80
+                          ? "bg-emerald-600"
+                          : matchPercentage >= 50
+                            ? "bg-amber-500"
+                            : "bg-gray-400"
+                      }`}
+                    >
                       {matchPercentage}%
                     </div>
                   </div>
