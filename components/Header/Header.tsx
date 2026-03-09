@@ -52,12 +52,14 @@ export default function Header() {
 
   return (
     <div className="sticky top-0 bg-[#7E6565] p-4 flex justify-between items-center z-50">
-      <h1
-        className="text-4xl text-[#F1F6F7] mx-auto text-center pl-9"
-        style={{ fontFamily: "Pomeranian, cursive" }}
-      >
-        MokoMoko
-      </h1>
+      <Link href="/home" className="mx-auto pl-9">
+        <h1
+          className="text-4xl text-[#F1F6F7] text-center"
+          style={{ fontFamily: "Pomeranian, cursive" }}
+        >
+          MokoMoko
+        </h1>
+      </Link>
 
       {/* ハンバーガーメニュー */}
       <div className="relative">
