@@ -95,7 +95,7 @@ export default function DiagnosisHistoryPage() {
   return (
     <div className="min-h-screen bg-[#E2D8D8]">
       <div className="mt-10 mx-4 mb-6">
-        <PageHeader title="診断履歴" backHref="/home" centerTitle={true} />
+        <PageHeader title="回答履歴" backHref="/home" centerTitle={true} />
       </div>
 
       <div className="mx-4 pb-8">

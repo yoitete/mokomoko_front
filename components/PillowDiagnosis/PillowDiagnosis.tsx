@@ -111,7 +111,7 @@ export default function PillowDiagnosis({
                 className="text-sm text-[#7E6565] hover:text-[#5A4A4A] transition-colors cursor-pointer underline"
                 style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
               >
-                過去の診断結果を見る
+                過去の回答履歴を見る
               </button>
             </Link>
           </div>
