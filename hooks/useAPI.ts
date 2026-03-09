@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useAuth } from "./useAuth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -7,43 +7,48 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export const useAPI = () => {
   const { token, refreshToken } = useAuth();
 
-  // トークン付きでAPIリクエストを作成する関数
+  // refで最新のtoken/refreshTokenを保持し、useCallbackの依存配列から除外して参照安定性を確保
+  const tokenRef = useRef(token);
+  tokenRef.current = token;
+
+  const refreshTokenRef = useRef(refreshToken);
+  refreshTokenRef.current = refreshToken;
+
+  // トークン付きでAPIリクエストを作成する関数（依存なしで安定）
   const createAuthenticatedRequest = useCallback(async () => {
-    try {
-      const api = axios.create({
-        baseURL: API_BASE_URL,
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
+    const currentToken = tokenRef.current;
 
-      // レスポンスインターセプターでトークン期限切れを処理
-      api.interceptors.response.use(
-        (response) => response,
-        async (error) => {
-          if (error.response?.status === 401 && token) {
-            try {
-              // トークンをリフレッシュして再試行
-              const newToken = await refreshToken();
-              const config = error.config;
-              config.headers.Authorization = `Bearer ${newToken}`;
-              return axios(config);
-            } catch {
-              // リフレッシュに失敗した場合は元のエラーを返す
-              return Promise.reject(error);
-            }
+    const api = axios.create({
+      baseURL: API_BASE_URL,
+      headers: {
+        "Content-Type": "application/json",
+        ...(currentToken && { Authorization: `Bearer ${currentToken}` }),
+      },
+    });
+
+    // レスポンスインターセプターでトークン期限切れを処理
+    api.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        // 再試行済みフラグで無限ループを防止
+        if (error.response?.status === 401 && tokenRef.current && !error.config?._isRetryAttempt) {
+          try {
+            const newToken = await refreshTokenRef.current();
+            const config = error.config;
+            config.headers.Authorization = `Bearer ${newToken}`;
+            config._isRetryAttempt = true;
+            return axios(config);
+          } catch {
+            return Promise.reject(error);
           }
-          return Promise.reject(error);
         }
-      );
+        return Promise.reject(error);
+      }
+    );
 
-      return api;
-    } catch (error) {
-      console.error("API request creation failed:", error);
-      throw error;
-    }
-  }, [token, refreshToken]);
+    return api;
+  }, []);
+
   const get = useCallback(
     async <T = unknown>(url: string) => {
       try {
@@ -51,7 +56,6 @@ export const useAPI = () => {
         const response = await api.get<T>(url);
         return response.data;
       } catch (error) {
-        // 404エラーの場合は詳細なログを出さない
         const axiosError = error as AxiosError;
         if (axiosError?.response?.status !== 404) {
           console.error("API Error:", url, axiosError?.response?.status, (error as Error)?.message);
@@ -71,11 +75,9 @@ export const useAPI = () => {
     [createAuthenticatedRequest]
   );
 
-  // 画像アップロード用のPOSTメソッド
   const postFormData = useCallback(
     async <T = unknown>(url: string, formData: FormData) => {
       const api = await createAuthenticatedRequest();
-      // Content-Typeを手動設定せず、axiosにFormDataを自動検出させる（boundary付与のため）
       const response = await api.post<T>(url, formData, {
         headers: {
           "Content-Type": undefined,
@@ -86,11 +88,9 @@ export const useAPI = () => {
     [createAuthenticatedRequest]
   );
 
-  // 画像アップロード用のPUTメソッド
   const putFormData = useCallback(
     async <T = unknown>(url: string, formData: FormData) => {
       const api = await createAuthenticatedRequest();
-      // Content-Typeを手動設定せず、axiosにFormDataを自動検出させる（boundary付与のため）
       const response = await api.put<T>(url, formData, {
         headers: {
           "Content-Type": undefined,

@@ -5,7 +5,9 @@ import {
   faSignOutAlt,
   faUser,
   faSignInAlt,
-  faEnvelope,
+  faHeart,
+  faBed,
+  faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,12 +19,6 @@ export default function Header() {
   const { user, isAuthenticated, logout, signIn } = useAuth();
   const { name, nickname, userData } = useCurrentUser();
   const [showMenu, setShowMenu] = useState(false);
-
-  // デバッグログ（プロフィール編集後の反映確認用）
-  console.log("Header - name:", name);
-  console.log("Header - nickname:", nickname);
-  console.log("Header - userData:", userData);
-  console.log("Header - user?.email:", user?.email);
 
   const handleLogout = async () => {
     try {
@@ -36,17 +32,10 @@ export default function Header() {
 
   const handleGuestLogin = async () => {
     try {
-      console.log("🔧 ヘッダーからゲストログイン試行");
-      console.log("🔧 ゲストユーザー情報:");
-      console.log("  - Email: admin@guest.com");
-      console.log("  - UID: 7AvuE3bjD6ZASXMZKxTfewsWsIO2");
-      console.log("  - Password: 33443344");
-      
       await signIn("admin@guest.com", "33443344");
-      console.log("✅ ヘッダーからゲストログイン成功");
       setShowMenu(false);
     } catch (error) {
-      console.error("❌ ヘッダーからゲストログインに失敗しました:", error);
+      console.error("ゲストログインに失敗しました:", error);
     }
   };
 
@@ -110,14 +99,38 @@ export default function Header() {
                   </button>
                 </Link>
 
-                <button
-                  className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
-                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-                  onClick={() => setShowMenu(false)}
-                >
-                  <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
-                  お問い合わせ
-                </button>
+                <Link href="/favorite">
+                  <button
+                    className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                    onClick={() => setShowMenu(false)}
+                  >
+                    <FontAwesomeIcon icon={faHeart} className="mr-2" />
+                    お気に入り
+                  </button>
+                </Link>
+
+                <Link href="/history">
+                  <button
+                    className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                    onClick={() => setShowMenu(false)}
+                  >
+                    <FontAwesomeIcon icon={faClock} className="mr-2" />
+                    閲覧履歴
+                  </button>
+                </Link>
+
+                <Link href="/diagnosis/history">
+                  <button
+                    className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
+                    style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+                    onClick={() => setShowMenu(false)}
+                  >
+                    <FontAwesomeIcon icon={faBed} className="mr-2" />
+                    枕診断
+                  </button>
+                </Link>
 
                 <div className="border-t border-gray-200 my-1"></div>
 
@@ -156,14 +169,6 @@ export default function Header() {
                   ゲストユーザーでログイン
                 </button>
 
-                <button
-                  className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
-                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-                  onClick={() => setShowMenu(false)}
-                >
-                  <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
-                  お問い合わせ
-                </button>
               </>
             )}
           </div>

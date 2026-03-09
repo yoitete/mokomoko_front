@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,8 +10,10 @@ import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useViewingHistory } from "@/hooks/useViewingHistory";
 import Button from "@/components/Button/Button";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
+import { useEffect } from "react";
 
 export default function PostDetail() {
   const params = useParams();
@@ -25,13 +26,18 @@ export default function PostDetail() {
     data: post,
     error,
     isLoading,
-  } = useGet<Post>(params.id ? `/posts/${params.id}` : null, {
-    revalidateOnFocus: true, // 詳細ページでは頻繁な再検証は不要
-    dedupingInterval: 0, // 詳細ページは長めのキャッシュ
-  });
+  } = useGet<Post>(params.id ? `/posts/${params.id}` : null);
 
   // お気に入り機能（ログインユーザーのIDを使用）
   const { toggleFavorite, isFavorite } = useFavorites(userId);
+
+  // 閲覧履歴に追加
+  const { addToHistory } = useViewingHistory();
+  useEffect(() => {
+    if (post?.id) {
+      addToHistory(post);
+    }
+  }, [post?.id, addToHistory, post]);
 
   // 自分の投稿かどうかを判定
   const isOwnPost = post && userId && post.user_id === userId;
@@ -132,12 +138,6 @@ export default function PostDetail() {
               {isAuthenticated && !isOwnPost && post?.id && (
                 <button
                   onClick={() => {
-                    console.log("お気に入りボタンクリック - post.id:", post.id);
-                    console.log("お気に入りボタンクリック - userId:", userId);
-                    console.log(
-                      "お気に入りボタンクリック - isFavorite:",
-                      post.id ? isFavorite(post.id) : false
-                    );
                     if (post.id) {
                       toggleFavorite(post.id);
                     }

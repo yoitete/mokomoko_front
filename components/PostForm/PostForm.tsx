@@ -116,12 +116,10 @@ export const PostForm: React.FC<PostFormProps> = ({
       await onSubmit(formData);
       onSuccess?.();
     } catch (err: unknown) {
-      console.error("投稿エラー:", err);
       const axiosErr = err as { response?: { status?: number; data?: unknown }; message?: string; code?: string };
       const status = axiosErr?.response?.status;
       const code = axiosErr?.code;
       const errMsg = axiosErr?.message || "";
-      console.error("投稿エラー詳細:", { status, code, errMsg, response: axiosErr?.response?.data });
 
       let message = "投稿エラー: ";
       if (status === 401) {

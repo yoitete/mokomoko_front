@@ -252,7 +252,6 @@ export default function Mypage() {
     }
     setIsLoading(true);
     try {
-      console.log("パスワードを変更:", { currentPassword, newPassword });
       setToastMessage("パスワードが正常に変更されました");
       setToastType("success");
       setShowToast(true);
@@ -271,7 +270,7 @@ export default function Mypage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPassword, newPassword, confirmPassword]);
+  }, [newPassword, confirmPassword]);
 
   // アカウント削除
   const handleDeleteAccount = useCallback(async () => {

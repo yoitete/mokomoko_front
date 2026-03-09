@@ -30,12 +30,6 @@ export default function ProfileImage({
 }: ProfileImageProps) {
   const selectedIconOption = iconOptions.find((opt) => opt.name === selectedIcon);
 
-  // デバッグ用ログ
-  console.log("ProfileImage - selectedIcon:", selectedIcon);
-  console.log("ProfileImage - iconOptions:", iconOptions);
-  console.log("ProfileImage - selectedIconOption:", selectedIconOption);
-  console.log("ProfileImage - profileImage:", profileImage);
-
   return (
     <div className="relative">
       <div className="w-16 h-16 rounded-full border-2 border-black overflow-hidden">
