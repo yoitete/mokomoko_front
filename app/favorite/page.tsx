@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import { useGet } from "@/hooks/useSWRAPI";
@@ -9,7 +9,6 @@ import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { mutate } from "swr";
 
 export default function FavoritePage() {
   const { isUnauthenticated, loading, userId, firebaseUID, error } =
@@ -36,66 +35,11 @@ export default function FavoritePage() {
   // お気に入り機能（ログインユーザーのIDを使用）
   const { favorites, isLoading: favoritesLoading } = useFavorites(userId);
 
-  // ページ表示時にキャッシュを再検証
-  useEffect(() => {
-    if (userId) {
-      console.log(
-        "FavoritePage - forcing cache revalidation for userId:",
-        userId
-      );
-      mutate(`/favorites?user_id=${userId}`);
-    }
-  }, [userId]);
-
-  // ページがフォーカスされた時にもキャッシュを更新
-  useEffect(() => {
-    const handleFocus = () => {
-      if (userId) {
-        console.log(
-          "FavoritePage - page focused, updating cache for userId:",
-          userId
-        );
-        mutate(`/favorites?user_id=${userId}`);
-      }
-    };
-
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
-  }, [userId]);
 
   // お気に入り投稿のみ抽出
   const favoritePosts = (posts || []).filter(
     (post) => post.id && favorites.includes(post.id)
   );
-
-  // デバッグログ
-  console.log("FavoritePage - userId:", userId);
-  console.log("FavoritePage - favorites:", favorites);
-  console.log("FavoritePage - favorites length:", favorites.length);
-  console.log(
-    "FavoritePage - all posts:",
-    posts.map((p) => ({ id: p.id, title: p.title }))
-  );
-  console.log("FavoritePage - favoritePosts count:", favoritePosts.length);
-  console.log(
-    "FavoritePage - favoritePosts:",
-    favoritePosts.map((p) => ({ id: p.id, title: p.title }))
-  );
-
-  // 除外された投稿を確認
-  const excludedPosts = posts.filter(
-    (post) => post.id && !favorites.includes(post.id)
-  );
-  console.log(
-    "FavoritePage - excluded posts:",
-    excludedPosts.map((p) => ({ id: p.id, title: p.title }))
-  );
-
-  // お気に入りIDに対応する投稿がない場合を確認
-  const missingPosts = favorites.filter(
-    (favId) => !posts.some((post) => post.id === favId)
-  );
-  console.log("FavoritePage - missing posts for favorite IDs:", missingPosts);
 
   // ページネーション計算
   const totalPages = Math.ceil(favoritePosts.length / itemsPerPage);
@@ -116,11 +60,6 @@ export default function FavoritePage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
           <p className="mt-2">認証状態を確認中...</p>
-          {firebaseUID && (
-            <p className="mt-1 text-sm text-gray-600">
-              Firebase UID: {firebaseUID}
-            </p>
-          )}
         </div>
       </div>
     );

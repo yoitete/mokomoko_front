@@ -31,6 +31,7 @@ import {
   faShieldAlt,
   faTrash,
   faNewspaper,
+  faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
@@ -61,10 +62,22 @@ export default function Mypage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPasswordSection, setShowPasswordSection] = useState(false);
-
   // アカウント管理
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // アコーディオン開閉（複数セクション同時に開ける）
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set());
+  const toggleSection = (section: string) => {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(section)) {
+        next.delete(section);
+      } else {
+        next.add(section);
+      }
+      return next;
+    });
+  };
 
   // UI状態
   const [isLoading, setIsLoading] = useState(false);
@@ -246,7 +259,11 @@ export default function Mypage() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setShowPasswordSection(false);
+      setOpenSections((prev) => {
+        const next = new Set(prev);
+        next.delete("security");
+        return next;
+      });
     } catch {
       setToastMessage("パスワードの変更に失敗しました");
       setToastType("error");
@@ -507,212 +524,224 @@ export default function Mypage() {
         {/* 設定カード */}
         <div className="bg-white rounded-lg shadow p-6">
           {/* 個人情報セクション */}
-          <h3
-            className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center"
-            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          <button
+            onClick={() => toggleSection("personal")}
+            className="w-full flex items-center justify-between cursor-pointer"
           >
-            <FontAwesomeIcon icon={faUser} className="mr-2" />
-            個人情報
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <label
-                className="block text-sm font-medium text-[#5A4A4A] mb-2"
-                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-              >
-                お名前
-              </label>
-              <Input
-                type="text"
-                placeholder="お名前を入力"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
-                disabled={isLoading}
-              />
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium text-[#5A4A4A] mb-2"
-                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-              >
-                <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
-                メールアドレス
-              </label>
-              <Input
-                type="email"
-                placeholder="メールアドレスを入力"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
-                disabled={isLoading}
-              />
-            </div>
-            <Button
-              onClick={handleSave}
-              disabled={isLoading || !name.trim() || !email.trim()}
-              className="w-full"
+            <h3
+              className="text-lg font-semibold text-[#5A4A4A] flex items-center"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
             >
-              <FontAwesomeIcon icon={faSave} className="mr-2" />
-              {isLoading ? "保存中..." : "個人情報を保存"}
-            </Button>
-          </div>
+              <FontAwesomeIcon icon={faUser} className="mr-2" />
+              個人情報
+            </h3>
+            <FontAwesomeIcon
+              icon={faChevronDown}
+              className={`text-[#7E6565] text-sm transition-transform duration-200 ${
+                openSections.has("personal") ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {openSections.has("personal") && (
+            <div className="space-y-4 mt-4">
+              <div>
+                <label
+                  className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  お名前
+                </label>
+                <Input
+                  type="text"
+                  placeholder="お名前を入力"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
+                  メールアドレス
+                </label>
+                <Input
+                  type="email"
+                  placeholder="メールアドレスを入力"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
+                  disabled={isLoading}
+                />
+              </div>
+              <Button
+                onClick={handleSave}
+                disabled={isLoading || !name.trim() || !email.trim()}
+                className="w-full"
+              >
+                <FontAwesomeIcon icon={faSave} className="mr-2" />
+                {isLoading ? "保存中..." : "個人情報を保存"}
+              </Button>
+            </div>
+          )}
 
           <div className="border-t border-gray-200 my-6"></div>
 
           {/* セキュリティセクション */}
-          <h3
-            className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center"
-            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          <button
+            onClick={() => toggleSection("security")}
+            className="w-full flex items-center justify-between cursor-pointer"
           >
-            <FontAwesomeIcon icon={faShieldAlt} className="mr-2" />
-            セキュリティ
-          </h3>
-          <div>
-            <Button
-              variant="outline"
-              onClick={() => setShowPasswordSection(!showPasswordSection)}
-              className="w-full"
-              disabled={isLoading}
+            <h3
+              className="text-lg font-semibold text-[#5A4A4A] flex items-center"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
             >
-              <FontAwesomeIcon icon={faLock} className="mr-2" />
-              パスワードを変更
-            </Button>
-
-            {showPasswordSection && (
-              <div className="mt-4 space-y-4 p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <label
-                    className="block text-sm font-medium text-[#5A4A4A] mb-2"
-                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-                  >
-                    現在のパスワード
-                  </label>
-                  <PasswordInput
-                    placeholder="現在のパスワードを入力"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
-                    disabled={isLoading}
-                  />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium text-[#5A4A4A] mb-2"
-                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-                  >
-                    新しいパスワード
-                  </label>
-                  <PasswordInput
-                    placeholder="新しいパスワードを入力"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
-                    disabled={isLoading}
-                  />
-                </div>
-                <div>
-                  <label
-                    className="block text-sm font-medium text-[#5A4A4A] mb-2"
-                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-                  >
-                    新しいパスワード（確認）
-                  </label>
-                  <PasswordInput
-                    placeholder="新しいパスワードを再入力"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={handlePasswordChange}
-                    disabled={
-                      isLoading ||
-                      !currentPassword.trim() ||
-                      !newPassword.trim() ||
-                      !confirmPassword.trim()
-                    }
-                    className="flex-1"
-                  >
-                    パスワードを変更
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowPasswordSection(false);
-                      setCurrentPassword("");
-                      setNewPassword("");
-                      setConfirmPassword("");
-                    }}
-                    className="flex-1"
-                  >
-                    キャンセル
-                  </Button>
-                </div>
+              <FontAwesomeIcon icon={faShieldAlt} className="mr-2" />
+              セキュリティ
+            </h3>
+            <FontAwesomeIcon
+              icon={faChevronDown}
+              className={`text-[#7E6565] text-sm transition-transform duration-200 ${
+                openSections.has("security") ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {openSections.has("security") && (
+            <div className="mt-4 space-y-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <label
+                  className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  現在のパスワード
+                </label>
+                <PasswordInput
+                  placeholder="現在のパスワードを入力"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
+                  disabled={isLoading}
+                />
               </div>
-            )}
-          </div>
+              <div>
+                <label
+                  className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  新しいパスワード
+                </label>
+                <PasswordInput
+                  placeholder="新しいパスワードを入力"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
+                  disabled={isLoading}
+                />
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium text-[#5A4A4A] mb-2"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  新しいパスワード（確認）
+                </label>
+                <PasswordInput
+                  placeholder="新しいパスワードを再入力"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
+                  disabled={isLoading}
+                />
+              </div>
+              <Button
+                onClick={handlePasswordChange}
+                disabled={
+                  isLoading ||
+                  !currentPassword.trim() ||
+                  !newPassword.trim() ||
+                  !confirmPassword.trim()
+                }
+                className="w-full"
+              >
+                <FontAwesomeIcon icon={faLock} className="mr-2" />
+                パスワードを変更
+              </Button>
+            </div>
+          )}
 
           <div className="border-t border-gray-200 my-6"></div>
 
           {/* アカウント管理セクション */}
-          <h3
-            className="text-lg font-semibold text-[#5A4A4A] mb-4 flex items-center"
-            style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+          <button
+            onClick={() => toggleSection("account")}
+            className="w-full flex items-center justify-between cursor-pointer"
           >
-            <FontAwesomeIcon icon={faTrash} className="mr-2" />
-            アカウント管理
-          </h3>
-
-          {showDeleteConfirm ? (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p
-                className="text-red-600 text-sm mb-4"
-                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-              >
-                アカウントを削除すると、すべてのデータが永久に失われます。この操作は取り消せません。
-              </p>
-              <div className="flex space-x-2">
-                <Button
-                  onClick={handleDeleteAccount}
-                  disabled={isLoading}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                >
-                  <FontAwesomeIcon icon={faTrash} className="mr-2" />
-                  アカウントを削除
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1"
-                >
-                  キャンセル
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteConfirm(true)}
-                className="w-full !text-red-600 !border-red-300 hover:!bg-red-50 hover:!text-red-700"
-                disabled={isLoading}
-              >
-                <FontAwesomeIcon icon={faTrash} className="mr-2" />
-                アカウントを削除
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-                className="w-full !text-gray-600 !border-gray-300 hover:!bg-gray-50 hover:!text-gray-700"
-                disabled={isLoading}
-              >
-                ログアウト
-              </Button>
+            <h3
+              className="text-lg font-semibold text-[#5A4A4A] flex items-center"
+              style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+            >
+              <FontAwesomeIcon icon={faTrash} className="mr-2" />
+              アカウント管理
+            </h3>
+            <FontAwesomeIcon
+              icon={faChevronDown}
+              className={`text-[#7E6565] text-sm transition-transform duration-200 ${
+                openSections.has("account") ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {openSections.has("account") && (
+            <div className="mt-4">
+              {showDeleteConfirm ? (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p
+                    className="text-red-600 text-sm mb-4"
+                    style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                  >
+                    アカウントを削除すると、すべてのデータが永久に失われます。この操作は取り消せません。
+                  </p>
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={handleDeleteAccount}
+                      disabled={isLoading}
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                      アカウントを削除
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="flex-1"
+                    >
+                      キャンセル
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="w-full !text-red-600 !border-red-300 hover:!bg-red-50 hover:!text-red-700"
+                    disabled={isLoading}
+                  >
+                    <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                    アカウントを削除
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleLogout}
+                    className="w-full !text-gray-600 !border-gray-300 hover:!bg-gray-50 hover:!text-gray-700"
+                    disabled={isLoading}
+                  >
+                    ログアウト
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

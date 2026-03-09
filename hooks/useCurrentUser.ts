@@ -32,14 +32,11 @@ export const useCurrentUser = () => {
 
     isCreatingRef.current = true;
     try {
-      console.log("useCurrentUser: APIユーザー自動作成開始", user.uid);
       await post("/users", {
         name: user.displayName || "",
         token: token,
       });
-      // 作成成功 → SWRキャッシュを再検証
       await mutate(`/users/by_firebase_uid/${user.uid}`);
-      console.log("useCurrentUser: APIユーザー自動作成成功");
     } catch (err) {
       console.error("useCurrentUser: APIユーザー自動作成失敗:", err);
     } finally {

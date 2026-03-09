@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Post } from "@/hooks/usePosts";
 import { useGet } from "@/hooks/useSWRAPI";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -25,27 +25,6 @@ export default function Home() {
 
   // お気に入り機能（ログインユーザーのIDを使用）
   const { toggleFavorite, isFavorite } = useFavorites(userId);
-
-  // 一時的にログを出す（ユーザーIDを確認）
-  useEffect(() => {
-    console.log("userId:", userId);
-  }, [userId]);
-
-  // デバッグ用のログ
-  useEffect(() => {
-    console.log("SWR posts data:", posts);
-    console.log("SWR loading:", isLoading);
-    console.log("SWR error:", error);
-    console.log("postsResponse:", postsResponse);
-    console.log(
-      "Posts with images:",
-      posts.filter((post) => post.images && post.images.length > 0),
-    );
-    console.log(
-      "Posts without images:",
-      posts.filter((post) => !post.images || post.images.length === 0),
-    );
-  }, [posts, isLoading, error, postsResponse]);
 
   // 新着投稿を取得（API側で既にソート済み）
   const newPosts = (posts || []).slice(0, 6);
