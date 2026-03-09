@@ -5,7 +5,6 @@ import {
   faSignOutAlt,
   faUser,
   faSignInAlt,
-  faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuth } from "@/hooks/useAuth";
@@ -110,15 +109,6 @@ export default function Header() {
                   </button>
                 </Link>
 
-                <button
-                  className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
-                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-                  onClick={() => setShowMenu(false)}
-                >
-                  <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
-                  お問い合わせ
-                </button>
-
                 <div className="border-t border-gray-200 my-1"></div>
 
                 <button
@@ -156,14 +146,6 @@ export default function Header() {
                   ゲストユーザーでログイン
                 </button>
 
-                <button
-                  className="w-full text-left px-4 py-2 text-[#5A4A4A] hover:bg-gray-50 transition-colors flex items-center"
-                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-                  onClick={() => setShowMenu(false)}
-                >
-                  <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
-                  お問い合わせ
-                </button>
               </>
             )}
           </div>
