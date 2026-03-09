@@ -149,43 +149,41 @@ export default function MyPostsPage() {
                   {post.description}
                 </p>
 
-                <div className="flex items-center justify-between text-sm text-gray-500 mt-2">
-                  <div className="flex items-center gap-4">
-                    <span>
-                      {post.created_at &&
-                        new Date(post.created_at).toLocaleString("ja-JP", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                    </span>
-                    <span>♥ {post.favorites_count || 0}</span>
-                  </div>
-                  <div className="flex gap-3">
-                    <Link
-                      href={`/post/edit/${post.id}`}
-                      className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-md transition-colors font-medium"
-                    >
-                      編集
-                    </Link>
-                    <button
-                      onClick={() => {
-                        if (
-                          confirm(
-                            `「${post.title}」を削除してもよろしいですか？\n\nこの操作は取り消すことができません。`
-                          )
-                        ) {
-                          deletePost(post.id!);
-                        }
-                      }}
-                      disabled={isDeleting}
-                      className="px-3 py-1.5 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white text-xs rounded-md transition-colors font-medium cursor-pointer disabled:cursor-not-allowed"
-                    >
-                      {isDeleting ? "削除中..." : "削除"}
-                    </button>
-                  </div>
+                <div className="flex items-center gap-4 text-xs text-[#7E6565] mt-2">
+                  <span>
+                    {post.created_at &&
+                      new Date(post.created_at).toLocaleString("ja-JP", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                  </span>
+                  <span>♥ {post.favorites_count || 0}</span>
+                </div>
+                <div className="flex gap-3 mt-2 justify-end">
+                  <Link
+                    href={`/post/edit/${post.id}`}
+                    className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs rounded-md transition-colors font-medium whitespace-nowrap"
+                  >
+                    編集
+                  </Link>
+                  <button
+                    onClick={() => {
+                      if (
+                        confirm(
+                          `「${post.title}」を削除してもよろしいですか？\n\nこの操作は取り消すことができません。`
+                        )
+                      ) {
+                        deletePost(post.id!);
+                      }
+                    }}
+                    disabled={isDeleting}
+                    className="px-3 py-1.5 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white text-xs rounded-md transition-colors font-medium whitespace-nowrap cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    {isDeleting ? "削除中..." : "削除"}
+                  </button>
                 </div>
               </div>
             </SimpleBox>
