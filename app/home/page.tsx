@@ -171,8 +171,6 @@ export default function Home() {
         </div>
         <PillowDiagnosis
           isAuthenticated={isAuthenticated}
-          isFavorite={isFavorite}
-          toggleFavorite={toggleFavorite}
           currentUserId={userId || undefined}
         />
       </section>

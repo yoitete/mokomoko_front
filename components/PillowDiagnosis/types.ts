@@ -92,3 +92,25 @@ export const INITIAL_ANSWERS: DiagnosisAnswers = {
   order_interest: null,
   price_range: null,
 };
+
+export type DiagnosisRecord = {
+  id: number;
+  sleeping_position: string;
+  height: string;
+  material_preference: string;
+  order_interest: string;
+  price_range: string;
+  created_at: string;
+};
+
+export function recordToAnswers(record: DiagnosisRecord): DiagnosisAnswers {
+  return {
+    sleeping_position: record.sleeping_position,
+    height: record.height,
+    material_preference: record.material_preference,
+    order_interest: record.order_interest,
+    price_range: record.price_range,
+  };
+}
+
+export const SESSION_KEY = "pillow_diagnosis_answers";
