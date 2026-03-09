@@ -49,14 +49,14 @@ export const useGet = <T = unknown>(
     (url: string) => fetcher(url) as Promise<T>,
     {
       // 最適化されたデフォルト設定
-      revalidateOnFocus: true, // フォーカス時に再検証（デフォルトtrue）
-      revalidateOnReconnect: true, // 再接続時に再検証
-      dedupingInterval: 0,
-      errorRetryCount: 1, // 404エラーの場合はリトライを減らす
-      errorRetryInterval: 1000, // リトライ間隔（1秒）
-      refreshInterval: 0, // 自動リフレッシュは無効（必要に応じて個別設定）
+      revalidateOnFocus: false, // フォーカス時の再検証を無効化
+      revalidateOnReconnect: false, // 再接続時の再検証を無効化
+      revalidateIfStale: false, // staleデータの自動再検証を無効化
+      dedupingInterval: 2000, // 同一キーの重複リクエストを2秒間抑制
+      errorRetryCount: 1,
+      errorRetryInterval: 5000,
+      refreshInterval: 0,
       shouldRetryOnError: (error) => {
-        // 404エラーの場合はリトライしない
         if (error?.response?.status === 404) {
           return false;
         }
