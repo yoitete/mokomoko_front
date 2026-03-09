@@ -9,6 +9,8 @@ import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function FavoritePage() {
   const { isUnauthenticated, loading, userId, firebaseUID, error } =
@@ -33,7 +35,7 @@ export default function FavoritePage() {
   const itemsPerPage = 10; // お気に入り一覧では10件表示
 
   // お気に入り機能（ログインユーザーのIDを使用）
-  const { favorites, isLoading: favoritesLoading } = useFavorites(userId);
+  const { favorites, isLoading: favoritesLoading, toggleFavorite, isFavorite } = useFavorites(userId);
 
 
   // お気に入り投稿のみ抽出
@@ -179,10 +181,50 @@ export default function FavoritePage() {
                     className="object-cover rounded-lg"
                     unoptimized={true}
                   />
+                  {post.user_id !== userId && post.id && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (post.id) toggleFavorite(post.id);
+                      }}
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
+                      title="お気に入りを解除"
+                    >
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        className={`text-sm ${
+                          post.id && isFavorite(post.id)
+                            ? "text-red-500"
+                            : "text-gray-400 hover:text-red-300"
+                        }`}
+                      />
+                    </button>
+                  )}
                 </div>
               ) : (
-                <div className="h-[118px] bg-gray-200 flex items-center justify-center rounded-lg">
+                <div className="h-[118px] bg-gray-200 flex items-center justify-center rounded-lg relative">
                   No Image
+                  {post.user_id !== userId && post.id && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (post.id) toggleFavorite(post.id);
+                      }}
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:scale-110 cursor-pointer"
+                      title="お気に入りを解除"
+                    >
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        className={`text-sm ${
+                          post.id && isFavorite(post.id)
+                            ? "text-red-500"
+                            : "text-gray-400 hover:text-red-300"
+                        }`}
+                      />
+                    </button>
+                  )}
                 </div>
               )}
             </div>
