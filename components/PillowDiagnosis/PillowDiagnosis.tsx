@@ -75,8 +75,13 @@ export default function PillowDiagnosis({
   }, []);
 
   const handleBack = useCallback(() => {
-    setCurrentStep((prev) => Math.max(0, prev - 1));
-  }, []);
+    if (currentStep === 0) {
+      setIsQuestion(false);
+      setAnswers(INITIAL_ANSWERS);
+    } else {
+      setCurrentStep((prev) => prev - 1);
+    }
+  }, [currentStep]);
 
   // 開始前: CTAカード
   if (!isQuestion) {
@@ -106,13 +111,12 @@ export default function PillowDiagnosis({
         </Button>
         {isAuthenticated && (
           <div className="mt-4">
-            <Link href="/diagnosis/history">
-              <button
-                className="text-sm text-[#7E6565] hover:text-[#5A4A4A] transition-colors cursor-pointer underline"
-                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-              >
-                過去の回答履歴を見る
-              </button>
+            <Link
+              href="/diagnosis/history"
+              className="text-sm text-[#7E6565] hover:text-[#5A4A4A] transition-colors cursor-pointer underline"
+              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
+              過去の回答履歴を見る
             </Link>
           </div>
         )}

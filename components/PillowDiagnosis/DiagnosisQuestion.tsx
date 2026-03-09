@@ -72,15 +72,13 @@ export default function DiagnosisQuestion({
       </div>
 
       {/* 戻るボタン */}
-      {currentStep > 0 && (
-        <button
-          onClick={onBack}
-          className="mt-4 text-sm text-[#7E6565] hover:text-[#5A4A4A] transition-colors cursor-pointer"
-          style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-        >
-          ← 戻る
-        </button>
-      )}
+      <button
+        onClick={onBack}
+        className="mt-4 text-sm text-[#7E6565] hover:text-[#5A4A4A] transition-colors cursor-pointer"
+        style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+      >
+        ← 戻る
+      </button>
     </div>
   );
 }
