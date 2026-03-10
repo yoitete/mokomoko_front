@@ -14,6 +14,8 @@ import { useViewingHistory } from "@/hooks/useViewingHistory";
 import Button from "@/components/Button/Button";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
 import CommentSection from "@/components/CommentSection/CommentSection";
+import PillowRadarChart from "@/components/PillowRadarChart/PillowRadarChart";
+import { calculatePillowScores } from "@/lib/pillowScoring";
 import { useEffect } from "react";
 
 export default function PostDetail() {
@@ -187,14 +189,21 @@ export default function PostDetail() {
             )}
 
             {/* 枕の特徴 */}
-            {(post.material || post.sleeping_position || post.height || post.order_type) && (
-              <div className="mb-6">
-                <h3
-                  className="text-sm font-medium text-gray-500 mb-3"
-                  style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
-                >
-                  枕の特徴
-                </h3>
+            <div className="mb-6">
+              <h3
+                className="text-sm font-medium text-gray-500 mb-3"
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+              >
+                枕の特徴
+              </h3>
+
+              {/* レーダーチャート */}
+              <div className="flex justify-center mb-4">
+                <PillowRadarChart data={calculatePillowScores(post)} />
+              </div>
+
+              {/* バッジ（データがある場合のみ） */}
+              {(post.material || post.sleeping_position || post.height || post.order_type) && (
                 <div className="space-y-3">
                   {post.material && (
                     <div>
@@ -243,8 +252,8 @@ export default function PostDetail() {
                     </div>
                   )}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* タグ */}
             {post.tags && post.tags.length > 0 && (
