@@ -3,6 +3,15 @@ import { usePost, usePut, useDelete } from "./useSWRAPI";
 import { useAPI } from "./useAPI";
 import { mutate } from "swr";
 
+// /posts で始まる全キーのキャッシュを再検証
+function revalidatePosts() {
+  mutate(
+    (key: string) => typeof key === "string" && key.startsWith("/posts"),
+    undefined,
+    { revalidate: true }
+  );
+}
+
 // 投稿の型定義
 export type Post = {
   id?: number;
@@ -67,7 +76,7 @@ export const usePosts = () => {
         setError(null);
         const data = await postData("/posts", { post: postDataInput });
         // キャッシュを更新
-        mutate("/posts");
+        revalidatePosts();
         return data;
       } catch (err) {
         const errorMessage =
@@ -125,7 +134,7 @@ export const usePosts = () => {
         const data = await postFormData<Post>("/posts", formData);
 
         // キャッシュを更新
-        mutate("/posts");
+        revalidatePosts();
         return data;
       } catch (err) {
         const errorMessage =
@@ -147,8 +156,7 @@ export const usePosts = () => {
         setError(null);
         const data = await putData(`/posts/${id}`, { post: postDataInput });
         // キャッシュを更新
-        mutate("/posts");
-        mutate(`/posts/${id}`);
+        revalidatePosts();
         return data;
       } catch (err) {
         const errorMessage =
@@ -203,8 +211,7 @@ export const usePosts = () => {
         const data = await putFormData<Post>(`/posts/${id}`, formData);
 
         // キャッシュを更新
-        mutate("/posts");
-        mutate(`/posts/${id}`);
+        revalidatePosts();
         return data;
       } catch (err) {
         const errorMessage =
@@ -226,7 +233,7 @@ export const usePosts = () => {
         setError(null);
         await deleteData(`/posts/${id}`);
         // キャッシュを更新
-        mutate("/posts");
+        revalidatePosts();
         return;
       } catch (err) {
         const errorMessage =
