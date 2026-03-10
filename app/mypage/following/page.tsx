@@ -73,9 +73,10 @@ export default function FollowingPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {following.map((user) => (
-              <Link key={user.id} href={`/user/${user.id}`}>
-                <div className="bg-white rounded-lg shadow p-4 flex items-center space-x-3 hover:bg-gray-50 transition-colors">
+            {following.map((user) => {
+              const isMyself = user.id === userId;
+              const content = (
+                <div className={`bg-white rounded-lg shadow p-4 flex items-center space-x-3 ${!isMyself ? "hover:bg-gray-50 transition-colors" : ""}`}>
                   <div className="w-10 h-10 rounded-full bg-[#F5F0F0] flex items-center justify-center flex-shrink-0">
                     <FontAwesomeIcon
                       icon={faUser}
@@ -91,8 +92,13 @@ export default function FollowingPage() {
                     </p>
                   </div>
                 </div>
-              </Link>
-            ))}
+              );
+              return isMyself ? (
+                <div key={user.id}>{content}</div>
+              ) : (
+                <Link key={user.id} href={`/user/${user.id}`}>{content}</Link>
+              );
+            })}
           </div>
         )}
       </div>

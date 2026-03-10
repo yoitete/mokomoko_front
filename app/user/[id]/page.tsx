@@ -123,52 +123,54 @@ export default function UserProfilePage() {
 
       <div className="max-w-md mx-auto px-4 py-6 space-y-4">
         {/* プロフィールカード */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center space-x-4 mb-4">
-            <div className="w-16 h-16 rounded-full bg-[#F5F0F0] flex items-center justify-center flex-shrink-0 overflow-hidden">
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 rounded-full bg-[#F5F0F0] flex items-center justify-center flex-shrink-0 overflow-hidden">
               {user.profile_image ? (
                 <Image
                   src={user.profile_image}
                   alt={user.nickname || user.name}
-                  width={64}
-                  height={64}
+                  width={48}
+                  height={48}
                   className="w-full h-full object-cover"
                   unoptimized={true}
                 />
               ) : (
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="text-[#7E6565] text-2xl"
+                  className="text-[#7E6565] text-lg"
                 />
               )}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h2
-                className="text-xl font-semibold text-[#5A4A4A]"
+                className="text-base font-semibold text-[#5A4A4A] truncate"
                 style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
               >
                 {user.nickname || user.name}
               </h2>
+              {user.bio && (
+                <p
+                  className="text-xs text-[#7E6565] mt-0.5 line-clamp-2 whitespace-pre-wrap"
+                  style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+                >
+                  {user.bio}
+                </p>
+              )}
             </div>
+            {isAuthenticated && !isOwnProfile && targetUserId && (
+              <FollowButton
+                currentUserId={userId}
+                targetUserId={targetUserId}
+              />
+            )}
           </div>
 
-          {/* bio */}
-          {user.bio && (
-            <div className="p-3 bg-gray-50 rounded-lg mb-4">
-              <p
-                className="text-[#5A4A4A] text-sm whitespace-pre-wrap"
-                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-              >
-                {user.bio}
-              </p>
-            </div>
-          )}
-
           {/* フォロー数 */}
-          <div className="flex justify-around py-3 border-t border-gray-100">
+          <div className="flex justify-around mt-3 pt-3 border-t border-gray-100">
             <div className="text-center">
               <p
-                className="text-xl font-bold text-[#5A4A4A]"
+                className="text-lg font-bold text-[#5A4A4A]"
                 style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
               >
                 {followersCount}
@@ -183,7 +185,7 @@ export default function UserProfilePage() {
             <div className="border-l border-gray-200" />
             <div className="text-center">
               <p
-                className="text-xl font-bold text-[#5A4A4A]"
+                className="text-lg font-bold text-[#5A4A4A]"
                 style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
               >
                 {followingCount}
@@ -196,16 +198,6 @@ export default function UserProfilePage() {
               </p>
             </div>
           </div>
-
-          {/* フォローボタン */}
-          {isAuthenticated && !isOwnProfile && targetUserId && (
-            <div className="mt-4">
-              <FollowButton
-                currentUserId={userId}
-                targetUserId={targetUserId}
-              />
-            </div>
-          )}
         </div>
 
         {/* 投稿一覧 */}
@@ -228,34 +220,40 @@ export default function UserProfilePage() {
               投稿はまだありません
             </p>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3">
               {posts.map((post) => (
                 <Link key={post.id} href={`/post/${post.id}`}>
-                  <div className="rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100">
                     {post.images && post.images.length > 0 ? (
                       <Image
                         src={post.images[0]}
                         alt={post.title}
-                        width={200}
-                        height={150}
-                        className="w-full h-28 object-cover"
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                        style={{ width: "80px", height: "80px" }}
                         unoptimized={true}
                       />
                     ) : (
-                      <div className="w-full h-28 bg-[#F5F0F0] flex items-center justify-center">
+                      <div className="w-20 h-20 bg-[#F5F0F0] rounded-lg flex items-center justify-center flex-shrink-0">
                         <p className="text-xs text-[#7E6565]">No Image</p>
                       </div>
                     )}
-                    <div className="p-2">
+                    <div className="flex-1 min-w-0">
                       <p
-                        className="text-xs font-medium text-[#5A4A4A] line-clamp-2"
+                        className="text-sm font-medium text-[#5A4A4A] line-clamp-2"
                         style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
                       >
                         {post.title}
                       </p>
                       {post.price && (
-                        <p className="text-xs font-bold text-red-600 mt-1">
+                        <p className="text-sm font-bold text-red-600 mt-1">
                           ¥{post.price.toLocaleString()}
+                        </p>
+                      )}
+                      {post.created_at && (
+                        <p className="text-xs text-[#7E6565] mt-1">
+                          {new Date(post.created_at).toLocaleDateString("ja-JP")}
                         </p>
                       )}
                     </div>

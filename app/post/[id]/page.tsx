@@ -280,12 +280,16 @@ export default function PostDetail() {
               {post.user_name && (
                 <p style={{ fontFamily: "'Noto Sans JP', sans-serif" }}>
                   投稿者:{" "}
-                  <Link
-                    href={`/user/${post.user_id}`}
-                    className="text-[#5A4A4A] underline hover:opacity-70"
-                  >
-                    {post.user_name}
-                  </Link>
+                  {isOwnPost ? (
+                    post.user_name
+                  ) : (
+                    <Link
+                      href={`/user/${post.user_id}`}
+                      className="text-[#5A4A4A] underline hover:opacity-70"
+                    >
+                      {post.user_name}
+                    </Link>
+                  )}
                 </p>
               )}
             </div>
