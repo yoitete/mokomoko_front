@@ -13,6 +13,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useViewingHistory } from "@/hooks/useViewingHistory";
 import Button from "@/components/Button/Button";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
+import CommentSection from "@/components/CommentSection/CommentSection";
 import { useEffect } from "react";
 
 export default function PostDetail() {
@@ -278,12 +279,27 @@ export default function PostDetail() {
               )}
               {post.user_name && (
                 <p style={{ fontFamily: "'Noto Sans JP', sans-serif" }}>
-                  投稿者: {post.user_name}
+                  投稿者:{" "}
+                  <Link
+                    href={`/user/${post.user_id}`}
+                    className="text-[#5A4A4A] underline hover:opacity-70"
+                  >
+                    {post.user_name}
+                  </Link>
                 </p>
               )}
             </div>
           </div>
         </div>
+
+        {/* コメントセクション */}
+        {post.id && (
+          <CommentSection
+            postId={post.id}
+            currentUserId={userId}
+            isAuthenticated={isAuthenticated}
+          />
+        )}
       </div>
     </div>
   );
