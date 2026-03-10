@@ -48,23 +48,31 @@ export default function PillowDiagnosis({
     // sessionStorageに回答を保存
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers));
 
-    // 認証済みならAPIに保存
-    if (isAuthenticated) {
-      postData("/pillow_diagnoses", {
-        pillow_diagnosis: {
-          sleeping_position: answers.sleeping_position,
-          height: answers.height,
-          material_preference: answers.material_preference,
-          order_interest: answers.order_interest,
-          price_range: answers.price_range,
-        },
-      })
-        .then(() => mutate("/pillow_diagnoses"))
-        .catch((err) => console.error("診断結果の保存に失敗:", err));
-    }
+    const saveAndNavigate = async () => {
+      // 認証済みならAPIに保存（完了を待つ）
+      if (isAuthenticated) {
+        try {
+          await postData("/pillow_diagnoses", {
+            pillow_diagnosis: {
+              sleeping_position: answers.sleeping_position,
+              height: answers.height,
+              material_preference: answers.material_preference,
+              order_interest: answers.order_interest,
+              price_range: answers.price_range,
+            },
+          });
+          // キャッシュをクリア（マウントされていないフックには revalidate が効かないため）
+          await mutate("/pillow_diagnoses", undefined, { revalidate: false });
+        } catch (err) {
+          console.error("診断結果の保存に失敗:", err);
+        }
+      }
 
-    // 結果ページへ遷移
-    router.push("/diagnosis/result");
+      // 結果ページへ遷移
+      router.push("/diagnosis/result");
+    };
+
+    saveAndNavigate();
   }, [isQuestion, currentStep, answers, isAuthenticated, postData, router]);
 
   const handleAnswer = useCallback((questionId: string, value: string) => {

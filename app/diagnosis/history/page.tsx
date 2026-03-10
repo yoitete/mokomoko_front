@@ -36,7 +36,7 @@ export default function DiagnosisHistoryPage() {
 
   const { data: historyData, isLoading } = useGet<DiagnosisRecord[]>(
     isAuthenticated ? "/pillow_diagnoses" : null,
-    { revalidateOnFocus: false },
+    { revalidateOnFocus: false, revalidateIfStale: true },
   );
   const history = useMemo(() => historyData || [], [historyData]);
 
