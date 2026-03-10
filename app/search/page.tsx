@@ -13,7 +13,9 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
 import {
   DiagnosisAnswers,
+  DiagnosisRecord,
   SESSION_KEY,
+  recordToAnswers,
   scorePosts,
 } from "@/components/PillowDiagnosis/types";
 
@@ -50,17 +52,28 @@ export default function Search() {
   const isRecommended = selectedSort === "recommended";
   const perPage = 10;
 
-  // sessionStorageから診断結果を読み込み
+  // APIから最新の診断履歴を取得（sessionStorageにない場合のフォールバック用）
+  const { data: diagnosisHistory } = useGet<DiagnosisRecord[]>(
+    userId ? "/pillow_diagnoses" : null,
+    { revalidateOnFocus: false }
+  );
+
+  // sessionStorageから診断結果を読み込み、なければAPIの最新履歴を使用
   useEffect(() => {
     try {
       const stored = sessionStorage.getItem(SESSION_KEY);
       if (stored) {
         setDiagnosisAnswers(JSON.parse(stored));
+        return;
       }
     } catch {
       // ignore
     }
-  }, []);
+    // sessionStorageになければAPIの最新診断データを使用
+    if (diagnosisHistory && diagnosisHistory.length > 0) {
+      setDiagnosisAnswers(recordToAnswers(diagnosisHistory[0]));
+    }
+  }, [diagnosisHistory]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -106,6 +119,18 @@ export default function Search() {
       (a, b) => (b.favorites_count || 0) - (a.favorites_count || 0)
     );
   }, [isRecommended, recommendedResults, searchData?.posts]);
+
+  // マッチ率マップ（postId → パーセント）
+  const matchPercentMap = useMemo(() => {
+    if (!isRecommended || !recommendedResults) return null;
+    const map = new Map<number, number>();
+    for (const r of recommendedResults) {
+      if (r.post.id && r.maxScore > 0) {
+        map.set(r.post.id, Math.round((r.score / r.maxScore) * 100));
+      }
+    }
+    return map;
+  }, [isRecommended, recommendedResults]);
 
   const displayPosts = useMemo(() => {
     if (isRecommended && recommendedResults) {
@@ -335,6 +360,19 @@ export default function Search() {
                         className="object-cover rounded-2xl"
                         unoptimized={true}
                       />
+                      {matchPercentMap && post.id && matchPercentMap.has(post.id) && (
+                        <div
+                          className={`absolute top-1.5 left-1.5 text-white text-xs font-bold px-2 py-0.5 rounded-full ${
+                            matchPercentMap.get(post.id)! >= 80
+                              ? "bg-emerald-600"
+                              : matchPercentMap.get(post.id)! >= 50
+                                ? "bg-amber-500"
+                                : "bg-gray-400"
+                          }`}
+                        >
+                          {matchPercentMap.get(post.id)}%
+                        </div>
+                      )}
                       {post.user_id !== userId && post.id && (
                         <button
                           onClick={(e) => {
@@ -361,6 +399,19 @@ export default function Search() {
                   ) : (
                     <div className="h-[140px] bg-gray-200 flex items-center justify-center rounded-2xl text-sm text-gray-400 relative">
                       No Image
+                      {matchPercentMap && post.id && matchPercentMap.has(post.id) && (
+                        <div
+                          className={`absolute top-1.5 left-1.5 text-white text-xs font-bold px-2 py-0.5 rounded-full ${
+                            matchPercentMap.get(post.id)! >= 80
+                              ? "bg-emerald-600"
+                              : matchPercentMap.get(post.id)! >= 50
+                                ? "bg-amber-500"
+                                : "bg-gray-400"
+                          }`}
+                        >
+                          {matchPercentMap.get(post.id)}%
+                        </div>
+                      )}
                       {post.user_id !== userId && post.id && (
                         <button
                           onClick={(e) => {
