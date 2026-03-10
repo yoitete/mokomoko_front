@@ -35,6 +35,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+import { useFollowers, useFollowing } from "@/hooks/useFollows";
 
 export default function Mypage() {
   const { logout, user: firebaseUser } = useAuth();
@@ -46,6 +47,8 @@ export default function Mypage() {
   const updateProfileState = useSetAtom(updateProfileAtom);
   const router = useRouter();
   const { posts } = useMyPosts();
+  const { count: followersCount } = useFollowers(userId);
+  const { count: followingCount } = useFollowing(userId);
 
   // プロフィール編集
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -180,6 +183,12 @@ export default function Mypage() {
         });
         await mutate(`/users/${userId}`);
         await mutate(`/users/by_firebase_uid/${firebaseUID}`);
+        // ニックネーム変更を投稿一覧にも反映
+        await mutate(
+          (key: string) => typeof key === "string" && key.startsWith("/posts"),
+          undefined,
+          { revalidate: true }
+        );
       }
 
       setIsEditingProfile(false);
@@ -496,6 +505,47 @@ export default function Mypage() {
             </div>
           )}
         </div>
+
+        {/* フォロー数 */}
+        {!isEditingProfile && (
+          <div className="bg-white rounded-lg shadow p-4 flex justify-around">
+            <Link
+              href="/mypage/followers"
+              className="text-center hover:opacity-70 transition-opacity"
+            >
+              <p
+                className="text-xl font-bold text-[#5A4A4A]"
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+              >
+                {followersCount}
+              </p>
+              <p
+                className="text-xs text-[#7E6565]"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
+                フォロワー
+              </p>
+            </Link>
+            <div className="border-l border-gray-200" />
+            <Link
+              href="/mypage/following"
+              className="text-center hover:opacity-70 transition-opacity"
+            >
+              <p
+                className="text-xl font-bold text-[#5A4A4A]"
+                style={{ fontFamily: "'Kosugi Maru', sans-serif" }}
+              >
+                {followingCount}
+              </p>
+              <p
+                className="text-xs text-[#7E6565]"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
+                フォロー中
+              </p>
+            </Link>
+          </div>
+        )}
 
         {/* 投稿管理カード */}
         <div className="bg-white rounded-lg shadow p-6">

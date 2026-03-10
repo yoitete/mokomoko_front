@@ -7,12 +7,14 @@ import { useGet } from "@/hooks/useSWRAPI";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Post } from "@/hooks/usePosts";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Button from "@/components/Button/Button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function FavoritePage() {
+  const router = useRouter();
   const { isUnauthenticated, loading, userId, firebaseUID, error } =
     useCurrentUser();
 
@@ -235,7 +237,7 @@ export default function FavoritePage() {
               <p className="text-sm text-black line-clamp-3 mt-1 whitespace-pre-wrap">
                 {post.description}
               </p>
-              <p className="text-xs text-[#7E6565] mt-2">
+              <p className="text-xs text-[#5A4A4A] mt-2">
                 {post.created_at &&
                   new Date(post.created_at).toLocaleString("ja-JP", {
                     year: "numeric",
@@ -244,8 +246,27 @@ export default function FavoritePage() {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                {post.user_name && ` ・ ${post.user_name}`}
               </p>
+              {post.user_name && (
+                <p className="text-xs text-[#7E6565] mt-1">
+                  投稿者:{" "}
+                  {post.user_id === userId ? (
+                    post.user_name
+                  ) : (
+                    <span
+                      role="link"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        router.push(`/user/${post.user_id}`);
+                      }}
+                      className="hover:underline cursor-pointer"
+                    >
+                      {post.user_name}
+                    </span>
+                  )}
+                </p>
+              )}
             </div>
           </SimpleBox>
         </Link>

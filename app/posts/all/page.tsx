@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useGet } from "@/hooks/useSWRAPI";
 import { Post } from "@/hooks/usePosts";
 import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
@@ -24,6 +24,7 @@ interface SearchResponse {
 }
 
 function AllPostsContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { isUnauthenticated, loading: authLoading, userId } = useCurrentUser();
 
@@ -218,8 +219,27 @@ function AllPostsContent() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
-                    {post.user_name && ` ・ ${post.user_name}`}
                   </p>
+                  {post.user_name && (
+                    <p className="text-xs text-[#7E6565] mt-1">
+                      投稿者:{" "}
+                      {post.user_id === userId ? (
+                        post.user_name
+                      ) : (
+                        <span
+                          role="link"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            router.push(`/user/${post.user_id}`);
+                          }}
+                          className="hover:underline cursor-pointer"
+                        >
+                          {post.user_name}
+                        </span>
+                      )}
+                    </p>
+                  )}
                 </div>
               </SimpleBox>
             </Link>
