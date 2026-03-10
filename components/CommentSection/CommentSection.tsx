@@ -14,6 +14,7 @@ import Button from "@/components/Button/Button";
 
 interface CommentSectionProps {
   postId: number;
+  postUserId: number;
   currentUserId: number | null;
   isAuthenticated: boolean;
 }
@@ -27,9 +28,11 @@ function DrawerPortal({ children }: { children: React.ReactNode }) {
 
 export default function CommentSection({
   postId,
+  postUserId,
   currentUserId,
   isAuthenticated,
 }: CommentSectionProps) {
+  const isOwnPost = currentUserId != null && currentUserId === postUserId;
   const { comments, isLoading, addComment, removeComment } =
     useComments(postId);
   const [newComment, setNewComment] = useState("");
@@ -195,7 +198,7 @@ export default function CommentSection({
             </div>
 
             {/* 入力フォーム */}
-            {isAuthenticated && (
+            {isAuthenticated && !isOwnPost && (
               <div className="border-t border-gray-100 px-4 py-3">
                 <div className="flex gap-2">
                   <textarea

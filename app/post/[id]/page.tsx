@@ -309,6 +309,7 @@ export default function PostDetail() {
         {post.id && (
           <CommentSection
             postId={post.id}
+            postUserId={post.user_id}
             currentUserId={userId}
             isAuthenticated={isAuthenticated}
           />
