@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { Post } from "@/hooks/usePosts";
@@ -25,6 +26,7 @@ export const PostCard = ({
   toggleFavorite,
   currentUserId,
 }: PostCardProps) => {
+  const router = useRouter();
   const imageUrl = post.images?.[0];
   const isOwnPost = currentUserId && post.user_id === currentUserId;
 
@@ -91,7 +93,21 @@ export const PostCard = ({
             )}
             {post.user_name && (
               <p className="text-xs text-[#7E6565] mt-1 truncate">
-                {post.user_name}
+                {isOwnPost ? (
+                  post.user_name
+                ) : (
+                  <span
+                    role="link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      router.push(`/user/${post.user_id}`);
+                    }}
+                    className="hover:underline cursor-pointer"
+                  >
+                    {post.user_name}
+                  </span>
+                )}
               </p>
             )}
           </div>

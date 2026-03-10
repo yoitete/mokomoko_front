@@ -9,6 +9,7 @@ import Button from "@/components/Button/Button";
 import { faHeart, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
 import {
@@ -38,6 +39,7 @@ interface SearchResponse {
 }
 
 export default function Search() {
+  const router = useRouter();
   const { isUnauthenticated, loading, userId } = useCurrentUser();
   const { toggleFavorite, isFavorite } = useFavorites(userId);
 
@@ -458,8 +460,27 @@ export default function Search() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
-                    {post.user_name && ` ・ ${post.user_name}`}
                   </p>
+                  {post.user_name && (
+                    <p className="text-xs text-[#7E6565] mt-1">
+                      投稿者:{" "}
+                      {post.user_id === userId ? (
+                        post.user_name
+                      ) : (
+                        <span
+                          role="link"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            router.push(`/user/${post.user_id}`);
+                          }}
+                          className="hover:underline cursor-pointer"
+                        >
+                          {post.user_name}
+                        </span>
+                      )}
+                    </p>
+                  )}
                   {post.tags && post.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {post.tags.slice(0, 5).map((tag, index) => (

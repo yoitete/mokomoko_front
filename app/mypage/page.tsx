@@ -183,6 +183,12 @@ export default function Mypage() {
         });
         await mutate(`/users/${userId}`);
         await mutate(`/users/by_firebase_uid/${firebaseUID}`);
+        // ニックネーム変更を投稿一覧にも反映
+        await mutate(
+          (key: string) => typeof key === "string" && key.startsWith("/posts"),
+          undefined,
+          { revalidate: true }
+        );
       }
 
       setIsEditingProfile(false);
