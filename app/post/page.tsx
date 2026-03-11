@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button/Button";
 import { usePosts, CreatePostWithImageData } from "@/hooks/usePosts";
@@ -11,6 +11,12 @@ import Toast from "@/components/Toast/Toast";
 
 export default function Post() {
   const router = useRouter();
+
+  // ホーム画面をプリフェッチして投稿後の遷移を高速化
+  useEffect(() => {
+    router.prefetch("/home");
+  }, [router]);
+
   const {
     isUnauthenticated,
     loading: authLoading,
@@ -51,7 +57,7 @@ export default function Post() {
     setShowToast(true);
     setTimeout(() => {
       router.push("/home");
-    }, 1500);
+    }, 800);
   };
 
   // ローディング中の表示

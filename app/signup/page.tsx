@@ -35,6 +35,11 @@ export default function Signup() {
     tokenRef.current = currentToken;
   }, [currentToken]);
 
+  // ホーム画面をプリフェッチして遷移を高速化
+  useEffect(() => {
+    router.prefetch("/home");
+  }, [router]);
+
   // ログイン済みの場合はホームページにリダイレクト
   useEffect(() => {
     if (isAuthenticated) {

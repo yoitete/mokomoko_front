@@ -272,7 +272,7 @@ export default function DiagnosisResultPage() {
                             : "bg-gray-400"
                       }`}
                     >
-                      {matchPercentage}%
+                      マッチ度{matchPercentage}%
                     </div>
                   </div>
 
