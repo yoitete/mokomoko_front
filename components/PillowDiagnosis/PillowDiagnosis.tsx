@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { usePost } from "@/hooks/useSWRAPI";
 import { mutate } from "swr";
@@ -27,6 +27,9 @@ export default function PillowDiagnosis({
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<DiagnosisAnswers>(INITIAL_ANSWERS);
   const postData = usePost();
+  const postDataRef = useRef(postData);
+  postDataRef.current = postData;
+  const isNavigatingRef = useRef(false);
 
   // ?diagnosis=start で自動開始
   useEffect(() => {
@@ -44,6 +47,8 @@ export default function PillowDiagnosis({
     if (!isQuestion || currentStep < QUESTIONS.length) return;
     const allAnswered = Object.values(answers).every((v) => v !== null);
     if (!allAnswered) return;
+    if (isNavigatingRef.current) return;
+    isNavigatingRef.current = true;
 
     // sessionStorageに回答を保存
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(answers));
@@ -52,7 +57,7 @@ export default function PillowDiagnosis({
       // 認証済みならAPIに保存（完了を待つ）
       if (isAuthenticated) {
         try {
-          await postData("/pillow_diagnoses", {
+          await postDataRef.current("/pillow_diagnoses", {
             pillow_diagnosis: {
               sleeping_position: answers.sleeping_position,
               height: answers.height,
@@ -73,7 +78,7 @@ export default function PillowDiagnosis({
     };
 
     saveAndNavigate();
-  }, [isQuestion, currentStep, answers, isAuthenticated, postData, router]);
+  }, [isQuestion, currentStep, answers, isAuthenticated, router]);
 
   const handleAnswer = useCallback((questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));

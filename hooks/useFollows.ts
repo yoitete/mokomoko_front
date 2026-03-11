@@ -29,31 +29,36 @@ export const useFollowStatus = (
 
   const isFollowing = data?.is_following ?? false;
 
+  const revalidateRelationships = useCallback(() => {
+    mutate(
+      (key: string) =>
+        typeof key === "string" && key.startsWith("/relationships"),
+      undefined,
+      { revalidate: true }
+    );
+  }, []);
+
   const follow = useCallback(async () => {
     if (!targetUserId) return;
     try {
       await postData(`/relationships`, { following_id: targetUserId });
-      mutate(`/relationships/check?following_id=${targetUserId}`);
-      mutate(`/relationships/followers?user_id=${targetUserId}`);
-      mutate(`/relationships/following?user_id=${currentUserId}`);
+      revalidateRelationships();
     } catch (err) {
       console.error("Failed to follow:", err);
       throw err;
     }
-  }, [postData, targetUserId, currentUserId]);
+  }, [postData, targetUserId, revalidateRelationships]);
 
   const unfollow = useCallback(async () => {
     if (!targetUserId) return;
     try {
       await deleteData(`/relationships?following_id=${targetUserId}`);
-      mutate(`/relationships/check?following_id=${targetUserId}`);
-      mutate(`/relationships/followers?user_id=${targetUserId}`);
-      mutate(`/relationships/following?user_id=${currentUserId}`);
+      revalidateRelationships();
     } catch (err) {
       console.error("Failed to unfollow:", err);
       throw err;
     }
-  }, [deleteData, targetUserId, currentUserId]);
+  }, [deleteData, targetUserId, revalidateRelationships]);
 
   const toggleFollow = useCallback(async () => {
     if (isFollowing) {

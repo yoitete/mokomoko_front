@@ -20,6 +20,7 @@ export const useAPI = () => {
 
     const api = axios.create({
       baseURL: API_BASE_URL,
+      withCredentials: true,
       headers: {
         "Content-Type": "application/json",
         ...(currentToken && { Authorization: `Bearer ${currentToken}` }),

@@ -22,14 +22,16 @@ function CustomTick(props: any, axes: PillowAxisScore[]) {
   const axis = axes[payload?.index];
   const color = axis?.hasData ? "#5A4A4A" : "#C4B5B5";
 
-  const offsetY = numY < 60 ? -4 : numY > 140 ? 8 : 0;
-  const offsetX = numX < 60 ? -2 : numX > 140 ? 2 : 0;
+  const cx = 140;
+  const cy = 120;
+  const offsetY = numY < cy - 50 ? -6 : numY > cy + 50 ? 10 : 0;
+  const offsetX = numX < cx - 50 ? -8 : numX > cx + 50 ? 8 : 0;
 
   return (
     <text
       x={numX + offsetX}
       y={numY + offsetY}
-      textAnchor={numX < 100 ? "end" : numX > 100 ? "start" : "middle"}
+      textAnchor={numX < cx ? "end" : numX > cx ? "start" : "middle"}
       fill={color}
       fontSize={10}
       fontFamily="'Noto Sans JP', sans-serif"
@@ -54,9 +56,9 @@ export default function PillowRadarChart({ data }: PillowRadarChartProps) {
   const gridColor = data.hasAnyData ? "#C4B5B5" : "#D5CCCC";
 
   return (
-    <div style={{ width: 220, height: 220 }}>
+    <div style={{ width: 280, height: 240 }}>
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={chartData} cx="50%" cy="50%" outerRadius="60%">
+        <RadarChart data={chartData} cx="50%" cy="50%" outerRadius="50%">
           <PolarGrid stroke={gridColor} />
           <PolarAngleAxis
             dataKey="label"
