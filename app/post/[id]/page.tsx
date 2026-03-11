@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Post } from "@/hooks/usePosts";
 import { useGet } from "@/hooks/useSWRAPI";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -16,7 +16,7 @@ import { PageHeader } from "@/components/PageHeader/PageHeader";
 import CommentSection from "@/components/CommentSection/CommentSection";
 import PillowRadarChart from "@/components/PillowRadarChart/PillowRadarChart";
 import { calculatePillowScores } from "@/lib/pillowScoring";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function PostDetail() {
   const params = useParams();
@@ -33,6 +33,9 @@ export default function PostDetail() {
 
   // お気に入り機能（ログインユーザーのIDを使用）
   const { toggleFavorite, isFavorite } = useFavorites(userId);
+
+  // 画像カルーセル
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // 閲覧履歴に追加
   const { addToHistory } = useViewingHistory();
@@ -126,17 +129,53 @@ export default function PostDetail() {
       <div className="max-w-4xl mx-auto p-4">
         {/* 投稿内容 */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* 画像 */}
+          {/* 画像カルーセル */}
           {post.images && post.images.length > 0 && (
             <div className="relative rounded-t-lg overflow-hidden">
               <Image
-                src={post.images[0]}
-                alt={post.title}
+                src={post.images[currentImageIndex]}
+                alt={`${post.title} - ${currentImageIndex + 1}`}
                 width={800}
                 height={400}
                 className="w-full h-64 object-cover rounded-t-lg"
                 unoptimized={true}
               />
+
+              {/* 左右ナビボタン（2枚以上の場合のみ） */}
+              {post.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentImageIndex((prev) => (prev - 1 + post.images!.length) % post.images!.length)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center transition-colors cursor-pointer"
+                  >
+                    <FontAwesomeIcon icon={faChevronLeft} className="text-sm" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentImageIndex((prev) => (prev + 1) % post.images!.length)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center transition-colors cursor-pointer"
+                  >
+                    <FontAwesomeIcon icon={faChevronRight} className="text-sm" />
+                  </button>
+                </>
+              )}
+
+              {/* ドットインジケーター（2枚以上の場合のみ） */}
+              {post.images.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {post.images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-all cursor-pointer ${
+                        index === currentImageIndex
+                          ? "bg-white w-4"
+                          : "bg-white/50 hover:bg-white/70"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+
               {/* お気に入りボタン（画像の右下にオーバーレイ） */}
               {isAuthenticated && !isOwnPost && post?.id && (
                 <button

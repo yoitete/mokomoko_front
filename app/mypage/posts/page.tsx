@@ -9,6 +9,7 @@ import { SimpleBox } from "@/components/SimpleBox/SimpleBox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { PageHeader } from "@/components/PageHeader/PageHeader";
+import Toast from "@/components/Toast/Toast";
 
 export default function MyPostsPage() {
   const { isUnauthenticated, loading } = useCurrentUser();
@@ -23,6 +24,29 @@ export default function MyPostsPage() {
     isDeleting,
     error: postsError,
   } = useMyPosts(currentPage, postsPerPage);
+
+  // 削除確認トースト用state
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null);
+
+  // 結果トースト用state
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error">("success");
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const target = deleteTarget;
+    setDeleteTarget(null);
+    const result = await deletePost(target.id);
+    if (result.success) {
+      setToastMessage("投稿を削除しました");
+      setToastType("success");
+    } else {
+      setToastMessage("削除に失敗しました");
+      setToastType("error");
+    }
+    setShowToast(true);
+  };
 
   // ページ変更時にトップにスクロール
   const handlePageChange = (page: number) => {
@@ -170,15 +194,7 @@ export default function MyPostsPage() {
                     編集
                   </Link>
                   <button
-                    onClick={() => {
-                      if (
-                        confirm(
-                          `「${post.title}」を削除してもよろしいですか？\n\nこの操作は取り消すことができません。`
-                        )
-                      ) {
-                        deletePost(post.id!);
-                      }
-                    }}
+                    onClick={() => setDeleteTarget({ id: post.id!, title: post.title })}
                     disabled={isDeleting}
                     className="px-3 py-1.5 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white text-xs rounded-md transition-colors font-medium whitespace-nowrap cursor-pointer disabled:cursor-not-allowed"
                   >
@@ -224,6 +240,44 @@ export default function MyPostsPage() {
           </Button>
         </div>
       )}
+
+      {/* 削除確認トースト */}
+      <div
+        className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-in-out ${
+          deleteTarget
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
+        <div
+          className="flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg border bg-amber-50 border-amber-200 text-amber-800 max-w-md mx-auto"
+          style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+        >
+          <span className="text-sm font-medium">削除しますか？</span>
+          <button
+            onClick={handleDeleteConfirm}
+            disabled={isDeleting}
+            className="px-3 py-1 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white text-xs rounded-md font-medium transition-colors cursor-pointer"
+          >
+            {isDeleting ? "削除中..." : "削除する"}
+          </button>
+          <button
+            onClick={() => setDeleteTarget(null)}
+            disabled={isDeleting}
+            className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs rounded-md font-medium transition-colors cursor-pointer"
+          >
+            キャンセル
+          </button>
+        </div>
+      </div>
+
+      {/* 結果トースト */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }

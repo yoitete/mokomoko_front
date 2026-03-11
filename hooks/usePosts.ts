@@ -51,7 +51,7 @@ export type CreatePostWithImageData = {
   price?: number;
   description?: string;
   tags?: string[];
-  image?: File;
+  images?: File[];
   material?: string[];
   sleeping_position?: string[];
   height?: string[];
@@ -126,8 +126,10 @@ export const usePosts = () => {
           formData.append("post[order_type]", postDataInput.order_type);
         }
 
-        if (postDataInput.image) {
-          formData.append("post[images][]", postDataInput.image);
+        if (postDataInput.images && postDataInput.images.length > 0) {
+          postDataInput.images.forEach((image) => {
+            formData.append("post[images][]", image);
+          });
         }
 
         // FormDataを使用してPOST
@@ -204,8 +206,10 @@ export const usePosts = () => {
           formData.append("post[order_type]", postDataInput.order_type);
         }
 
-        if (postDataInput.image) {
-          formData.append("post[images][]", postDataInput.image);
+        if (postDataInput.images && postDataInput.images.length > 0) {
+          postDataInput.images.forEach((image) => {
+            formData.append("post[images][]", image);
+          });
         }
 
         const data = await putFormData<Post>(`/posts/${id}`, formData);

@@ -59,7 +59,7 @@ export default function EditPost({
       description: formData.description || "",
       price: formData.price,
       tags: formData.tags,
-      image: formData.image || undefined,
+      images: formData.images.length > 0 ? formData.images : undefined,
       material: formData.material,
       sleeping_position: formData.sleeping_position,
       height: formData.height,
@@ -84,7 +84,7 @@ export default function EditPost({
         description: postData.description || "",
         price: postData.price,
         tags: postData.tags || [],
-        image: null,
+        images: [],
         material: postData.material ? postData.material.split(",").map((s) => s.trim()) : [],
         sleeping_position: postData.sleeping_position ? postData.sleeping_position.split(",").map((s) => s.trim()) : [],
         height: postData.height ? postData.height.split(",").map((s) => s.trim()) : [],
@@ -171,7 +171,7 @@ export default function EditPost({
           error={error}
           submitButtonText="投稿を更新"
           showImageUpload={true}
-          currentImageUrl={postData?.images?.[0]}
+          currentImageUrls={postData?.images || []}
         />
       </main>
 

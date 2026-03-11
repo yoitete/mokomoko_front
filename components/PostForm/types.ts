@@ -3,7 +3,7 @@ export type PostFormData = {
   description: string;
   price?: number;
   tags: string[];
-  image?: File | null;
+  images: File[];
   material?: string[];
   sleeping_position?: string[];
   height?: string[];
@@ -16,7 +16,7 @@ export type PostFormSectionProps = {
     field: K,
     value: PostFormData[K]
   ) => void;
-  onImageChange?: (file: File | null) => void;
-  previewUrl?: string | null;
+  onImageChange?: (files: File[]) => void;
+  previewUrls?: string[];
   showImageUpload?: boolean;
 };

@@ -22,6 +22,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
+  const [nickname, setNickname] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -76,7 +77,7 @@ export default function Signup() {
 
   // ユーザー作成API呼び出し
   const createUserInDatabase = useCallback(
-    async (userData: { email: string; name?: string; token: string }) => {
+    async (userData: { email: string; name?: string; nickname?: string; token: string }) => {
       try {
         const response = await post("/users", userData);
         return response;
@@ -89,6 +90,12 @@ export default function Signup() {
   );
 
   const validateForm = useCallback(() => {
+    if (!name.trim()) {
+      setToastMessage("お名前を入力してください");
+      setToastType("error");
+      setShowToast(true);
+      return false;
+    }
     if (!email.trim()) {
       setToastMessage("メールアドレスを入力してください");
       setToastType("error");
@@ -114,7 +121,7 @@ export default function Signup() {
       return false;
     }
     return true;
-  }, [email, password, confirmPassword]);
+  }, [name, email, password, confirmPassword]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -137,6 +144,7 @@ export default function Signup() {
         const userResponse = await createUserInDatabase({
           email,
           name: name.trim() || undefined,
+          nickname: nickname.trim() || undefined,
           token: obtainedToken,
         });
 
@@ -167,6 +175,7 @@ export default function Signup() {
       email,
       password,
       name,
+      nickname,
       signUp,
       validateForm,
       createUserInDatabase,
@@ -215,7 +224,7 @@ export default function Signup() {
                 htmlFor="name"
                 className="block text-sm font-medium text-[#5A4A4A] mb-2"
               >
-                お名前（任意）
+                お名前 <span className="text-red-500">*</span>
               </label>
               <Input
                 id="name"
@@ -223,6 +232,25 @@ export default function Signup() {
                 placeholder="お名前を入力"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
+                disabled={isLoading}
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="nickname"
+                className="block text-sm font-medium text-[#5A4A4A] mb-2"
+              >
+                ニックネーム（任意）
+              </label>
+              <Input
+                id="nickname"
+                type="text"
+                placeholder="ニックネームを入力"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
                 className="border-[#C4B5B5] focus:border-[#7E6565] focus:ring-[#7E6565]"
                 disabled={isLoading}
               />
@@ -233,7 +261,7 @@ export default function Signup() {
                 htmlFor="email"
                 className="block text-sm font-medium text-[#5A4A4A] mb-2"
               >
-                メールアドレス
+                メールアドレス <span className="text-red-500">*</span>
               </label>
               <Input
                 id="email"
@@ -252,7 +280,7 @@ export default function Signup() {
                 htmlFor="password"
                 className="block text-sm font-medium text-[#5A4A4A] mb-2"
               >
-                パスワード
+                パスワード <span className="text-red-500">*</span>
               </label>
               <PasswordInput
                 id="password"
@@ -273,7 +301,7 @@ export default function Signup() {
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium text-[#5A4A4A] mb-2"
               >
-                パスワード（確認）
+                パスワード（確認） <span className="text-red-500">*</span>
               </label>
               <PasswordInput
                 id="confirmPassword"
@@ -291,6 +319,7 @@ export default function Signup() {
               className="w-full"
               disabled={
                 isLoading ||
+                !name.trim() ||
                 !email.trim() ||
                 !password.trim() ||
                 !confirmPassword.trim()

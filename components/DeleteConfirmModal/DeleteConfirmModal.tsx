@@ -20,20 +20,11 @@ export const DeleteConfirmModal = ({
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="投稿を削除">
+    <Modal isOpen={isOpen} onClose={onClose} title="確認">
       <div>
-        <p className="text-gray-600 mb-2">
-          以下の投稿を削除してもよろしいですか？
+        <p className="text-[#5A4A4A] mb-6" style={{ fontFamily: "'Noto Sans JP', sans-serif" }}>
+          「{title}」を削除しますか？
         </p>
-        <p className="text-gray-800 font-medium mb-6 p-3 bg-gray-50 rounded">
-          「{title}」
-        </p>
-        <div className="bg-red-50 border border-red-200 rounded p-3 mb-6">
-          <p className="text-red-700 text-sm">
-            ⚠️
-            この操作は取り消すことができません。削除された投稿は復元できません。
-          </p>
-        </div>
         <div className="flex gap-3 justify-end">
           <Button variant="outline" onClick={onClose} disabled={isDeleting}>
             キャンセル

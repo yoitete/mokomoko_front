@@ -42,7 +42,7 @@ export default function Post() {
       description: formData.description || "",
       price: formData.price,
       tags: formData.tags,
-      image: formData.image || undefined,
+      images: formData.images.length > 0 ? formData.images : undefined,
       material: formData.material,
       sleeping_position: formData.sleeping_position,
       height: formData.height,
