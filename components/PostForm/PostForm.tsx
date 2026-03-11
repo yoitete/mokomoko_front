@@ -76,7 +76,7 @@ export const PostForm: React.FC<PostFormProps> = ({
       return false;
     }
 
-    if (showImageUpload && (!formData.image || formData.image === null)) {
+    if (showImageUpload && !currentImageUrl && (!formData.image || formData.image === null)) {
       setToastMessage("画像を選択してください");
       setToastType("error");
       setShowToast(true);
