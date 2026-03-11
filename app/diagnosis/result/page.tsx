@@ -264,15 +264,42 @@ export default function DiagnosisResultPage() {
                       className="object-cover"
                     />
                     <div
-                      className={`absolute top-1.5 left-1.5 text-white text-xs font-bold px-2 py-0.5 rounded-full ${
+                      className={`absolute bottom-1.5 right-1.5 w-12 h-12 rounded-full flex flex-col items-center justify-center bg-white shadow-md border-2 ${
                         matchPercentage >= 80
-                          ? "bg-emerald-600"
-                          : matchPercentage >= 50
-                            ? "bg-amber-500"
-                            : "bg-gray-400"
+                          ? "border-emerald-500"
+                          : matchPercentage >= 60
+                            ? "border-lime-500"
+                            : matchPercentage >= 40
+                              ? "border-amber-500"
+                              : "border-red-400"
                       }`}
                     >
-                      マッチ度{matchPercentage}%
+                      <span
+                        className={`text-[7px] leading-none font-medium ${
+                          matchPercentage >= 80
+                            ? "text-emerald-600"
+                            : matchPercentage >= 60
+                              ? "text-lime-600"
+                              : matchPercentage >= 40
+                                ? "text-amber-600"
+                                : "text-red-500"
+                        }`}
+                      >
+                        マッチ度
+                      </span>
+                      <span
+                        className={`text-sm font-bold leading-tight ${
+                          matchPercentage >= 80
+                            ? "text-emerald-600"
+                            : matchPercentage >= 60
+                              ? "text-lime-600"
+                              : matchPercentage >= 40
+                                ? "text-amber-600"
+                                : "text-red-500"
+                        }`}
+                      >
+                        {matchPercentage}%
+                      </span>
                     </div>
                   </div>
 
