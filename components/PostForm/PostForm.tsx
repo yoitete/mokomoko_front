@@ -21,7 +21,7 @@ export type PostFormProps = {
   error?: string | null;
   submitButtonText?: string;
   showImageUpload?: boolean;
-  currentImageUrl?: string;
+  currentImageUrls?: string[];
 };
 
 export const PostForm: React.FC<PostFormProps> = ({
@@ -32,14 +32,14 @@ export const PostForm: React.FC<PostFormProps> = ({
   error,
   submitButtonText = "投稿する",
   showImageUpload = true,
-  currentImageUrl,
+  currentImageUrls = [],
 }) => {
   const [formData, setFormData] = useState<PostFormData>({
     title: "",
     description: "",
     price: undefined,
     tags: [],
-    image: null,
+    images: [],
     material: [],
     sleeping_position: [],
     height: [],
@@ -47,7 +47,8 @@ export const PostForm: React.FC<PostFormProps> = ({
     ...initialData,
   });
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [removedExistingIndexes, setRemovedExistingIndexes] = useState<number[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "error" | "info">(
@@ -61,12 +62,19 @@ export const PostForm: React.FC<PostFormProps> = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleImageChange = (file: File | null) => {
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    }
+  const handleImageChange = (files: File[]) => {
+    // プレビューURLを生成
+    const urls = files.map((file) => URL.createObjectURL(file));
+    setPreviewUrls(urls);
   };
+
+  const handleRemoveExisting = (index: number) => {
+    setRemovedExistingIndexes((prev) => [...prev, index]);
+  };
+
+  const visibleExistingCount = currentImageUrls.filter(
+    (_, i) => !removedExistingIndexes.includes(i)
+  ).length;
 
   const validateForm = (): boolean => {
     if (!formData.title.trim()) {
@@ -76,8 +84,8 @@ export const PostForm: React.FC<PostFormProps> = ({
       return false;
     }
 
-    if (showImageUpload && !currentImageUrl && (!formData.image || formData.image === null)) {
-      setToastMessage("画像を選択してください");
+    if (showImageUpload && visibleExistingCount === 0 && formData.images.length === 0) {
+      setToastMessage("画像を1枚以上選択してください");
       setToastType("error");
       setShowToast(true);
       return false;
@@ -151,8 +159,10 @@ export const PostForm: React.FC<PostFormProps> = ({
             data={formData}
             onChange={handleChange}
             onImageChange={handleImageChange}
-            previewUrl={previewUrl}
-            currentImageUrl={currentImageUrl}
+            previewUrls={previewUrls}
+            currentImageUrls={currentImageUrls}
+            removedExistingIndexes={removedExistingIndexes}
+            onRemoveExisting={handleRemoveExisting}
             showImageUpload={showImageUpload}
           />
 

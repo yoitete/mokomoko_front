@@ -18,12 +18,14 @@ interface MyPostsResponse {
 export const useMyPosts = (page: number = 1, perPage: number = 10) => {
   const { isAuthenticated } = useAuth();
 
+  const cacheKey = `/posts/my?page=${page}&per_page=${perPage}`;
+
   // Hooksを先に呼び出す（条件分岐の前）
   const {
     data: response,
     error,
     isLoading,
-  } = useGet<MyPostsResponse>(`/posts/my?page=${page}&per_page=${perPage}`, {
+  } = useGet<MyPostsResponse>(cacheKey, {
     requireAuth: true,
   });
 
@@ -42,13 +44,11 @@ export const useMyPosts = (page: number = 1, perPage: number = 10) => {
     setIsDeleting(true);
     try {
       await deleteAPI(`/posts/${postId}`);
-      // キャッシュを更新してリストから削除された投稿を除外
+      // キャッシュを再検証して最新データを取得
       mutate(
-        "/posts/my",
-        (currentPosts: Post[] | undefined) => {
-          return currentPosts?.filter((post) => post.id !== postId) || [];
-        },
-        false
+        (key: string) => typeof key === "string" && key.startsWith("/posts"),
+        undefined,
+        { revalidate: true }
       );
       return { success: true };
     } catch (error) {
