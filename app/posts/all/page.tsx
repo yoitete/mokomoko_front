@@ -203,7 +203,13 @@ function AllPostsContent() {
                       {post.tags.slice(0, 5).map((tag, index) => (
                         <span
                           key={index}
-                          className="bg-[#F5F0F0] text-[#7E6565] px-2 py-1 rounded-full text-xs"
+                          role="link"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            router.push(`/search?tag=${encodeURIComponent(tag)}`);
+                          }}
+                          className="bg-[#F5F0F0] text-[#7E6565] px-2 py-1 rounded-full text-xs hover:bg-[#E8E0E0] cursor-pointer transition-colors"
                         >
                           #{tag}
                         </span>

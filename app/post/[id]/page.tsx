@@ -300,12 +300,13 @@ export default function PostDetail() {
                 <h3 className="text-sm font-medium text-gray-500 mb-2">タグ</h3>
                 <div className="flex flex-wrap gap-2">
                   {post.tags.map((tag, index) => (
-                    <span
+                    <Link
                       key={index}
-                      className="inline-block bg-gray-100 text-gray-700 text-sm px-2 py-1 rounded"
+                      href={`/search?tag=${encodeURIComponent(tag)}`}
+                      className="inline-block bg-gray-100 text-gray-700 text-sm px-2 py-1 rounded hover:bg-gray-200 transition-colors"
                     >
                       #{tag}
-                    </span>
+                    </Link>
                   ))}
                 </div>
               </div>
