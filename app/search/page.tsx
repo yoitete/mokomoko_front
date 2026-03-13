@@ -9,7 +9,7 @@ import Button from "@/components/Button/Button";
 import { faHeart, faList, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFavorites } from "@/hooks/useFavorites";
 import {
@@ -40,11 +40,13 @@ interface SearchResponse {
 
 export default function Search() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isUnauthenticated, loading, userId } = useCurrentUser();
   const { toggleFavorite, isFavorite } = useFavorites(userId);
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const tagParam = searchParams.get("tag") || "";
+  const [searchQuery, setSearchQuery] = useState(tagParam);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(tagParam);
   const [currentPage, setCurrentPage] = useState(1);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState<SortType>("newest");
@@ -76,6 +78,14 @@ export default function Search() {
       setDiagnosisAnswers(recordToAnswers(diagnosisHistory[0]));
     }
   }, [diagnosisHistory]);
+
+  // URLのtagパラメータが変わったら検索クエリを更新
+  useEffect(() => {
+    if (tagParam) {
+      setSearchQuery(tagParam);
+      setDebouncedSearchQuery(tagParam);
+    }
+  }, [tagParam]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -486,7 +496,13 @@ export default function Search() {
                       {post.tags.slice(0, 5).map((tag, index) => (
                         <span
                           key={index}
-                          className="bg-[#F5F0F0] text-[#7E6565] px-2 py-1 rounded-full text-xs"
+                          role="link"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            router.push(`/search?tag=${encodeURIComponent(tag)}`);
+                          }}
+                          className="bg-[#F5F0F0] text-[#7E6565] px-2 py-1 rounded-full text-xs hover:bg-[#E8E0E0] cursor-pointer transition-colors"
                         >
                           #{tag}
                         </span>
